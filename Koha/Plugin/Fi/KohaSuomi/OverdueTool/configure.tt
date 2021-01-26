@@ -1,0 +1,57 @@
+[% USE KohaDates %]
+[% INCLUDE 'doc-head-open.inc' %]
+ <title>Koha-Suomi - Laskutusasetukset</title>
+[% INCLUDE 'doc-head-close.inc' %]
+</head>
+<body>
+[% INCLUDE 'header.inc' %]
+[% INCLUDE 'cat-search.inc' %]
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Etusivu</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugit</a> &rsaquo; Siirtoraportti &rsaquo; Asetukset</div>
+
+<div id="doc3">
+
+    <h3>Laskutusasetukset</h3>
+
+    <!-- Notice our form here has no 'action', this is good, it means that our forms will always get passed back to 'plugins/run.pl'. You could hard code it instead if you prefer -->
+    <form method="get">
+        <!-- Always pass these two parameters so the plugin system knows what to execute! -->
+        <input type="hidden" name="class" value="[% CLASS %]"/>
+        <input type="hidden" name="method" value="[% METHOD %]"/>
+
+        <p>
+
+        <label for="endpointpath">REST-osoite: </label>
+        <input type="text" name="endpointpath" value="[% endpointpath %]" />
+        </p>
+        <p>
+        <label for="delaymonths">Eräpäivästä kuukaudet taaksepäin: </label>
+        <input type="text" name="delaymonths" value="[% delaymonths %]" />
+        </p>
+        <p>
+        <label for="invoicelibrary">Laskuttava kirjasto: </label>
+        <select name="invoicelibrary">
+            [% UNLESS invoicelibrary %]
+                <option value="" selected="selected"></option>
+            [% END %]
+            [% IF invoicelibrary == 'issuebranch' %]
+                <option value="issuebranch" selected="selected">Lainaajakirjasto</option>
+            [% ELSE %]
+                <option value="issuebranch">Lainaajakirjasto</option>
+            [% END %]
+
+            [% IF invoicelibrary == 'itembranch' %]
+                <option value="itembranch" selected="selected">Omistajakirjasto</option>
+            [% ELSE %]
+                <option value="itembranch">Omistajakirjasto</option>
+            [% END %]
+        </select>
+
+        </p>
+
+        <input type="hidden" name="save" value="1" />
+
+        <input type="submit" value="Tallenna" />
+    </form>
+
+[% INCLUDE 'intranet-bottom.inc' %]

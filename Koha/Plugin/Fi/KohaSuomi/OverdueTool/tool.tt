@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<title>Koha-Suomi - Laskutustyökalu</title>
+	<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<!-- Bootstrap core CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+		<!-- Custom styles for this template-->
+		<script src="https://unpkg.com/vue"></script>
+		<script src="https://unpkg.com/vuex"></script>
+		<script src="https://unpkg.com/vuejs-datepicker"></script>
+		<script src="https://unpkg.com/vuejs-datepicker/dist/locale/translations/fi.js"></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+	</head>
+	<body>
+
+		<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Etusivu</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugit</a> &rsaquo; Koha-Suomi &rsaquo; Laskutustyökalu</div>
+		<div id="content-wrapper">
+			<div class="container-fluid">
+				<main role="main" class="ml-sm-auto pt-3 px-4">
+				<div id="viewApp">
+					<h2>Laskutustyökalu</h2>
+					<div class="alert alert-danger" role="alert" v-if="errors.length">
+						<b>Tapahtui virhe:</b>
+						<ul class="text-danger">
+							<li v-for="error in errors">{{ error }}</li>
+						</ul>
+					</div>
+					<ul class="nav nav-pills mb-3 mt-3">
+						<li class="nav-item pr-2">
+							<vuejs-datepicker :value="startDate" :language="fi" format="dd.MM.yyyy" @selected="updateStartDate($event)"></vuejs-datepicker>
+						</li>
+						<li class="nav-item pl-2">
+							<vuejs-datepicker :value="endDate" :disabled-dates="disabledEndDates" :language="fi" format="dd.MM.yyyy" @selected="updateEndDate($event)"></vuejs-datepicker>
+						</li>
+					</ul>
+					<div><button class="btn btn-success fixed-bottom justify-content-end">Luo laskut</button>
+					<nav v-bind:class="{'d-none': pages == 1 }" aria-label="Page navigation example">
+						<ul class="pagination">
+						<li class="page-item">
+							<a class="page-link" v-bind:class="{'text-muted bg-muted cursor-default': page == 1 }" href="#" v-on:click="decreasePage" aria-label="Previous">
+							<span aria-hidden="true">&laquo;</span>
+							<span class="sr-only">Edellinen</span>
+							</a>
+						</li>
+						<li v-for="page in pages"><a class="page-link" v-bind:class="{'d-none': pageHide}" href="#" :data-current="page" v-on:click="changePage($event, page)">{{page}}</a></li>
+						<li class="page-item">
+							<a class="page-link" href="#" v-bind:class="{'text-muted bg-muted cursor-default': page == pages }" v-on:click="increasePage" aria-label="Next">
+							<span aria-hidden="true">&raquo;</span>
+							<span class="sr-only">Seuraava</span>
+							</a>
+						</li>
+						</ul>
+					</nav>
+					<div v-if="results.length">
+						<div class="row d-table w-100 p-3 border-bottom" style="table-layout:fixed;">
+							<ul class="list-inline d-table-row font-weight-bold">
+								<li class="list-inline-item d-table-cell">Lainaaja</li>
+								<li class="list-inline-item d-table-cell">Takaaja</li>
+								<li class="list-inline-item d-table-cell">Osoite</li>
+								<li class="list-inline-item d-table-cell">Toiminnot</li>
+							</ul>
+						</div>
+						<div is="result-list"
+							v-for="(result, index) in results" 
+							:key="index"
+							:index="index"
+							v-bind:result="result">
+						</div>
+					</div>
+					<div v-else class="alert alert-warning" role="alert">
+						Aikavälillä ei ole laskutettavia lainoja!
+					</div>
+					<nav v-bind:class="{'d-none': pages == 1 }" aria-label="Page navigation example">
+						<ul class="pagination">
+						<li class="page-item">
+							<a class="page-link" v-bind:class="{'text-muted bg-muted cursor-default': page == 1 }" href="#" v-on:click="changePage($event, page-1)" aria-label="Previous">
+							<span aria-hidden="true">&laquo;</span>
+							<span class="sr-only">Edellinen</span>
+							</a>
+						</li>
+						<li v-for="page in pages"><a class="page-link" v-bind:class="{'d-none': pageHide}" href="#" :data-current="page" v-on:click="changePage($event, page)">{{page}}</a></li>
+						<li class="page-item">
+							<a class="page-link" href="#" v-bind:class="{'text-muted bg-muted cursor-default': page == pages }" v-on:click="changePage($event, page+1)" aria-label="Next">
+							<span aria-hidden="true">&raquo;</span>
+							<span class="sr-only">Seuraava</span>
+							</a>
+						</li>
+						</ul>
+					</nav>
+				</div>
+				</main>
+			</div>
+			<div id="modalWrapper"></div>
+		</div>
+		<template id="list-items">
+			<div>
+				<div class="row d-table w-100 p-3" style="table-layout:fixed;" :class="{'odd-cell': index % 2 !== 0 }">
+					<ul class="list-inline w-100 d-table-row">
+						<li class="list-inline-item d-table-cell">
+							<span class="d-block">{{result.cardnumber}}</span>
+							<span>{{result.firstname}} {{result.surname}} ({{result.dateofbirth}})</span>
+						</li>
+						<li class="list-inline-item d-table-cell">
+							<patrondata v-if="result.guarantorid" :borrowernumber="result.guarantorid"></patrondata>
+						</li>
+						<li class="list-inline-item d-table-cell">
+							{{result.address}}, {{result.zipcode}} {{result.city}}
+						</li>
+						<li class="list-inline-item d-table-cell">
+							<button class="btn btn-info" v-on:click="activate"><i class='fas fa-angle-down' :class="{'fa-angle-up': isActive}" style='font-size:24px'></i></button>
+							<button class="btn btn-success" v-on:click="createInvoice">Luo lasku</button>
+						</li>
+					</ul>
+				</div>
+				<div class="row d-none w-100 p-3" :class="{'d-table': isActive }">
+					<ul class="list-inline d-table-row">
+						<li class="list-inline-item d-table-cell">Laskuta</li>
+						<li class="list-inline-item d-table-cell">Eräpäivä</li>
+						<li class="list-inline-item d-table-cell">Korvaushinta</li>
+						<li class="list-inline-item d-table-cell">Nimeke</li>
+					</ul>
+					<ul class="list-inline w-100 d-table-row" v-for="(checkout, index) in result.checkouts" :key="checkout.itemnumber">
+						<li>
+							<selectprice @change="selectedPrice" :itemnumber="checkout.itemnumber"></selectprice>
+						</li>
+						<li class="list-inline-item d-table-cell">
+							{{checkout.date_due | moment}}
+						</li>
+						<li class="list-inline-item d-table-cell">
+							<pricedata @change="newPrice" :replacementprice="checkout.replacementprice" :index="index"></pricedata>
+						</li>
+						<li class="list-inline-item d-table-cell">
+							{{checkout.author}} - {{checkout.title}}
+						</li>
+					</ul>
+				</div>
+			</div>
+		</template>
+		<!-- Bootstrap core JavaScript
+		================================================== -->
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+		<!-- Icons -->
+		<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+		<script>
+			feather.replace();
+			var jsondata = JSON.parse('[% data %]');
+			console.log(jsondata);
+		</script>
+		<script type="module" src="[% PLUGIN_PATH %]/js/main.js"></script>
+		<style>
+			.odd-cell {
+				background-color: #eee;
+			}
+		</style>
+	</body>
+</html>

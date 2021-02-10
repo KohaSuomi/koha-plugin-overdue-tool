@@ -31,12 +31,7 @@ use
   CGI; # NOT a CGI script, this is just to keep C4::Templates::gettemplate happy
 use C4::Context;
 use Koha::DateUtils;
-use C4::Debug;
 use C4::Letters;
-use HTML::Template;
-use C4::Templates;
-use C4::Items;
-use C4::Reserves;
 use File::Spec;
 use Getopt::Long;
 use Data::Dumper;
@@ -46,6 +41,8 @@ use XML::LibXML;
 use Encode qw(decode encode);
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 use File::Copy;
+use Koha::Plugins;
+use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Finvoice;
 
 
 sub usage {
@@ -80,123 +77,68 @@ if ( !$output_directory || !-d $output_directory || !-w $output_directory ) {
 }
 
 my $today     = output_pref( { dt => dt_from_string, dateonly => 1, dateformat => 'iso' } ) ;
-my $notices = Koha::Notice::Messages->search({letter_code => 'ODUECLAIM', status => 'pending', from_address => 'JOE_JOE'});
+my $notices = Koha::Notice::Messages->search({letter_code => 'FINVOICE', status => 'pending'});
 my $xsd = "$FindBin::Bin/../finvoice/Finvoice3.0.xsd";
 my $tmppath = $output_directory ."/tmp/";
 exit unless ($notices);
 
 my @message_ids;
 foreach my $notice (@{$notices->unblessed}) {
-    my $parser = XML::LibXML->new();
-    my $data = Encode::encode( "iso-8859-15", $notice->{content});
-    my $dom = $parser->load_xml(string => $data);
+    # $notice->{content} =~ s/&/&amp;/sg;
+    my $doc = process_xml($notice);
     my $xmlschema = XML::LibXML::Schema->new(location => $xsd);
-	eval {$xmlschema->validate($dom);};
+	eval {$xmlschema->validate($doc);};
     if ($@) {
+        print "$notice->{message_id} failed with $@\n";
         C4::Letters::_set_message_status(
-        { message_id => $notice->{message_id}, status => 'failed', delivery_note => $@ } );
+        { message_id => $notice->{message_id}, status => 'failed', delivery_note => "Finvoice template error, check logs." } );
     } else {
-        my $xmlFile = $notice->{from_address}.'_'.$notice->{message_id}."_".$today. ".xml";
+        my $xmlFile = $notice->{from_address}.'_'.$notice->{borrowernumber}."_".$today. ".xml";
         #Write xml to file
         open(my $fh, '>', $tmppath.$xmlFile);
-        print $fh $dom->toString();
+        print $fh $doc->toString();
         close $fh;
         push @message_ids, $notice->{message_id};
     }
 
 }
-my $zip = Archive::Zip->new();
-my $zipFile = "kirjasto-finvoice-".$today. ".zip";
+if (@message_ids) {
+    my $zip = Archive::Zip->new();
+    my $zipFile = "kirjasto-finvoice-".$today. ".zip";
 
-chdir $tmppath;
-my @files = <*.xml>;
+    chdir $tmppath;
+    my @files = <*.xml>;
 
-foreach my $file (@files) {
-    $zip->addFile( $file );
-}
-
-unless ( $zip->writeToFileNamed($tmppath . $zipFile) == AZ_OK ) {
-    die 'error creating zip-file';
-}
-
-foreach my $file (@files) {
-    unlink $file;
-}
-
-my @zipfiles = <*.zip>;
-my $archivepath = $output_directory.'/archived/';
-foreach my $file (@zipfiles) {
-
-#   system ("sshpass -p $providerConfig->{pw} sftp $providerConfig->{user}\@$providerConfig->{host} > /dev/null 2>&1 << EOF
-# 	cd IN
-# 	put $tmppath$file
-# 	bye
-# 	EOF") == 0 or die "system failed: $!";
-
-  move ("$tmppath$file", "$archivepath$file") or die "The move operation failed: $!";
-
-}
-
-foreach my $message_id (@message_ids) {
-    C4::Letters::_set_message_status(
-        { message_id => $message_id, status => 'sent'} );
-}
-
-sub GetBorrower {
-    my ($borrowernumber) = shift or return;
-    my $sth = C4::Context->dbh->prepare("SELECT * FROM borrowers WHERE borrowernumber = ?");
-    $sth->execute($borrowernumber);
-    return $sth->fetchrow_hashref();
-}
-
-sub GetBranchByEmail {
-    my ($email) = shift or return;
-    my $sth = C4::Context->dbh->prepare("SELECT * FROM branches WHERE branchemail = ?");
-    $sth->execute($email);
-    return $sth->fetchrow_hashref();
-}
-
-sub claimingTemplate {
-    my ($message) = shift or return;
-
-    my $now = strftime "%d%m%Y", localtime;
-
-    my $totalfines = 0;
-
-    my $billNumberTag = "MessageID";
-    my $billNumber = $message->{message_id};
-
-    $message->{'content'} =~ s/$billNumberTag/$billNumber/g;
-
-    my $referenseNumberTag = "ReferenceNumber";
-    my $referenseNumber = $message->{message_id}." ".$message->{'borrowernumber'}." ".$now;
-
-    $message->{'content'} =~ s/$referenseNumberTag/$referenseNumber/g;
-
-    my $DueDateTag = "DueDate";
-    my $date = time;
-    $date = $date + (14 * 24 * 60 * 60);
-    my $DueDate = strftime "%d.%m.%Y", localtime($date);
-
-    $message->{'content'} =~ s/$DueDateTag/$DueDate/g;
-
-    my $start = "<var>";
-    my $end = "</var>";
-
-    my @matches = $message->{'content'} =~ /$start(.*?)$end/g;
-
-    foreach my $match (@matches) {
-        $totalfines = $totalfines + $match;
-        my $new_match = $match;
-        $new_match =~ tr/./,/;
-        $message->{'content'} =~ s/$match/$new_match/g;
+    foreach my $file (@files) {
+        $zip->addFile( $file );
     }
 
-    $totalfines = sprintf("%.2f", $totalfines);
-    $totalfines =~ tr/./,/;
+    unless ( $zip->writeToFileNamed($tmppath . $zipFile) == AZ_OK ) {
+        die 'error creating zip-file';
+    }
 
-    $message->{'content'} =~ s/TotalFines/$totalfines/g;
+    foreach my $file (@files) {
+        unlink $file;
+    }
 
-    return $message;
+    my @zipfiles = <*.zip>;
+    my $archivepath = $output_directory.'/archived/';
+    foreach my $file (@zipfiles) {
 
+    #   system ("sshpass -p $providerConfig->{pw} sftp $providerConfig->{user}\@$providerConfig->{host} > /dev/null 2>&1 << EOF
+    # 	cd IN
+    # 	put $tmppath$file
+    # 	bye
+    # 	EOF") == 0 or die "system failed: $!";
+
+    move ("$tmppath$file", "$archivepath$file") or die "The move operation failed: $!";
+
+    }
+
+    foreach my $message_id (@message_ids) {
+        C4::Letters::_set_message_status(
+            { message_id => $message_id, status => 'sent'} );
+    }
+} else {
+    print "Not any notices processed\n";
 }

@@ -8,9 +8,10 @@ use base qw(Koha::Plugins::Base);
 
 ## We will also need to include any Koha libraries we want to access
 use C4::Context;
-use Koha::LibraryCategories;
 use utf8;
 use JSON;
+
+use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Config;
 
 ## Here we set our plugin version
 our $VERSION = "1.0";
@@ -70,9 +71,12 @@ sub configure {
 
         ## Grab the values we already have for our settings, if any exist
         $template->param(
-            endpointpath => $self->retrieve_data('endpointpath'),
             delaymonths => $self->retrieve_data('delaymonths'),
+            maxyears => $self->retrieve_data('maxyears'),
             invoicelibrary => $self->retrieve_data('invoicelibrary'),
+            invoicenotforloan => $self->retrieve_data('invoicenotforloan'),
+            debarment => $self->retrieve_data('debarment'),
+            addreplacementprice   => $self->retrieve_data('addreplacementprice'),
 
         );
 
@@ -82,9 +86,12 @@ sub configure {
     else {
         $self->store_data(
             {
-                endpointpath          => $cgi->param('endpointpath'),
                 delaymonths           => $cgi->param('delaymonths'),
+                maxyears              => $cgi->param('maxyears'),
                 invoicelibrary        => $cgi->param('invoicelibrary'),
+                invoicenotforloan     => $cgi->param('invoicenotforloan'),
+                debarment             => $cgi->param('debarment'),
+                addreplacementprice   => $cgi->param('addreplacementprice'),
 
             }
         );
@@ -123,14 +130,20 @@ sub tool_view {
     my ( $self, $args ) = @_;
     my $cgi = $self->{'cgi'};
     my $template = $self->get_template({ file => 'tool.tt' });
-    #my $userbranch = C4::Context->userenv->{'branch'};
-    my $branches = $self->get_branch_group;
-    my $overduerules = $self->check_overdue_rules;
+
+    my $branch = C4::Context->userenv->{'branch'};
+    my $branchsettings = get_branch_settings($branch);
+    my $overduerules = check_overdue_rules($branch, $self->retrieve_data("delaymonths"));
+
     my $json = {
-        endpointpath => $self->retrieve_data('endpointpath'),
-        branches => $branches,
+        userlibrary => $branch,
+        libraries => $branchsettings->{libraries},
+        invoiceletters => $branchsettings->{invoiceletters},
         overduerules => $overduerules,
-        invoicelibrary => $self->retrieve_data('invoicelibrary')
+        invoicelibrary => $self->retrieve_data('invoicelibrary'),
+        invoicenotforloan => $self->retrieve_data('invoicenotforloan'),
+        debarment => $self->retrieve_data('debarment'),
+        addreplacementprice   => $self->retrieve_data('addreplacementprice'),
     };
     $template->param(
         data => JSON::to_json($json)
@@ -138,90 +151,6 @@ sub tool_view {
 
     print $cgi->header(-charset    => 'utf-8');
     print $template->output();
-}
-
-sub get_branch_group {
-    my $userbranch = C4::Context->userenv->{'branch'};
-    my $dbh1 = C4::Context->dbh;
-    my $sth1 = $dbh1->prepare("SELECT categorycode FROM branchrelations WHERE branchcode = ?");
-    $sth1->execute($userbranch);
-    my $branchgroup;
-    while (my $categorycode = $sth1->fetchrow_array) {
-        if ($categorycode =~ /LASKU/i) {
-            $branchgroup = $categorycode;
-        }
-    }
-    $sth1->finish;
-
-    my @branches = Koha::LibraryCategories->find( $branchgroup )->libraries;
-    my @branchcodes;
-    if (@branches) {
-        foreach my $branch (@branches) {
-            push @branchcodes, $branch->branchcode;
-        }
-    } else {
-        push @branchcodes, $userbranch;
-    }
-
-    return \@branchcodes;
-}
-
-sub check_overdue_rules {
-    my ( $self, $args ) = @_;
-    my $branch = C4::Context->userenv->{'branch'};
-
-    my %delay;
-    my $fine;
-    my $delayperiod;
-    my $delaytime;
-
-    my $dbh2 = C4::Context->dbh;
-    my $sth2;
-    $sth2 = $dbh2->prepare("SELECT * FROM overduerules WHERE branchcode = ?");
-    $sth2->execute($branch);
-    if (my $data = $sth2->fetchrow_hashref) {
-        if ($data->{delay3}) {
-            $delaytime = $data->{delay3};
-            $delayperiod = '3';
-            $fine = $data->{fine3};
-        } elsif ($data->{delay2}) {
-            $delaytime =$data->{delay2};
-            $delayperiod= '2';
-            $fine = $data->{fine2};
-        } elsif ($data->{delay1}) {
-            $delaytime =$data->{delay1};
-            $delayperiod = '1';
-            $fine = $data->{fine1};
-        }
-        $sth2->finish;
-    } else {
-        my $isth = $dbh2->prepare("SELECT * FROM overduerules");
-        $isth->execute();
-        if (my $idata = $isth->fetchrow_hashref) {
-            if ($idata->{delay3}) {
-                $delaytime = $idata->{delay3};
-                $delayperiod = '3';
-                $fine = $idata->{fine3};
-            } elsif ($idata->{delay2}) {
-                $delaytime = $idata->{delay2};
-                $delayperiod = '2';
-                $fine = $idata->{fine2};
-            } elsif ($idata->{delay1}) {
-                $delaytime = $idata->{delay1};
-                $delayperiod = '1';
-                $fine = $idata->{fine1};
-            }
-        }
-        $isth->finish;
-    }
-
-    $delay{delaytime} = $delaytime;
-    $delay{delayperiod} = $delayperiod;
-    $delay{delayfine} = $fine;
-    $delay{delaymonths} = 0+$self->retrieve_data("delaymonths");
-
-    return \%delay;
-
 }
 
 1;

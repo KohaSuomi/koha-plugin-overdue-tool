@@ -1,8 +1,8 @@
-import store from "./modules/store.js";
-import resultlist from "./modules/components/resultList.js";
+import store from './store.js';
+import resultlist from './components/resultList.js';
 
 new Vue({
-  el: "#viewApp",
+  el: '#viewApp',
   store: store,
   components: {
     vuejsDatepicker,
@@ -14,14 +14,27 @@ new Vue({
     };
   },
   mounted() {
-    store.commit("addBasePath", jsondata.endpointpath);
-    store.commit("addBranches", jsondata.branches);
-    store.dispatch("setDates", jsondata.overduerules);
+    store.commit('addInvoiceLibrary', jsondata.invoicelibrary);
+    store.commit('addLibraries', jsondata.libraries);
+    store.commit('addInvoiceLetters', jsondata.invoiceletters);
+    store.commit('addUserLibrary', jsondata.userlibrary);
+    store.commit('addNotForLoanStatus', jsondata.invoicenotforloan);
+    store.commit('addCategoryCodes', jsondata.overduerules.categorycodes);
+    store.dispatch('setDates', jsondata.overduerules);
     this.fetch();
   },
   computed: {
     results() {
       return store.state.results;
+    },
+    totalResults() {
+      return store.state.totalResults;
+    },
+    resultOffset() {
+      return store.state.resultOffset;
+    },
+    offset() {
+      return store.state.offset;
     },
     errors() {
       return store.state.errors;
@@ -29,8 +42,8 @@ new Vue({
     status() {
       return store.state.status;
     },
-    isActive() {
-      return store.state.isActive;
+    showLoader() {
+      return store.state.showLoader;
     },
     page() {
       return store.state.page;
@@ -64,39 +77,36 @@ new Vue({
     },
   },
   methods: {
-    setBasePath(path) {
-      store.commit("addBasePath", path);
-    },
     fetch() {
-      store.dispatch("fetchOverdues");
+      store.dispatch('fetchOverdues');
       this.activate();
     },
     updateStartDate(value) {
-      store.commit("addStartDate", value);
+      store.commit('addStartDate', value);
       this.fetch();
     },
     updateEndDate(value) {
-      store.commit("addEndDate", value);
+      store.commit('addEndDate', value);
       this.fetch();
     },
     increasePage() {
       if (this.page != this.pages) {
-        store.commit("increasePage");
-        store.commit("increaseOffset");
+        store.commit('increasePage');
+        store.commit('increaseOffset');
         this.fetch();
       }
     },
     decreasePage() {
       if (this.page != 1) {
-        store.commit("decreasePage");
-        store.commit("decreaseOffset");
+        store.commit('decreasePage');
+        store.commit('decreaseOffset');
         this.fetch();
       }
     },
     changePage(e, page) {},
     activate() {
-      $(".page-link").removeClass("bg-primary text-white");
-      $("[data-current=" + this.page + "]").addClass("bg-primary text-white");
+      $('.page-link').removeClass('bg-primary text-white');
+      $('[data-current=' + this.page + ']').addClass('bg-primary text-white');
     },
   },
 });

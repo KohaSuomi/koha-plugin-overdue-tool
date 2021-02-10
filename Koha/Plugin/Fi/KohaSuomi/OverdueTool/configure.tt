@@ -18,37 +18,71 @@
         <!-- Always pass these two parameters so the plugin system knows what to execute! -->
         <input type="hidden" name="class" value="[% CLASS %]"/>
         <input type="hidden" name="method" value="[% METHOD %]"/>
-
         <p>
-
-        <label for="endpointpath">REST-osoite: </label>
-        <input type="text" name="endpointpath" value="[% endpointpath %]" />
+            <label for="delaymonths">Näytä lainat eräpäivästä </label>
+            <input type="text" name="delaymonths" value="[% delaymonths %]" />
+            <span>kuukautta taaksepäin.</span>
         </p>
         <p>
-        <label for="delaymonths">Eräpäivästä kuukaudet taaksepäin: </label>
-        <input type="text" name="delaymonths" value="[% delaymonths %]" />
+            <label for="maxyears">Jätä laskuttamatta lainat jotka ovat </label>
+            <input type="text" name="maxyears" value="[% maxyears %]" />
+            <span>vuotta vanhat.</span>
         </p>
         <p>
-        <label for="invoicelibrary">Laskuttava kirjasto: </label>
-        <select name="invoicelibrary">
-            [% UNLESS invoicelibrary %]
-                <option value="" selected="selected"></option>
-            [% END %]
-            [% IF invoicelibrary == 'issuebranch' %]
-                <option value="issuebranch" selected="selected">Lainaajakirjasto</option>
-            [% ELSE %]
-                <option value="issuebranch">Lainaajakirjasto</option>
-            [% END %]
+            <label for="invoicelibrary">Laskuttava kirjasto: </label>
+            <select name="invoicelibrary">
+                [% UNLESS invoicelibrary %]
+                    <option value="" selected="selected"></option>
+                [% END %]
+                [% IF invoicelibrary == 'issuebranch' %]
+                    <option value="issuebranch" selected="selected">Lainaajakirjasto</option>
+                [% ELSE %]
+                    <option value="issuebranch">Lainaajakirjasto</option>
+                [% END %]
 
-            [% IF invoicelibrary == 'itembranch' %]
-                <option value="itembranch" selected="selected">Omistajakirjasto</option>
-            [% ELSE %]
-                <option value="itembranch">Omistajakirjasto</option>
-            [% END %]
-        </select>
-
+                [% IF invoicelibrary == 'itembranch' %]
+                    <option value="itembranch" selected="selected">Omistajakirjasto</option>
+                [% ELSE %]
+                    <option value="itembranch">Omistajakirjasto</option>
+                [% END %]
+            </select>
         </p>
+        <p>
+            <label for="invoicenotforloan">Laskutetun niteen "ei lainata"-tila: </label>
+            <input type="text" name="invoicenotforloan" value="[% invoicenotforloan %]" />
+        </p>
+        <p>
+            <label for="debarment">Aseta rajoitus: </label>
+            <select name="debarment">
+                [% IF debarment == 'no' %]
+                    <option value="no" selected="selected">Ei</option>
+                [% ELSE %]
+                    <option value="no">Ei</option>
+                [% END %]
 
+                [% IF debarment == 'yes' %]
+                    <option value="yes" selected="selected">Kyllä</option>
+                [% ELSE %]
+                    <option value="yes">Kyllä</option>
+                [% END %]
+            </select>
+        </p>
+        <p>
+            <label for="addreplacementprice">Lisää niteen hinta asiakkaan maksuihin: </label>
+            <select name="addreplacementprice">
+                [% IF addreplacementprice == 'no' %]
+                    <option value="no" selected="selected">Ei</option>
+                [% ELSE %]
+                    <option value="no">Ei</option>
+                [% END %]
+
+                [% IF addreplacementprice == 'yes' %]
+                    <option value="yes" selected="selected">Kyllä</option>
+                [% ELSE %]
+                    <option value="yes">Kyllä</option>
+                [% END %]
+            </select>
+        </p>
         <input type="hidden" name="save" value="1" />
 
         <input type="submit" value="Tallenna" />

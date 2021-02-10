@@ -58,7 +58,18 @@
 						</li>
 						</ul>
 					</nav>
-					<div v-if="results.length">
+					<div :class="{'d-none': !showLoader }">
+						<div class="row w-100 p-3">
+							<div class="col text-center">
+								<i class="fas fa-circle-notch fa-spin fa-3x"></i>
+							</div>
+						</div>
+					</div>
+					<div :class="{'d-none': showLoader }"  v-if="results.length">
+						<div>
+							<b v-if="offset == 0"> Tulokset: 1 - {{resultOffset}} / {{totalResults}} </b>
+							<b v-else>Tulokset: {{offset}} - {{resultOffset}} / {{totalResults}}</b>
+						</div>
 						<div class="row d-table w-100 p-3 border-bottom" style="table-layout:fixed;">
 							<ul class="list-inline d-table-row font-weight-bold">
 								<li class="list-inline-item d-table-cell">Lainaaja</li>
@@ -74,7 +85,7 @@
 							v-bind:result="result">
 						</div>
 					</div>
-					<div v-else class="alert alert-warning" role="alert">
+					<div :class="{'d-none': showLoader }" v-else class="alert alert-warning" role="alert">
 						Aikavälillä ei ole laskutettavia lainoja!
 					</div>
 					<nav v-bind:class="{'d-none': pages == 1 }" aria-label="Page navigation example">
@@ -97,14 +108,13 @@
 				</div>
 				</main>
 			</div>
-			<div id="modalWrapper"></div>
 		</div>
 		<template id="list-items">
 			<div>
 				<div class="row d-table w-100 p-3" style="table-layout:fixed;" :class="{'odd-cell': index % 2 !== 0 }">
 					<ul class="list-inline w-100 d-table-row">
 						<li class="list-inline-item d-table-cell">
-							<span class="d-block">{{result.cardnumber}}</span>
+							<span class="d-block"><a :href="'/cgi-bin/koha/members/moremember.pl?borrowernumber='+result.borrowernumber" target="_blank">{{result.cardnumber}}</a></span>
 							<span>{{result.firstname}} {{result.surname}} ({{result.dateofbirth}})</span>
 						</li>
 						<li class="list-inline-item d-table-cell">
@@ -120,7 +130,7 @@
 					</ul>
 				</div>
 				<div class="row d-none w-100 p-3" :class="{'d-table': isActive }">
-					<ul class="list-inline d-table-row">
+					<ul class="list-inline d-table-row font-weight-bold">
 						<li class="list-inline-item d-table-cell">Laskuta</li>
 						<li class="list-inline-item d-table-cell">Eräpäivä</li>
 						<li class="list-inline-item d-table-cell">Korvaushinta</li>
@@ -128,7 +138,7 @@
 					</ul>
 					<ul class="list-inline w-100 d-table-row" v-for="(checkout, index) in result.checkouts" :key="checkout.itemnumber">
 						<li>
-							<selectprice @change="selectedPrice" :itemnumber="checkout.itemnumber"></selectprice>
+							<selectprice @change="selectedPrice" :itemnumber="checkout.itemnumber" :replacementprice="checkout.replacementprice"></selectprice>
 						</li>
 						<li class="list-inline-item d-table-cell">
 							{{checkout.date_due | moment}}
@@ -137,7 +147,7 @@
 							<pricedata @change="newPrice" :replacementprice="checkout.replacementprice" :index="index"></pricedata>
 						</li>
 						<li class="list-inline-item d-table-cell">
-							{{checkout.author}} - {{checkout.title}}
+							<a :href="'/cgi-bin/koha/catalogue/detail.pl?biblionumber='+checkout.biblionumber">{{checkout.title}}</a> {{checkout.author}}
 						</li>
 					</ul>
 				</div>

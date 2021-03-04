@@ -24,7 +24,7 @@
             <span>kuukautta taaksepäin.</span>
         </p>
         <p>
-            <label for="maxyears">Jätä laskuttamatta lainat jotka ovat </label>
+            <label for="maxyears">Jätä laskuttamatta lainat jotka ovat yli </label>
             <input type="text" name="maxyears" value="[% maxyears %]" />
             <span>vuotta vanhat.</span>
         </p>

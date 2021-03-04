@@ -15,9 +15,13 @@ const store = new Vuex.Store({
     endDate: '',
     libraries: [],
     invoiceLibrary: '',
+    maxYears: 1,
+    lastDate: '',
     invoiceLetters: [],
     userLibrary: '',
     notforloanStatus: '',
+    debarment: '',
+    addReplacementPrice: '',
     categorycodes: [],
     resultOffset: 0,
     showLoader: false,
@@ -47,6 +51,9 @@ const store = new Vuex.Store({
     addEndDate(state, value) {
       state.endDate = moment(value).format('YYYY-MM-DD');
     },
+    addLastDate(state, value) {
+      state.lastDate = moment(value).format('YYYY-MM-DD');
+    },
     addOffset(state, value) {
       state.offset = value;
     },
@@ -68,6 +75,9 @@ const store = new Vuex.Store({
     addInvoiceLibrary(state, value) {
       state.invoiceLibrary = value;
     },
+    addMaxYears(state, value) {
+      state.maxYears = value;
+    },
     addInvoiceLetters(state, value) {
       state.invoiceLetters = value;
     },
@@ -79,6 +89,12 @@ const store = new Vuex.Store({
     },
     addCategoryCodes(state, value) {
       state.categorycodes = value;
+    },
+    debarment(state, value) {
+      state.debarment = value;
+    },
+    addReplacementPrice(state, value) {
+      state.addReplacementPrice = value;
     },
     showLoader(state, value) {
       state.showLoader = value;
@@ -107,6 +123,7 @@ const store = new Vuex.Store({
       searchParams.append('startdate', state.startDate);
       searchParams.append('enddate', state.endDate);
       searchParams.append('invoicelibrary', state.invoiceLibrary);
+      searchParams.append('lastdate', state.lastDate);
       searchParams.append('categorycodes', state.categorycodes);
       searchParams.append('libraries', state.libraries);
       searchParams.append('offset', state.offset);
@@ -171,7 +188,7 @@ const store = new Vuex.Store({
         commit('addLastPage', state.lastPage - 10);
       }
     },
-    setDates({ commit }, payload) {
+    setDates({ commit, state }, payload) {
       let today = new Date();
       let endDate = today.setDate(today.getDate() - payload.delaytime);
       commit('addEndDate', endDate);
@@ -180,6 +197,8 @@ const store = new Vuex.Store({
         endDate.getMonth() - payload.delaymonths
       );
       commit('addStartDate', startDate);
+      let lastDate = endDate.setYear(endDate.getFullYear() - state.maxYears);
+      commit('addLastDate', lastDate);
     },
   },
   getters: {

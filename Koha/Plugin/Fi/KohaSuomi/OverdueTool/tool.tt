@@ -133,6 +133,7 @@
 					<ul class="list-inline d-table-row font-weight-bold">
 						<li class="list-inline-item d-table-cell">Laskuta</li>
 						<li class="list-inline-item d-table-cell">Eräpäivä</li>
+						<li class="list-inline-item d-table-cell">Nidenumero</li>
 						<li class="list-inline-item d-table-cell">Korvaushinta</li>
 						<li class="list-inline-item d-table-cell">Nimeke</li>
 					</ul>
@@ -144,10 +145,13 @@
 							{{checkout.date_due | moment}}
 						</li>
 						<li class="list-inline-item d-table-cell">
+							<a :href="'/cgi-bin/koha/catalogue/moredetail.pl?biblionumber='+checkout.biblionumber+'&itemnumber='+checkout.itemnumber+'#'+checkout.itemnumber" target="_blank">{{checkout.barcode}}</a>
+						</li>
+						<li class="list-inline-item d-table-cell">
 							<pricedata @change="newPrice" :replacementprice="checkout.replacementprice" :index="index"></pricedata>
 						</li>
 						<li class="list-inline-item d-table-cell">
-							<a :href="'/cgi-bin/koha/catalogue/detail.pl?biblionumber='+checkout.biblionumber">{{checkout.title}}</a> {{checkout.author}}
+							{{checkout.title}} {{checkout.author}}
 						</li>
 					</ul>
 				</div>

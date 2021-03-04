@@ -41,6 +41,7 @@ use XML::LibXML;
 use Encode qw(decode encode);
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 use File::Copy;
+use YAML::XS;
 use Koha::Plugins;
 use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Finvoice;
 
@@ -51,19 +52,21 @@ Usage: $0 OUTPUT_DIRECTORY
   Will print all waiting print notices to
   OUTPUT_DIRECTORY/branchcode-CURRENT_DATE.pdf .
 
-  -l --library  Get print notices by branchcode, can be repeated.
-  -m --message  Choose which messages are printed, can be repeated.
+  -l --library  Get print notices by branchcodes, can be repeated. (Mandatory)
+  -p --path   Config file path for sftp (Mandatory). See example file config.yaml.example.
+  -c --config  Config name. See example file config.yaml.example. (Mandatory)
 
 USAGE
     exit $_[0];
 }
 
-my ( $stylesheet, $help, @branchcodes, @messagecodes, $claiming);
+my ( $help, @branchcodes, $config, $path);
 
 GetOptions(
     'h|help'  => \$help,
-    'library=s' => \@branchcodes,
-    'message=s' => \@messagecodes,
+    'l|library=s' => \@branchcodes,
+    'p|path=s' => \$path,
+    'c|config=s' => \$config,
 ) || usage(1);
 
 usage(0) if ($help);
@@ -76,16 +79,44 @@ if ( !$output_directory || !-d $output_directory || !-w $output_directory ) {
     usage(1);
 }
 
+if(!@branchcodes) {
+    print "Define branchcodes for sending\n";
+    exit;
+}
+
+if(!$path) {
+    print "Define config file path for sftp\n";
+    exit;
+}
+
+if(!$config) {
+    print "Define config name\n";
+    exit;
+}
+
 my $today     = output_pref( { dt => dt_from_string, dateonly => 1, dateformat => 'iso' } ) ;
-my $notices = Koha::Notice::Messages->search({letter_code => 'FINVOICE', status => 'pending'});
-my $xsd = "$FindBin::Bin/../finvoice/Finvoice3.0.xsd";
+my $notices = Koha::Notice::Messages->search({letter_code => 'FINVOICE', status => 'pending', from_address => {'=' => [@branchcodes]}});
+exit unless $notices;
+my $xsd_fi = "$FindBin::Bin/../finvoice/Finvoice3.0.xsd";
+my $xsd_se = "$FindBin::Bin/../finvoice/Finvoice3.0.xsd";
+my $xsd_en = "$FindBin::Bin/../finvoice/Finvoice3.0.xsd";
 my $tmppath = $output_directory ."/tmp/";
-exit unless ($notices);
+my $configfile = eval { YAML::XS::LoadFile($path) };
+exit unless $configfile->{$config};
+my $finvoiceconfig = $configfile->{$config};
 
 my @message_ids;
 foreach my $notice (@{$notices->unblessed}) {
-    # $notice->{content} =~ s/&/&amp;/sg;
+    my $patron = Koha::Patrons->find($notice->{borrowernumber});
     my $doc = process_xml($notice);
+    my $xsd;
+    if ($patron->{lang} eq 'en') {
+        $xsd = $xsd_en;
+    } elsif ($patron->{lang} eq 'sv-SE') {
+        $xsd = $xsd_se;
+    } else {
+        $xsd = $xsd_fi;
+    }
     my $xmlschema = XML::LibXML::Schema->new(location => $xsd);
 	eval {$xmlschema->validate($doc);};
     if ($@) {
@@ -125,13 +156,13 @@ if (@message_ids) {
     my $archivepath = $output_directory.'/archived/';
     foreach my $file (@zipfiles) {
 
-    #   system ("sshpass -p $providerConfig->{pw} sftp $providerConfig->{user}\@$providerConfig->{host} > /dev/null 2>&1 << EOF
-    # 	cd IN
-    # 	put $tmppath$file
-    # 	bye
-    # 	EOF") == 0 or die "system failed: $!";
+        system ("sshpass -p $finvoiceconfig->{password} sftp $finvoiceconfig->{username}\@$finvoiceconfig->{host} > /dev/null 2>&1 << EOF
+        cd IN
+        put $tmppath$file
+        bye
+        EOF") == 0 or die "system failed: $!";
 
-    move ("$tmppath$file", "$archivepath$file") or die "The move operation failed: $!";
+        move ("$tmppath$file", "$archivepath$file") or die "The move operation failed: $!";
 
     }
 

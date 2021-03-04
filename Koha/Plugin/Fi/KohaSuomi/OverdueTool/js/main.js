@@ -15,10 +15,13 @@ new Vue({
   },
   mounted() {
     store.commit('addInvoiceLibrary', jsondata.invoicelibrary);
+    store.commit('addMaxYears', jsondata.maxyears);
     store.commit('addLibraries', jsondata.libraries);
     store.commit('addInvoiceLetters', jsondata.invoiceletters);
     store.commit('addUserLibrary', jsondata.userlibrary);
     store.commit('addNotForLoanStatus', jsondata.invoicenotforloan);
+    store.commit('debarment', jsondata.debarment);
+    store.commit('addReplacementPrice', jsondata.addreplacementprice);
     store.commit('addCategoryCodes', jsondata.overduerules.categorycodes);
     store.dispatch('setDates', jsondata.overduerules);
     this.fetch();

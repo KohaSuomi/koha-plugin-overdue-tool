@@ -50,6 +50,11 @@ const selectPrice = Vue.component('selectprice', {
       toggle: true,
     };
   },
+  mounted() {
+    if (this.checkprice == false) {
+      this.$parent.addRemoveCheckouts(this.itemnumber);
+    }
+  },
   computed: {
     checkprice() {
       var intvalue = Math.floor(this.replacementprice);
@@ -106,24 +111,43 @@ const resultList = Vue.component('result-list', {
         repeat_type: 'item',
         repeat: this.newcheckouts,
         notforloan_status: this.$store.state.notforloanStatus,
+        debarment: this.$store.state.debarment,
+        addreplacementprice: this.$store.state.addReplacementPrice,
+        lang: this.result.lang,
       };
+      params.guarantee = this.result.borrowernumber;
+      let patronid = this.result.guarantorid
+        ? this.result.guarantorid
+        : this.result.borrowernumber;
       this.$store.dispatch('sendOverdues', {
-        borrowernumber: this.result.borrowernumber,
+        borrowernumber: patronid,
         params: params,
       });
     },
     newPrice(val, index) {
+      var intvalue = Math.floor(val);
+      if (intvalue == 0) {
+        this.addRemoveCheckouts(this.result.checkouts[index].itemnumber);
+      } else {
+        this.removeFromArray(
+          this.removecheckouts,
+          this.result.checkouts[index].itemnumber
+        );
+      }
       this.result.checkouts[index].replacementprice = val;
     },
-    selectedPrice(val, index) {
+    selectedPrice(val, itemnumber) {
       if (val == false) {
-        this.removecheckouts.push(index);
+        this.addRemoveCheckouts(itemnumber);
       } else {
-        this.removeFromArray(this.removecheckouts, index);
+        this.removeFromArray(this.removecheckouts, itemnumber);
       }
     },
-    removeFromArray(arr, index) {
-      var ind = arr.indexOf(index);
+    addRemoveCheckouts(itemnumber) {
+      this.removecheckouts.push(itemnumber);
+    },
+    removeFromArray(arr, itemnumber) {
+      var ind = arr.indexOf(itemnumber);
       if (ind > -1) {
         arr.splice(ind, 1);
       }

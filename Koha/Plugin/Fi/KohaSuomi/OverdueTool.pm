@@ -137,6 +137,7 @@ sub tool_view {
 
     my $json = {
         userlibrary => $branch,
+        maxyears => $self->retrieve_data('maxyears'),
         libraries => $branchsettings->{libraries},
         invoiceletters => $branchsettings->{invoiceletters},
         overduerules => $overduerules,

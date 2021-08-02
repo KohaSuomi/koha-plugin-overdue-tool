@@ -50,7 +50,7 @@ sub usage {
     print STDERR <<USAGE;
 Usage: $0 OUTPUT_DIRECTORY
   Will print all waiting print notices to
-  OUTPUT_DIRECTORY/branchcode-CURRENT_DATE.pdf .
+  OUTPUT_DIRECTORY .
 
   -l --library  Get print notices by branchcodes, can be repeated. (Mandatory)
   -p --path   Config file path for sftp (Mandatory). See example file config.yaml.example.
@@ -97,26 +97,16 @@ if(!$config) {
 my $today     = output_pref( { dt => dt_from_string, dateonly => 1, dateformat => 'iso' } ) ;
 my $notices = Koha::Notice::Messages->search({letter_code => 'FINVOICE', status => 'pending', from_address => {'=' => [@branchcodes]}});
 exit unless $notices;
-my $xsd_fi = "$FindBin::Bin/../finvoice/Finvoice3.0.xsd";
-my $xsd_se = "$FindBin::Bin/../finvoice/Finvoice3.0.xsd";
-my $xsd_en = "$FindBin::Bin/../finvoice/Finvoice3.0.xsd";
-my $tmppath = $output_directory ."/tmp/";
 my $configfile = eval { YAML::XS::LoadFile($path) };
 exit unless $configfile->{$config};
 my $finvoiceconfig = $configfile->{$config};
+my $xsd = "$FindBin::Bin/../finvoice/Finvoice3.0.xsd";
+my $tmppath = $output_directory ."/tmp/";
 
 my @message_ids;
 foreach my $notice (@{$notices->unblessed}) {
     my $patron = Koha::Patrons->find($notice->{borrowernumber});
     my $doc = process_xml($notice);
-    my $xsd;
-    if ($patron->{lang} eq 'en') {
-        $xsd = $xsd_en;
-    } elsif ($patron->{lang} eq 'sv-SE') {
-        $xsd = $xsd_se;
-    } else {
-        $xsd = $xsd_fi;
-    }
     my $xmlschema = XML::LibXML::Schema->new(location => $xsd);
 	eval {$xmlschema->validate($doc);};
     if ($@) {

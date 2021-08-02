@@ -58,11 +58,32 @@ sub tool {
     $self->tool_view();
 }
 
+sub api {
+    my ( $self, $args ) = @_;
+    my $cgi = $self->{'cgi'};
+    $self->store_data(
+        {
+            delaymonths           => $cgi->param('delaymonths'),
+            maxyears              => $cgi->param('maxyears'),
+            invoicelibrary        => $cgi->param('invoicelibrary'),
+            invoicenotforloan     => $cgi->param('invoicenotforloan'),
+            debarment             => $cgi->param('debarment'),
+            addreplacementprice   => $cgi->param('addreplacementprice'),
+            referencenumbersettings    => $cgi->param('referencenumbersettings'),
+
+        }
+    );
+
+    print $cgi->header( -type => 'text/json', -charset => 'UTF-8' );
+    print JSON::to_json({message => 'success'});
+    exit 0;
+}
+
 ## If your tool is complicated enough to needs it's own setting/configuration
 ## you will want to add a 'configure' method to your plugin like so.
 ## Here I am throwing all the logic into the 'configure' method, but it could
 ## be split up like the 'report' method is.
-sub configure {
+sub configure_old {
     my ( $self, $args ) = @_;
     my $cgi = $self->{'cgi'};
 
@@ -77,6 +98,7 @@ sub configure {
             invoicenotforloan => $self->retrieve_data('invoicenotforloan'),
             debarment => $self->retrieve_data('debarment'),
             addreplacementprice   => $self->retrieve_data('addreplacementprice'),
+            addreferencenumber   => $self->retrieve_data('addreferencenumber'),
 
         );
 
@@ -92,11 +114,38 @@ sub configure {
                 invoicenotforloan     => $cgi->param('invoicenotforloan'),
                 debarment             => $cgi->param('debarment'),
                 addreplacementprice   => $cgi->param('addreplacementprice'),
+                addreferencenumber    => $cgi->param('addreferencenumber'),
 
             }
         );
         $self->go_home();
     }
+}
+
+sub configure {
+    my ( $self, $args ) = @_;
+    my $cgi = $self->{'cgi'};
+
+    my $template = $self->get_template({ file => 'config.tt' });
+
+    my $referencesettings = get_reference_settings(JSON::from_json($self->retrieve_data('referencenumbersettings')));
+
+    my $json = {
+        delaymonths => $self->retrieve_data('delaymonths'),
+        maxyears => $self->retrieve_data('maxyears'),
+        invoicelibrary => $self->retrieve_data('invoicelibrary'),
+        invoicenotforloan => $self->retrieve_data('invoicenotforloan'),
+        debarment => $self->retrieve_data('debarment'),
+        addreplacementprice   => $self->retrieve_data('addreplacementprice'),
+        referencenumbersettings => $referencesettings
+    };
+    $template->param(
+        data => JSON::to_json($json),
+    );
+
+    print $cgi->header(-charset    => 'utf-8');
+    print $template->output();
+
 }
 
 ## This is the 'install' method. Any database tables or other setup that should
@@ -134,17 +183,21 @@ sub tool_view {
     my $branch = C4::Context->userenv->{'branch'};
     my $branchsettings = get_branch_settings($branch);
     my $overduerules = check_overdue_rules($branch, $self->retrieve_data("delaymonths"));
-
+    my ($addreferencenumber, $increment) = get_reference_number(JSON::from_json($self->retrieve_data('referencenumbersettings')), $branchsettings->{librarygroup});
+    
     my $json = {
         userlibrary => $branch,
         maxyears => $self->retrieve_data('maxyears'),
         libraries => $branchsettings->{libraries},
+        librarygroup => $branchsettings->{librarygroup},
         invoiceletters => $branchsettings->{invoiceletters},
         overduerules => $overduerules,
         invoicelibrary => $self->retrieve_data('invoicelibrary'),
         invoicenotforloan => $self->retrieve_data('invoicenotforloan'),
         debarment => $self->retrieve_data('debarment'),
         addreplacementprice   => $self->retrieve_data('addreplacementprice'),
+        addreferencenumber  => $addreferencenumber,
+        increment   => $increment,
     };
     $template->param(
         data => JSON::to_json($json)

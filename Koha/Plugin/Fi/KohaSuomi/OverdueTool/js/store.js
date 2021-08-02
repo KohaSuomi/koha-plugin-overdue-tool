@@ -20,11 +20,16 @@ const store = new Vuex.Store({
     invoiceLetters: [],
     userLibrary: '',
     notforloanStatus: '',
+    invoiced: false,
     debarment: '',
     addReplacementPrice: '',
+    addReferenceNumber: '',
+    libraryGroup: '',
     categorycodes: [],
     resultOffset: 0,
     showLoader: false,
+    notice: '',
+    increment: '',
   },
   mutations: {
     addError(state, value) {
@@ -72,6 +77,9 @@ const store = new Vuex.Store({
     addLibraries(state, value) {
       state.libraries = value;
     },
+    addLibraryGroup(state, value) {
+      state.libraryGroup = value;
+    },
     addInvoiceLibrary(state, value) {
       state.invoiceLibrary = value;
     },
@@ -93,8 +101,17 @@ const store = new Vuex.Store({
     debarment(state, value) {
       state.debarment = value;
     },
+    invoiced(state, value) {
+      state.invoiced = value;
+    },
     addReplacementPrice(state, value) {
       state.addReplacementPrice = value;
+    },
+    addIncrement(state, value) {
+      state.increment = value;
+    },
+    addReferenceNumber(state, value) {
+      state.addReferenceNumber = value;
     },
     showLoader(state, value) {
       state.showLoader = value;
@@ -114,6 +131,10 @@ const store = new Vuex.Store({
     modifyReplacementPrice(state, payload) {
       state.results.checkouts[payload.index].replacementprice = payload.value;
     },
+    setNotice(state, value) {
+      state.notice = '';
+      state.notice += value;
+    },
   },
   actions: {
     fetchOverdues({ commit, state }) {
@@ -125,6 +146,8 @@ const store = new Vuex.Store({
       searchParams.append('invoicelibrary', state.invoiceLibrary);
       searchParams.append('lastdate', state.lastDate);
       searchParams.append('categorycodes', state.categorycodes);
+      searchParams.append('invoicedstatus', state.notforloanStatus);
+      searchParams.append('invoiced', state.invoiced);
       searchParams.append('libraries', state.libraries);
       searchParams.append('offset', state.offset);
       searchParams.append('limit', state.limit);
@@ -160,15 +183,14 @@ const store = new Vuex.Store({
     },
     sendOverdues({ commit, state }, payload) {
       commit('removeErrors');
-      state.invoiceLetters.forEach((element) => {
-        payload.params.letter_code = element;
-        axios
-          .post('/api/v1/invoices/' + payload.borrowernumber, payload.params)
-          .then(() => {})
-          .catch((error) => {
-            commit('addError', error.response.data.error);
-          });
-      });
+      axios
+        .post('/api/v1/invoices/' + payload.borrowernumber, payload.params)
+        .then((response) => {
+          commit('setNotice', response.data.notice);
+        })
+        .catch((error) => {
+          commit('addError', error.response.data.error);
+        });
     },
     changePage({ commit, state }) {
       if (state.page < 1) {

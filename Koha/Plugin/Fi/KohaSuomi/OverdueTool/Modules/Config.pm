@@ -4,9 +4,48 @@ use Modern::Perl;
 use Exporter;
 use C4::Context;
 use Koha::LibraryCategories;
+use Mojo::JSON;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(get_branch_settings check_overdue_rules);
+our @EXPORT = qw(get_branch_settings check_overdue_rules get_reference_settings get_reference_number);
+
+sub get_reference_settings {
+    my ( $saved ) = @_;
+    my $library_categories = Koha::LibraryCategories->search({});
+    my $categories = $saved;
+    foreach my $category (@{$library_categories->unblessed}) {
+        if ($category->{categorycode} =~ /LASKU/i) {
+            my $add = 1;
+            if ($saved) {
+                foreach my $s (@{$saved}) {
+                    if ($s->{groupname} eq $category->{categorycode}) {
+                        $add = 0;
+                    }
+                }
+            }
+            if ($add) {
+                my $settings = {groupname => $category->{categorycode}, increment => '', addreferencenumber => Mojo::JSON->false};
+                push @{$categories}, $settings;
+            }
+        }
+    }
+    
+    return $categories;
+}
+
+sub get_reference_number {
+    my ( $saved, $group ) = @_;
+    my $increment;
+    my $addreferencenumber;
+    foreach my $s (@{$saved}) {
+        if ($s->{groupname} eq $group) {
+            $increment = $s->{increment};
+            $addreferencenumber = $s->{addreferencenumber};
+        }
+    }
+    
+    return ($addreferencenumber, $increment);
+}
 
 sub get_branch_settings {
     my ( $userbranch ) = @_;
@@ -40,7 +79,7 @@ sub get_branch_settings {
         push @branchcodes, $userbranch;
     }
 
-    return {libraries => \@branchcodes, invoiceletters => \@invoiceletter};
+    return {librarygroup => $branchgroup, libraries => \@branchcodes, invoiceletters => \@invoiceletter};
 }
 
 sub check_overdue_rules {

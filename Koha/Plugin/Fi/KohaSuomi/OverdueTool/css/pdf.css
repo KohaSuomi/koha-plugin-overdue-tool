@@ -1,0 +1,100 @@
+.a4-width {
+  max-width: 922px;
+}
+.preview .header,
+.preview .footer {
+  margin-top: 20mm;
+  margin-left: 21mm;
+  margin-right: 21mm;
+  height: 30mm;
+  position: relative;
+}
+.preview .footer {
+  clear: both;
+  margin-top: 40mm;
+}
+.preview .recipient {
+  margin-left: 21mm;
+  margin-right: 21mm;
+  height: 30mm;
+}
+.preview .content,
+.preview .recipient {
+  margin-top: 20mm;
+  /* margin-left: 21mm;
+  margin-right: 21mm; */
+  /* padding-bottom: 21mm; */
+  position: relative;
+}
+
+.preview .content .table {
+  font-size: 14px;
+  padding: 0.75rem;
+  vertical-align: top;
+  border-top: 1px solid #dee2e6;
+}
+
+.preview .content .table tr {
+  margin-bottom: 20px;
+}
+.preview .content .table tr th {
+  padding: 0.75rem;
+  padding-right: 0.75rem;
+  vertical-align: top;
+  border-top: 1px solid #dee2e6;
+}
+
+.preview .content .table tr td {
+  padding: 0.75rem;
+  padding-right: 0.75rem;
+  vertical-align: top;
+  border-top: 1px solid #dee2e6;
+}
+
+.preview .sender {
+  padding-bottom: 30mm;
+}
+.preview .billheader,
+.preview .billfooter {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.preview .library {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.preview hr {
+  background: #000000;
+  border: 0;
+  height: 0.5mm;
+}
+.preview .summary {
+  position: relative;
+  float: right;
+}
+.preview ul.info {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.preview ul.items-row {
+  display: table;
+  width: 100%;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+}
+
+.preview ul.items-row > li {
+  display: table-cell;
+  width: 25%;
+  padding: 5mm 0;
+}
+.preview li {
+  list-style: none;
+}
+.preview .hidden {
+  display: none;
+}

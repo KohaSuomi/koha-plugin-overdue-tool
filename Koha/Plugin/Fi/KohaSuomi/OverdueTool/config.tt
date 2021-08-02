@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<title>Koha-Suomi - Laskutustyökalu</title>
+	<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<!-- Bootstrap core CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+		<!-- Custom styles for this template-->
+		<script src="https://unpkg.com/vue"></script>
+		<script src="https://unpkg.com/vuex"></script>
+		<script src="https://unpkg.com/vuejs-datepicker"></script>
+		<script src="https://unpkg.com/vuejs-datepicker/dist/locale/translations/fi.js"></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+		<script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://printjs-4de6.kxcdn.com/print.min.css">
+	</head>
+	<body>
+		<!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="main-breadcrumb">
+            <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/cgi-bin/koha/mainpage.pl">Etusivu</a></li>
+            <li class="breadcrumb-item"><a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugit</a></li>
+            <li class="breadcrumb-item"><a href="/cgi-bin/koha/plugins/plugins-home.pl">Laskutustyökalu</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Asetukset</li>
+            </ol>
+        </nav>
+        <!-- /Breadcrumb -->
+        <div id="content-wrapper">
+			<div class="container-fluid">
+				<main role="main" class="ml-sm-auto pt-3 px-4">
+				<div id="configApp">
+					<div class="alert alert-danger" role="alert" v-if="errors.length">
+						<b>Tapahtui virhe:</b>
+						<ul class="text-danger">
+							<li v-for="error in errors">{{ error }}</li>
+						</ul>
+					</div>
+                    <div class="alert alert-success" role="alert" v-if="saved">
+						<b>Tallennus onnistui!</b>
+					</div>
+                    <div class="container">
+                        <div class="row gutters-sm">
+                            <div class="col-md-4 d-none d-md-block">
+                                <div class="card">
+                                    <div class="card-body">
+                                    <nav class="nav flex-column nav-pills nav-gap-y-1">
+                                        <a href="#default" data-toggle="tab" class="nav-item nav-link has-icon nav-link-faded active">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings mr-2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>Yleiset
+                                        </a>
+                                        <a href="#references" data-toggle="tab" class="nav-item nav-link has-icon nav-link-faded">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card mr-2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>Viitenumerot
+                                        </a>
+                                    </nav>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-body tab-content">
+                                        <div class="tab-pane active" id="default">
+                                            <h6>Yleiset</h6>
+                                            <hr>
+                                            <form>
+                                                <div class="form-group">
+                                                    <label for="invoicelibrary">Laskuttava kirjasto:</label>
+                                                    <select class="form-control" id="invoicelibrary" v-model="invoicelibrary">
+                                                        <option></option>
+                                                        <option value="issuebranch">Lainaajakirjasto</option>
+                                                        <option value="itembranch">Omistajakirjasto</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="delaymonths">Näytä lainat eräpäivästä </label>
+                                                    <input type="text" class="form-control" name="delaymonths" v-model="delaymonths"/>
+                                                    <span>kuukautta taaksepäin.</span>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="maxyears">Jätä laskuttamatta lainat jotka ovat yli </label>
+                                                    <input type="text"  class="form-control" name="maxyears" v-model="maxyears"/>
+                                                    <span>vuotta vanhat.</span>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="invoicenotforloan">Laskutetun niteen "ei lainata"-tila: </label>
+                                                    <input type="text" class="form-control" name="invoicenotforloan" v-model="invoicenotforloan"/>
+                                                </div>
+                                                <div class="form-group mb-0">
+                                                    <ul class="list-group list-group-sm">
+                                                        <li class="list-group-item has-icon">
+                                                            Aseta rajoitus
+                                                            <div class="custom-control custom-control-nolabel custom-switch ml-auto">
+                                                            <input type="checkbox" class="custom-control-input" id="customSwitch1" v-model="debarment">
+                                                            <label class="custom-control-label" for="customSwitch1"></label>
+                                                            </div>
+                                                        </li>
+                                                        <li class="list-group-item has-icon">
+                                                            Lisää niteen hinta asiakkaan maksuihin
+                                                            <div class="custom-control custom-control-nolabel custom-switch ml-auto">
+                                                            <input type="checkbox" class="custom-control-input" id="customSwitch2">
+                                                            <label class="custom-control-label" for="customSwitch2"></label>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane" id="references">
+                                            <h6>Viitenumerot</h6>
+                                            <hr>
+                                            <form>
+                                                <div class="form-group mb-0" v-for="(category, index) in referencenumbersettings">
+                                                    <h6>{{category.groupname}}</h6>
+                                                    <ul class="list-group list-group-sm">
+                                                        <li class="list-group-item has-icon">
+                                                            Lisää viitenumero laskuun
+                                                            <div class="custom-control custom-control-nolabel custom-switch ml-auto">
+                                                            <input type="checkbox" class="custom-control-input" id="customSwitch3" name="addreferencenumber" v-model="category.addreferencenumber">
+                                                            <label class="custom-control-label" for="customSwitch3"></label>
+                                                            </div>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <label for="increment">Kasvuarvo</label>
+                                                            <input type="text" class="form-control" name="increment"  v-model="category.increment"/>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="mt-3">
+                                            <button type="button" class="btn btn-primary" @click="save()">Tallenna</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+				</div>
+				</main>
+			</div>
+		</div>
+		<!-- Bootstrap core JavaScript
+		================================================== -->
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+		<!-- Icons -->
+		<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+		<script>
+			feather.replace();
+			var jsondata = JSON.parse('[% data %]');
+			//console.log(jsondata);
+		</script>
+		<script type="module" src="[% PLUGIN_PATH %]/js/config.js"></script>
+	</body>
+</html>

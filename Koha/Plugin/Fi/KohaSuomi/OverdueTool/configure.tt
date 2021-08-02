@@ -83,6 +83,22 @@
                 [% END %]
             </select>
         </p>
+        <p>
+            <label for="addreferencenumber">Lisää viitenumero laskuun: </label>
+            <select name="addreferencenumber">
+                [% IF addreferencenumber == 'no' %]
+                    <option value="no" selected="selected">Ei</option>
+                [% ELSE %]
+                    <option value="no">Ei</option>
+                [% END %]
+
+                [% IF addreferencenumber == 'yes' %]
+                    <option value="yes" selected="selected">Kyllä</option>
+                [% ELSE %]
+                    <option value="yes">Kyllä</option>
+                [% END %]
+            </select>
+        </p>
         <input type="hidden" name="save" value="1" />
 
         <input type="submit" value="Tallenna" />

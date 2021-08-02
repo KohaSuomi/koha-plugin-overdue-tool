@@ -97,7 +97,7 @@ const resultList = Vue.component('result-list', {
     activate: function () {
       this.isActive = !this.isActive;
     },
-    createInvoice: function () {
+    createInvoice: function (letter_code, preview) {
       this.newcheckouts = this.result.checkouts.slice(0);
       this.removecheckouts.forEach((element) => {
         let index = this.newcheckouts.findIndex(
@@ -113,9 +113,16 @@ const resultList = Vue.component('result-list', {
         notforloan_status: this.$store.state.notforloanStatus,
         debarment: this.$store.state.debarment,
         addreplacementprice: this.$store.state.addReplacementPrice,
+        addreferencenumber: this.$store.state.addReferenceNumber,
+        increment: this.$store.state.increment,
+        librarygroup: this.$store.state.libraryGroup,
         lang: this.result.lang,
+        letter_code: letter_code,
       };
       params.guarantee = this.result.borrowernumber;
+      if (preview) {
+        params.preview = true;
+      }
       let patronid = this.result.guarantorid
         ? this.result.guarantorid
         : this.result.borrowernumber;
@@ -123,6 +130,10 @@ const resultList = Vue.component('result-list', {
         borrowernumber: patronid,
         params: params,
       });
+    },
+    previewPDF: function () {
+      this.createInvoice('ODUECLAIM', true);
+      this.$parent.previewPDF();
     },
     newPrice(val, index) {
       var intvalue = Math.floor(val);

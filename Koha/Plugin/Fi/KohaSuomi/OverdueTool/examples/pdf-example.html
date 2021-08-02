@@ -1,0 +1,55 @@
+<div class="header">
+        <div class="sender">
+            <div class="library">
+                <p><ul class="info"><li><<branches.branchname>></li>
+                    <li><<branches.branchaddress1>></li>
+                    <li><<branches.branchzip>> <<branches.branchcity>></li>
+                                        <li><<branches.branchphone>></li>
+                </ul></p>
+            </div>
+            <div class="billheader">
+                <p><ul class="info"><li>Perintäkirje</li>
+                    <li><<today>></li>
+                </ul></p>
+            </div>
+        </div>
+    </div>
+            <div class="recipient">
+        <p><ul class="info">
+            <li><<borrowers.firstname>>  <<borrowers.surname>></li>
+            <li><<borrowers.address>></li>
+            <li><<borrowers.zipcode>> <<borrowers.city>></li>
+        </ul></p>
+    </div>
+    <div class="content">
+        <p><strong>Lainaajan nimi:</strong> <<issueborname>> <strong>Nro:</strong> <<issueborbarcode>></p>
+        <p>Pyydämme palauttamaan oheisen aineiston välittömästi. Ellei aineistoa palauteta, lähetämme laskun, joka on ulosottokelpoinen. Korvaushinta peritään vain niiden niteiden osalta, joita ei palauteta. </p><br/>
+        <table class="table">
+            <thead>
+                <tr>
+                <th>Eräpäivä</th>
+                <th>Teos</th>
+                <th>Nidetiedot</th>
+                <th>Maksu</th>
+                </tr>
+            </thead>
+            <tbody>
+                <item>
+                    <tr>
+                        <td><<date_due>></td>
+                        <td><<biblio.author>> <<biblio.title>> <<items.enumchron>></td>
+                        <td><<items.itype>><br/><<items.barcode>><br/><<items.itemcallnumber>></td>
+                        <td>Hinta: <<items.replacementprice>><br/>
+                            Myöhästymismaksu: 5€
+                        </td>
+                    </tr>
+                </item>
+            </tbody>
+        </table>
+        <div class="summary">
+            <p><ul class="info">
+            <li>Perimiskulut: 7,4 €</li>
+            <li>MAKSETTAVA YHTEENSÄ: <<totalfines>> €</li>
+            </ul></p>
+        </div>
+    </div>

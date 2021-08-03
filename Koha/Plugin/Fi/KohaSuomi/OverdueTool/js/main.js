@@ -76,9 +76,6 @@ new Vue({
     endDate() {
       return store.state.endDate;
     },
-    pageHide() {
-      return store.getters.pageHide;
-    },
     disabledEndDates() {
       return store.getters.disabledEndDates;
     },
@@ -119,6 +116,7 @@ new Vue({
       if (this.page != this.pages) {
         store.commit('increasePage');
         store.commit('increaseOffset');
+        store.dispatch('showPages', this.page);
         this.fetch();
       }
     },
@@ -126,6 +124,7 @@ new Vue({
       if (this.page != 1) {
         store.commit('decreasePage');
         store.commit('decreaseOffset');
+        store.dispatch('showPages', this.page);
         this.fetch();
       }
     },
@@ -137,7 +136,13 @@ new Vue({
       }
       this.fetch();
     },
-    changePage(e, page) {},
+    changePage(page) {
+      store.dispatch('changePage', page);
+      this.fetch();
+    },
+    pageHide(page) {
+      return store.getters.pageHide(page);
+    },
     activate() {
       $('.page-link').removeClass('bg-primary text-white');
       $('[data-current=' + this.page + ']').addClass('bg-primary text-white');

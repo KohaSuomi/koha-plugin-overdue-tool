@@ -192,20 +192,32 @@ const store = new Vuex.Store({
           commit('addError', error.response.data.error);
         });
     },
-    changePage({ commit, state }) {
-      if (state.page < 1) {
+    changePage({ commit, state }, payload) {
+      let selectedPage = payload;
+
+      commit('addPage', selectedPage);
+      if (selectedPage < 1) {
         commit('addPage', 1);
       }
-      if (state.page > state.pages) {
+      if (selectedPage > state.pages) {
         commit('addPage', state.pages);
       }
-      if (state.page == state.endPage) {
-        commit('addStartCount', state.page);
-        commit('addEndPage', state.endPage + 10);
-        commit('addLastPage', state.page);
+
+      let countValue = state.limit * (state.page - 1);
+      if (selectedPage == 1) {
+        commit('addOffset', 0);
+      } else {
+        commit('addOffset', countValue);
       }
-      if (state.page < state.lastPage) {
-        commit('addStartCount', state.page - 10);
+    },
+    showPages({ commit, state }, payload) {
+      if (payload == state.endPage) {
+        commit('addStartCount', payload);
+        commit('addEndPage', state.endPage + 10);
+        commit('addLastPage', payload);
+      }
+      if (payload < state.lastPage) {
+        commit('addStartCount', payload - 10);
         commit('addEndPage', state.lastPage);
         commit('addLastPage', state.lastPage - 10);
       }
@@ -224,12 +236,12 @@ const store = new Vuex.Store({
     },
   },
   getters: {
-    pageHide: (state) => {
+    pageHide: (state) => (page) => {
       if (state.pages > 5) {
-        if (state.endPage <= state.page && state.startCount < state.page) {
+        if (state.endPage <= page && state.startCount < page) {
           return true;
         }
-        if (state.endPage >= state.page && state.startCount > state.page) {
+        if (state.endPage >= page && state.startCount > page) {
           return true;
         }
       }

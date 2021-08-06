@@ -17,8 +17,6 @@
 		<script src="https://unpkg.com/vuejs-datepicker/dist/locale/translations/fi.js"></script>
 		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
-		<script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="https://printjs-4de6.kxcdn.com/print.min.css">
 	</head>
 	<body>
 		<!-- Breadcrumb -->
@@ -53,8 +51,8 @@
                                         <a href="#default" data-toggle="tab" class="nav-item nav-link has-icon nav-link-faded active">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings mr-2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>Yleiset
                                         </a>
-                                        <a href="#references" data-toggle="tab" class="nav-item nav-link has-icon nav-link-faded">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card mr-2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>Viitenumerot
+                                        <a href="#groups" data-toggle="tab" class="nav-item nav-link has-icon nav-link-faded">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card mr-2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>Ryhmäasetukset
                                         </a>
                                     </nav>
                                     </div>
@@ -89,43 +87,50 @@
                                                     <label for="invoicenotforloan">Laskutetun niteen "ei lainata"-tila: </label>
                                                     <input type="text" class="form-control" name="invoicenotforloan" v-model="invoicenotforloan"/>
                                                 </div>
-                                                <div class="form-group mb-0">
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane" id="groups">
+                                            <h6>Ryhmäasetukset</h6>
+                                            <hr>
+                                            <form>
+                                                <div class="form-group mb-0" v-for="(group, index) in groupsettings">
+                                                    <h6>{{group.groupname}}</h6>
                                                     <ul class="list-group list-group-sm">
+                                                        <li class="list-group-item has-icon">
+                                                            Lisää viitenumero laskuun
+                                                            <div class="custom-control custom-control-nolabel custom-switch ml-auto">
+                                                            <input type="checkbox" class="custom-control-input" :id="group.groupname + '_refnumber'" name="addreferencenumber" v-model="group.addreferencenumber">
+                                                            <label class="custom-control-label" :for="group.groupname + '_refnumber'"></label>
+                                                            </div>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <label for="increment">Viitenumeron kasvuarvo</label>
+                                                            <input type="text" class="form-control" name="increment"  v-model="group.increment"/>
+                                                        </li>
                                                         <li class="list-group-item has-icon">
                                                             Aseta rajoitus
                                                             <div class="custom-control custom-control-nolabel custom-switch ml-auto">
-                                                            <input type="checkbox" class="custom-control-input" id="customSwitch1" v-model="debarment">
-                                                            <label class="custom-control-label" for="customSwitch1"></label>
+                                                            <input type="checkbox" class="custom-control-input" :id="group.groupname + '_debarment'" v-model="group.debarment">
+                                                            <label class="custom-control-label" :for="group.groupname + '_debarment'" ></label>
                                                             </div>
                                                         </li>
                                                         <li class="list-group-item has-icon">
                                                             Lisää niteen hinta asiakkaan maksuihin
                                                             <div class="custom-control custom-control-nolabel custom-switch ml-auto">
-                                                            <input type="checkbox" class="custom-control-input" id="customSwitch2">
-                                                            <label class="custom-control-label" for="customSwitch2"></label>
+                                                            <input type="checkbox" class="custom-control-input" :id="group.groupname + '_price'" v-model="group.addreplacementprice">
+                                                            <label class="custom-control-label" :for="group.groupname + '_price'"></label>
                                                             </div>
                                                         </li>
-                                                    </ul>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div class="tab-pane" id="references">
-                                            <h6>Viitenumerot</h6>
-                                            <hr>
-                                            <form>
-                                                <div class="form-group mb-0" v-for="(category, index) in referencenumbersettings">
-                                                    <h6>{{category.groupname}}</h6>
-                                                    <ul class="list-group list-group-sm">
                                                         <li class="list-group-item has-icon">
-                                                            Lisää viitenumero laskuun
+                                                            Lisää myöhästymismaksut laskuun
                                                             <div class="custom-control custom-control-nolabel custom-switch ml-auto">
-                                                            <input type="checkbox" class="custom-control-input" id="customSwitch3" name="addreferencenumber" v-model="category.addreferencenumber">
-                                                            <label class="custom-control-label" for="customSwitch3"></label>
+                                                            <input type="checkbox" class="custom-control-input" :id="group.groupname + '_overduefines'" v-model="group.overduefines">
+                                                            <label class="custom-control-label" :for="group.groupname + '_overduefines'"></label>
                                                             </div>
                                                         </li>
                                                         <li class="list-group-item">
-                                                            <label for="increment">Kasvuarvo</label>
-                                                            <input type="text" class="form-control" name="increment"  v-model="category.increment"/>
+                                                            <label for="invoicefine">Laskutuslisä</label>
+                                                            <input type="text" class="form-control" name="invoicefine"  v-model="group.invoicefine"/>
                                                         </li>
                                                     </ul>
                                                 </div>

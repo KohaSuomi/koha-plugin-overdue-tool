@@ -61,6 +61,7 @@ sub tool {
 sub api {
     my ( $self, $args ) = @_;
     my $cgi = $self->{'cgi'};
+    
     $self->store_data(
         {
             delaymonths           => $cgi->param('delaymonths'),
@@ -69,7 +70,7 @@ sub api {
             invoicenotforloan     => $cgi->param('invoicenotforloan'),
             debarment             => $cgi->param('debarment'),
             addreplacementprice   => $cgi->param('addreplacementprice'),
-            referencenumbersettings    => $cgi->param('referencenumbersettings'),
+            groupsettings         => $cgi->param('groupsettings'),
 
         }
     );
@@ -127,8 +128,8 @@ sub configure {
     my $cgi = $self->{'cgi'};
 
     my $template = $self->get_template({ file => 'config.tt' });
-
-    my $referencesettings = get_reference_settings(JSON::from_json($self->retrieve_data('referencenumbersettings')));
+    my $settings = $self->retrieve_data('groupsettings') ? JSON::from_json($self->retrieve_data('groupsettings')) : [];
+    my $groupsettings = set_group_settings($settings);
 
     my $json = {
         delaymonths => $self->retrieve_data('delaymonths'),
@@ -137,7 +138,7 @@ sub configure {
         invoicenotforloan => $self->retrieve_data('invoicenotforloan'),
         debarment => $self->retrieve_data('debarment'),
         addreplacementprice   => $self->retrieve_data('addreplacementprice'),
-        referencenumbersettings => $referencesettings
+        groupsettings => $groupsettings
     };
     $template->param(
         data => JSON::to_json($json),
@@ -183,7 +184,7 @@ sub tool_view {
     my $branch = C4::Context->userenv->{'branch'};
     my $branchsettings = get_branch_settings($branch);
     my $overduerules = check_overdue_rules($branch, $self->retrieve_data("delaymonths"));
-    my ($addreferencenumber, $increment) = get_reference_number(JSON::from_json($self->retrieve_data('referencenumbersettings')), $branchsettings->{librarygroup});
+    my ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine) = get_group_settings(JSON::from_json($self->retrieve_data('groupsettings')), $branchsettings->{librarygroup});
     
     my $json = {
         userlibrary => $branch,
@@ -194,10 +195,12 @@ sub tool_view {
         overduerules => $overduerules,
         invoicelibrary => $self->retrieve_data('invoicelibrary'),
         invoicenotforloan => $self->retrieve_data('invoicenotforloan'),
-        debarment => $self->retrieve_data('debarment'),
-        addreplacementprice   => $self->retrieve_data('addreplacementprice'),
+        debarment => $debarment,
+        addreplacementprice   => $addreplacementprice,
         addreferencenumber  => $addreferencenumber,
         increment   => $increment,
+        overduefines => $overduefines,
+        invoicefine => $invoicefine,
     };
     $template->param(
         data => JSON::to_json($json)

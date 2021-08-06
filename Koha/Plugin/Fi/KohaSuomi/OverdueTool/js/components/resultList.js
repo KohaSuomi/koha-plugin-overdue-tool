@@ -115,6 +115,8 @@ const resultList = Vue.component('result-list', {
         addreplacementprice: this.$store.state.addReplacementPrice,
         addreferencenumber: this.$store.state.addReferenceNumber,
         increment: this.$store.state.increment,
+        invoicefine: this.$store.state.invoicefine,
+        overduefines: this.$store.state.overduefines,
         librarygroup: this.$store.state.libraryGroup,
         lang: this.result.lang,
         letter_code: letter_code,

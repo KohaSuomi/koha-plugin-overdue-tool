@@ -7,9 +7,9 @@ use Koha::LibraryCategories;
 use Mojo::JSON;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(get_branch_settings check_overdue_rules get_reference_settings get_reference_number);
+our @EXPORT = qw(get_branch_settings check_overdue_rules set_group_settings get_group_settings);
 
-sub get_reference_settings {
+sub set_group_settings {
     my ( $saved ) = @_;
     my $library_categories = Koha::LibraryCategories->search({});
     my $categories = $saved;
@@ -24,7 +24,15 @@ sub get_reference_settings {
                 }
             }
             if ($add) {
-                my $settings = {groupname => $category->{categorycode}, increment => '', addreferencenumber => Mojo::JSON->false};
+                my $settings = {
+                    groupname => $category->{categorycode}, 
+                    increment => '', 
+                    addreferencenumber => Mojo::JSON->false, 
+                    debarment => Mojo::JSON->false, 
+                    addreplacementprice => Mojo::JSON->false,
+                    overduefines =>  Mojo::JSON->false,
+                    invoicefine => ''
+                };
                 push @{$categories}, $settings;
             }
         }
@@ -33,18 +41,27 @@ sub get_reference_settings {
     return $categories;
 }
 
-sub get_reference_number {
+sub get_group_settings {
     my ( $saved, $group ) = @_;
     my $increment;
     my $addreferencenumber;
+    my $debarment;
+    my $addreplacementprice;
+    my $overduefines;
+    my $invoicefine;
     foreach my $s (@{$saved}) {
         if ($s->{groupname} eq $group) {
             $increment = $s->{increment};
             $addreferencenumber = $s->{addreferencenumber};
+            $debarment = $s->{addreferencenumber};
+            $addreplacementprice = $s->{addreplacementprice};
+            $overduefines = $s->{overduefines};
+            $invoicefine = $s->{invoicefine};
+
         }
     }
     
-    return ($addreferencenumber, $increment);
+    return ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine);
 }
 
 sub get_branch_settings {

@@ -2,7 +2,6 @@ const store = new Vuex.Store({
   state: {
     results: [],
     errors: [],
-    status: 'pending',
     offset: 0,
     page: 1,
     limit: 20,
@@ -30,6 +29,8 @@ const store = new Vuex.Store({
     showLoader: false,
     notice: '',
     increment: '',
+    invoicefine: '',
+    overduefines: '',
   },
   mutations: {
     addError(state, value) {
@@ -97,6 +98,15 @@ const store = new Vuex.Store({
     },
     addCategoryCodes(state, value) {
       state.categorycodes = value;
+    },
+    debarment(state, value) {
+      state.debarment = value;
+    },
+    addInvoiceFine(state, value) {
+      state.invoicefine = value;
+    },
+    addOverdueFines(state, value) {
+      state.overduefines = value;
     },
     debarment(state, value) {
       state.debarment = value;
@@ -182,11 +192,13 @@ const store = new Vuex.Store({
         });
     },
     sendOverdues({ commit, state }, payload) {
+      commit('showLoader', true);
       commit('removeErrors');
       axios
         .post('/api/v1/invoices/' + payload.borrowernumber, payload.params)
         .then((response) => {
           commit('setNotice', response.data.notice);
+          commit('showLoader', false);
         })
         .catch((error) => {
           commit('addError', error.response.data.error);

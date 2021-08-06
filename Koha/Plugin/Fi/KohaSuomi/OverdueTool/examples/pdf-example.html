@@ -4,7 +4,7 @@
             <p><ul class="info"><li><<branches.branchname>></li>
                 <li><<branches.branchaddress1>></li>
                 <li><<branches.branchzip>> <<branches.branchcity>></li>
-                                    <li><<branches.branchphone>></li>
+                <li><<branches.branchphone>></li>
             </ul></p>
         </div>
         <div class="billheader">
@@ -39,17 +39,17 @@
                     <td><<date_due>></td>
                     <td><<biblio.author>> <<biblio.title>> <<items.enumchron>></td>
                     <td><<items.itype>><br/><<items.barcode>><br/><<items.itemcallnumber>></td>
-                    <td>Hinta: <<items.replacementprice>><br/>
-                        Myöhästymismaksu: 5€
+                    <td>Hinta: <<items.replacementprice>>€<br/>
+                        Myöhästymismaksu: <<items.overduefine>>€
                     </td>
                 </tr>
             </item>
         </tbody>
     </table>
-    <div class="summary">
-        <p><ul class="info">
-        <li>Perimiskulut: 7,4 €</li>
-        <li>MAKSETTAVA YHTEENSÄ: <<totalfines>> €</li>
-        </ul></p>
-    </div>
+</div>
+<div class="summary">
+    <p><ul class="info">
+    <li>Perimiskulut: <<invoicefine>>€</li>
+    <li>MAKSETTAVA YHTEENSÄ: <<totalfines>>€</li>
+    </ul></p>
 </div>

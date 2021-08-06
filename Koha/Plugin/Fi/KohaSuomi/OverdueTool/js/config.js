@@ -7,9 +7,7 @@ new Vue({
       delaymonths: jsondata.delaymonths,
       maxyears: jsondata.maxyears,
       invoicenotforloan: jsondata.invoicenotforloan,
-      debarment: jsondata.debarment,
-      addreplacementprice: jsondata.addreplacementprice,
-      referencenumbersettings: jsondata.referencenumbersettings,
+      groupsettings: jsondata.groupsettings,
       saved: false,
     };
   },
@@ -29,9 +27,7 @@ new Vue({
             invoicenotforloan: this.invoicenotforloan,
             debarment: this.debarment,
             addreplacementprice: this.addreplacementprice,
-            referencenumbersettings: JSON.stringify(
-              this.referencenumbersettings
-            ),
+            groupsettings: JSON.stringify(this.groupsettings),
           },
         })
         .then(() => {

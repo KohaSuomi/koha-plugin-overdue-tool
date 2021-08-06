@@ -24,6 +24,8 @@ new Vue({
     store.commit('debarment', jsondata.debarment);
     store.commit('addReplacementPrice', jsondata.addreplacementprice);
     store.commit('addReferenceNumber', jsondata.addreferencenumber);
+    store.commit('addInvoiceFine', jsondata.invoicefine);
+    store.commit('addOverdueFines', jsondata.overduefines);
     store.commit('addIncrement', jsondata.increment);
     store.commit('addLibraryGroup', jsondata.librarygroup);
     store.commit('addCategoryCodes', jsondata.overduerules.categorycodes);

@@ -144,19 +144,16 @@ sub check_overdue_rules {
                 $delaytime = $row->{delay3};
                 $delayperiod = '3';
                 $fine = $row->{fine3};
-                next;
-            } elsif ($row->{delay2} && $row->{letter2}) {
+            } elsif ($row->{delay2} && $row->{letter2} && !$delayperiod) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay2};
                 $delayperiod = '2';
                 $fine = $row->{fine2};
-                next;
-            } elsif ($row->{delay1} && $row->{letter1}) {
+            } elsif ($row->{delay1} && $row->{letter1} && !$delayperiod) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay1};
                 $delayperiod = '1';
                 $fine = $row->{fine1};
-                next;
             }
         }
         $isth->finish;

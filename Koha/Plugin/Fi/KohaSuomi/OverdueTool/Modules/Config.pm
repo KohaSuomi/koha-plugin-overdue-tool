@@ -136,7 +136,7 @@ sub check_overdue_rules {
         }
         $sth->finish;
     } else {
-        my $isth = $dbh->prepare("SELECT * FROM overduerules");
+        my $isth = $dbh->prepare("SELECT * FROM overduerules WHERE branchcode = ''");
         $isth->execute();
         while (my $row = $isth->fetchrow_hashref) {
             if ($row->{delay3} && $row->{letter3}) {

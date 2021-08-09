@@ -112,45 +112,51 @@ sub check_overdue_rules {
     my $sth;
     $sth = $dbh->prepare("SELECT * FROM overduerules WHERE branchcode = ?");
     $sth->execute($branch);
-    if (my $data = $sth->fetchrow_hashref) {
-        push @categorycodes, $data->{categorycode};
+    if ($sth->fetchrow_hashref) {
         while (my $row = $sth->fetchrow_hashref) {
-            push @categorycodes, $row->{categorycode};
-        }
-        if ($data->{delay3}) {
-            $delaytime = $data->{delay3};
-            $delayperiod = '3';
-            $fine = $data->{fine3};
-        } elsif ($data->{delay2}) {
-            $delaytime =$data->{delay2};
-            $delayperiod= '2';
-            $fine = $data->{fine2};
-        } elsif ($data->{delay1}) {
-            $delaytime =$data->{delay1};
-            $delayperiod = '1';
-            $fine = $data->{fine1};
+            if ($row->{delay3} && $row->{letter3}) {
+                push @categorycodes, $row->{categorycode};
+                $delaytime = $row->{delay3};
+                $delayperiod = '3';
+                $fine = $row->{fine3};
+                next;
+            } elsif ($row->{delay2} && $row->{letter2}) {
+                push @categorycodes, $row->{categorycode};
+                $delaytime = $row->{delay2};
+                $delayperiod = '2';
+                $fine = $row->{fine2};
+                next;
+            } elsif ($row->{delay1} && $row->{letter1}) {
+                push @categorycodes, $row->{categorycode};
+                $delaytime = $row->{delay1};
+                $delayperiod = '1';
+                $fine = $row->{fine1};
+                next;
+            }
         }
         $sth->finish;
     } else {
         my $isth = $dbh->prepare("SELECT * FROM overduerules");
         $isth->execute();
-        if (my $idata = $isth->fetchrow_hashref) {
-            push @categorycodes, $idata->{categorycode};
-            while (my $row = $isth->fetchrow_hashref) {
+        while (my $row = $isth->fetchrow_hashref) {
+            if ($row->{delay3} && $row->{letter3}) {
                 push @categorycodes, $row->{categorycode};
-            }
-            if ($idata->{delay3}) {
-                $delaytime = $idata->{delay3};
+                $delaytime = $row->{delay3};
                 $delayperiod = '3';
-                $fine = $idata->{fine3};
-            } elsif ($idata->{delay2}) {
-                $delaytime = $idata->{delay2};
+                $fine = $row->{fine3};
+                next;
+            } elsif ($row->{delay2} && $row->{letter2}) {
+                push @categorycodes, $row->{categorycode};
+                $delaytime = $row->{delay2};
                 $delayperiod = '2';
-                $fine = $idata->{fine2};
-            } elsif ($idata->{delay1}) {
-                $delaytime = $idata->{delay1};
+                $fine = $row->{fine2};
+                next;
+            } elsif ($row->{delay1} && $row->{letter1}) {
+                push @categorycodes, $row->{categorycode};
+                $delaytime = $row->{delay1};
                 $delayperiod = '1';
-                $fine = $idata->{fine1};
+                $fine = $row->{fine1};
+                next;
             }
         }
         $isth->finish;

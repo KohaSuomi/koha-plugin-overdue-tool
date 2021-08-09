@@ -14,14 +14,14 @@ use JSON;
 use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Config;
 
 ## Here we set our plugin version
-our $VERSION = "1.0";
+our $VERSION = "1.1";
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {
     name            => 'Laskutustyökalu',
     author          => 'Johanna Räisä',
     date_authored   => '2020-12-28',
-    date_updated    => "2021-08-06",
+    date_updated    => "2021-08-09",
     minimum_version => '17.05.00.000',
     maximum_version => undef,
     version         => $VERSION,

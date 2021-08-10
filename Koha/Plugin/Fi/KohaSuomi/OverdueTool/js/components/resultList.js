@@ -93,6 +93,14 @@ const resultList = Vue.component('result-list', {
       this.activate();
     }
   },
+  computed: {
+    invoiceLetters() {
+      return this.$store.state.invoiceLetters;
+    },
+    invoiced() {
+      return this.$store.state.invoiced;
+    },
+  },
   methods: {
     activate: function () {
       this.isActive = !this.isActive;
@@ -169,6 +177,9 @@ const resultList = Vue.component('result-list', {
   filters: {
     moment: function (date) {
       return moment(date).locale('fi').format('DD.MM.YYYY');
+    },
+    lowercase: function (string) {
+      return string.toLowerCase();
     },
   },
 });

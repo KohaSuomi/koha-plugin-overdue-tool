@@ -159,7 +159,6 @@
 		<script>
 			feather.replace();
 			var jsondata = JSON.parse('[% data %]');
-			//console.log(jsondata);
 		</script>
 		<script type="module" src="[% PLUGIN_PATH %]/js/config.js"></script>
 	</body>

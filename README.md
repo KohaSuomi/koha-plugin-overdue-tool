@@ -1,4 +1,4 @@
-# Koha-Suomi Exporter Report plugin
+# Koha-Suomi Overdue tool plugin
 
 This plugin is for getting export report from KohaSuomiServices
 
@@ -13,12 +13,12 @@ To set up the Koha plugin system you must first make some changes to your instal
     Change <enable_plugins>0<enable_plugins> to <enable_plugins>1</enable_plugins> in your koha-conf.xml file
     Confirm that the path to <pluginsdir> exists, is correct, and is writable by the web server
     Remember to allow access to plugin directory from Apache
-	
+
     <Directory <pluginsdir>>
-	    Options Indexes FollowSymLinks
-	    AllowOverride None
-	    Require all granted
-	</Directory>
+        Options Indexes FollowSymLinks
+        AllowOverride None
+        Require all granted
+    </Directory>
 
     Restart your webserver
 
@@ -26,8 +26,4 @@ Once set up is complete you will need to alter your UseKohaPlugins system prefer
 
 # Downloading
 
-From the release page you can download the latest *.kpz file
-
-
-
-
+From the release page you can download the latest \*.kpz file

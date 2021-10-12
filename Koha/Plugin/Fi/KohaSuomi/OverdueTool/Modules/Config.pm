@@ -72,6 +72,7 @@ sub get_branch_settings {
     $sth->execute($userbranch);
     my $branchgroup;
     my @invoiceletter;
+    push @invoiceletter,'ODUECLAIM';
     while (my $categorycode = $sth->fetchrow_array) {
         if ($categorycode =~ /LASKU/i) {
             $branchgroup = $categorycode;
@@ -79,8 +80,6 @@ sub get_branch_settings {
 
         if ($categorycode =~ /Finvoice/i) {
             push @invoiceletter, 'FINVOICE';
-        } elsif ($categorycode =~ /PDFBill/i) {
-            push @invoiceletter,'ODUECLAIM';
         }
         
     }

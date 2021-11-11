@@ -14,14 +14,14 @@ use JSON;
 use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Config;
 
 ## Here we set our plugin version
-our $VERSION = "1.4.1";
+our $VERSION = "1.4.2";
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {
     name            => 'Laskutustyökalu',
     author          => 'Johanna Räisä',
     date_authored   => '2020-12-28',
-    date_updated    => "2021-10-12",
+    date_updated    => "2021-11-11",
     minimum_version => '17.05.00.000',
     maximum_version => undef,
     version         => $VERSION,
@@ -68,8 +68,6 @@ sub api {
             maxyears              => $cgi->param('maxyears'),
             invoicelibrary        => $cgi->param('invoicelibrary'),
             invoicenotforloan     => $cgi->param('invoicenotforloan'),
-            debarment             => $cgi->param('debarment'),
-            addreplacementprice   => $cgi->param('addreplacementprice'),
             groupsettings         => $cgi->param('groupsettings'),
 
         }
@@ -78,49 +76,6 @@ sub api {
     print $cgi->header( -type => 'text/json', -charset => 'UTF-8' );
     print JSON::to_json({message => 'success'});
     exit 0;
-}
-
-## If your tool is complicated enough to needs it's own setting/configuration
-## you will want to add a 'configure' method to your plugin like so.
-## Here I am throwing all the logic into the 'configure' method, but it could
-## be split up like the 'report' method is.
-sub configure_old {
-    my ( $self, $args ) = @_;
-    my $cgi = $self->{'cgi'};
-
-    unless ( $cgi->param('save') ) {
-        my $template = $self->get_template({ file => 'configure.tt' });
-
-        ## Grab the values we already have for our settings, if any exist
-        $template->param(
-            delaymonths => $self->retrieve_data('delaymonths'),
-            maxyears => $self->retrieve_data('maxyears'),
-            invoicelibrary => $self->retrieve_data('invoicelibrary'),
-            invoicenotforloan => $self->retrieve_data('invoicenotforloan'),
-            debarment => $self->retrieve_data('debarment'),
-            addreplacementprice   => $self->retrieve_data('addreplacementprice'),
-            addreferencenumber   => $self->retrieve_data('addreferencenumber'),
-
-        );
-
-        print $cgi->header(-charset    => 'utf-8');
-        print $template->output();
-    }
-    else {
-        $self->store_data(
-            {
-                delaymonths           => $cgi->param('delaymonths'),
-                maxyears              => $cgi->param('maxyears'),
-                invoicelibrary        => $cgi->param('invoicelibrary'),
-                invoicenotforloan     => $cgi->param('invoicenotforloan'),
-                debarment             => $cgi->param('debarment'),
-                addreplacementprice   => $cgi->param('addreplacementprice'),
-                addreferencenumber    => $cgi->param('addreferencenumber'),
-
-            }
-        );
-        $self->go_home();
-    }
 }
 
 sub configure {
@@ -136,8 +91,6 @@ sub configure {
         maxyears => $self->retrieve_data('maxyears'),
         invoicelibrary => $self->retrieve_data('invoicelibrary'),
         invoicenotforloan => $self->retrieve_data('invoicenotforloan'),
-        debarment => $self->retrieve_data('debarment'),
-        addreplacementprice   => $self->retrieve_data('addreplacementprice'),
         groupsettings => $groupsettings
     };
     $template->param(

@@ -28,6 +28,8 @@ new Vue({
     store.commit('addOverdueFines', jsondata.overduefines);
     store.commit('addIncrement', jsondata.increment);
     store.commit('addLibraryGroup', jsondata.librarygroup);
+    store.commit('addAccountNumber', jsondata.accountnumber);
+    store.commit('addBicCode', jsondata.biccode);
     store.commit('addCategoryCodes', jsondata.overduerules.categorycodes);
     store.dispatch('setDates', jsondata.overduerules);
     this.fetch();

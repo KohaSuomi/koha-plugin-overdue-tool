@@ -31,6 +31,8 @@ const store = new Vuex.Store({
     increment: '',
     invoicefine: '',
     overduefines: '',
+    accountNumber: '',
+    bicCode: '',
   },
   mutations: {
     addError(state, value) {
@@ -122,6 +124,12 @@ const store = new Vuex.Store({
     },
     addReferenceNumber(state, value) {
       state.addReferenceNumber = value;
+    },
+    addAccountNumber(state, value) {
+      state.accountNumber = value;
+    },
+    addBicCode(state, value) {
+      state.bicCode = value;
     },
     showLoader(state, value) {
       state.showLoader = value;

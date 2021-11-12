@@ -126,6 +126,8 @@ const resultList = Vue.component('result-list', {
         invoicefine: this.$store.state.invoicefine,
         overduefines: this.$store.state.overduefines,
         librarygroup: this.$store.state.libraryGroup,
+        accountnumber: this.$store.state.accountNumber,
+        biccode: this.$store.state.bicCode,
         lang: this.result.lang,
         letter_code: letter_code,
       };

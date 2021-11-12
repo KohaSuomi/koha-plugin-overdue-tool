@@ -29,12 +29,8 @@
   </SellerPartyDetails>
   <SellerInformationDetails>
     <SellerAccountDetails>
-      <SellerAccountID IdentificationSchemeName="IBAN">FI2757800750155447</SellerAccountID>
-      <SellerBic IdentificationSchemeName="BIC">OKOYFIHH</SellerBic>
-    </SellerAccountDetails>
-    <SellerAccountDetails>
-      <SellerAccountID IdentificationSchemeName="IBAN">FI7429501800000014</SellerAccountID>
-      <SellerBic IdentificationSchemeName="BIC">NDEAFIHH</SellerBic>
+      <SellerAccountID IdentificationSchemeName="IBAN"><<accountnumber>></SellerAccountID>
+      <SellerBic IdentificationSchemeName="BIC"><<biccode>></SellerBic>
     </SellerAccountDetails>
   </SellerInformationDetails>
   <BuyerPartyDetails>
@@ -82,11 +78,11 @@
     </EpiIdentificationDetails>
     <EpiPartyDetails>
       <EpiBfiPartyDetails>
-        <EpiBfiIdentifier IdentificationSchemeName="BIC">NDEAFIHH</EpiBfiIdentifier>
+        <EpiBfiIdentifier IdentificationSchemeName="BIC"><<biccode>></EpiBfiIdentifier>
       </EpiBfiPartyDetails>
       <EpiBeneficiaryPartyDetails>
         <EpiNameAddressDetails>Kirjasto</EpiNameAddressDetails>
-        <EpiAccountID IdentificationSchemeName="IBAN">FI7429501800000014</EpiAccountID>
+        <EpiAccountID IdentificationSchemeName="IBAN"><<accountnumber>></EpiAccountID>
       </EpiBeneficiaryPartyDetails>
     </EpiPartyDetails>
     <EpiPaymentInstructionDetails>

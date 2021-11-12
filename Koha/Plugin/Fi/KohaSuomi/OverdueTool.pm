@@ -137,7 +137,7 @@ sub tool_view {
     my $branch = C4::Context->userenv->{'branch'};
     my $branchsettings = get_branch_settings($branch);
     my $overduerules = check_overdue_rules($branch, $self->retrieve_data("delaymonths"));
-    my ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine) = get_group_settings(JSON::from_json($self->retrieve_data('groupsettings')), $branchsettings->{librarygroup});
+    my ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine, $accountnumber, $biccode) = get_group_settings(JSON::from_json($self->retrieve_data('groupsettings')), $branchsettings->{librarygroup});
     
     my $json = {
         userlibrary => $branch,
@@ -154,6 +154,8 @@ sub tool_view {
         increment   => $increment,
         overduefines => $overduefines,
         invoicefine => $invoicefine,
+        accountnumber => $accountnumber,
+        biccode => $biccode,
     };
     $template->param(
         data => JSON::to_json($json)

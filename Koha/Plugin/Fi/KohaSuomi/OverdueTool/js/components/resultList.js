@@ -144,8 +144,17 @@ const resultList = Vue.component('result-list', {
       });
     },
     previewPDF: function () {
-      this.createInvoice('ODUECLAIM', true);
+      this.createInvoice('ODUECLAIM', this.onlyPreview());
       this.$parent.previewPDF();
+    },
+    onlyPreview: function () {
+      let retval = false;
+      this.$store.state.invoiceLetters.forEach((element) => {
+        if (element == 'FINVOICE') {
+          retval = true;
+        }
+      });
+      return retval;
     },
     newPrice(val, index) {
       var intvalue = Math.floor(val);

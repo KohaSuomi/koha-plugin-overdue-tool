@@ -3,12 +3,12 @@
 <Finvoice Version="3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Finvoice3.0.xsd">
   <MessageTransmissionDetails>
     <MessageSenderDetails>
-      <FromIdentifier SchemeID="0037">00371234567890</FromIdentifier>
-      <FromIntermediator>NDEAFIHH</FromIntermediator>
+      <FromIdentifier SchemeID="0037"><<accountnumber>></FromIdentifier>
+      <FromIntermediator><<biccode>></FromIntermediator>
     </MessageSenderDetails>
     <MessageReceiverDetails>
-      <ToIdentifier SchemeID="0037">00370987654321</ToIdentifier>
-      <ToIntermediator>003710948874</ToIntermediator>
+      <ToIdentifier SchemeID="0037"><<borrowers.cardnumber>> </ToIdentifier>
+      <ToIntermediator><<borrowers.borrowernumber>></ToIntermediator>
     </MessageReceiverDetails>
     <MessageDetails>
       <MessageIdentifier></MessageIdentifier>

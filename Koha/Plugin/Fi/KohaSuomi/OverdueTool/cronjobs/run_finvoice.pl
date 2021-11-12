@@ -52,7 +52,6 @@ Usage: $0 OUTPUT_DIRECTORY
   Will print all waiting print notices to
   OUTPUT_DIRECTORY .
 
-  -l --library  Get print notices by branchcodes, can be repeated. (Mandatory)
   -p --path   Config file path for sftp (Mandatory). See example file config.yaml.example.
   -c --config  Config name. See example file config.yaml.example. (Mandatory)
 
@@ -60,11 +59,10 @@ USAGE
     exit $_[0];
 }
 
-my ( $help, @branchcodes, $config, $path);
+my ( $help, $config, $path);
 
 GetOptions(
     'h|help'  => \$help,
-    'l|library=s' => \@branchcodes,
     'p|path=s' => \$path,
     'c|config=s' => \$config,
 ) || usage(1);
@@ -79,13 +77,8 @@ if ( !$output_directory || !-d $output_directory || !-w $output_directory ) {
     usage(1);
 }
 
-if(!@branchcodes) {
-    print "Define branchcodes for sending\n";
-    exit;
-}
-
 if(!$path) {
-    print "Define config file path for sftp\n";
+    print "Define config file output path for sftp\n";
     exit;
 }
 
@@ -94,12 +87,21 @@ if(!$config) {
     exit;
 }
 
-my $today     = output_pref( { dt => dt_from_string, dateonly => 1, dateformat => 'iso' } ) ;
-my $notices = Koha::Notice::Messages->search({letter_code => 'FINVOICE', status => 'pending', from_address => {'=' => [@branchcodes]}});
-exit unless $notices;
 my $configfile = eval { YAML::XS::LoadFile($path) };
 exit unless $configfile->{$config};
 my $finvoiceconfig = $configfile->{$config};
+
+my @librarycodes = $finvoiceconfig->{libraries};
+
+if(!@librarycodes) {
+    print "Define librarycodes to config file\n";
+    exit;
+}
+
+my $today     = output_pref( { dt => dt_from_string, dateonly => 1, dateformat => 'iso' } ) ;
+my $notices = Koha::Notice::Messages->search({letter_code => 'FINVOICE', status => 'pending', from_address => {'=' => [@librarycodes]}});
+exit unless $notices;
+
 my $xsd = "$FindBin::Bin/../finvoice/Finvoice3.0.xsd";
 my $tmppath = $output_directory ."/tmp/";
 

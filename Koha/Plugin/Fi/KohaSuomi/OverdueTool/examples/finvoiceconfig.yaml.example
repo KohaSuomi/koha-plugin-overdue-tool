@@ -1,4 +1,7 @@
 name:
+    libraries: 
+        - branchcode1
+        - branchcode2
     host:
     username:
     password:

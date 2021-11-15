@@ -127,7 +127,7 @@ foreach my $notice (@{$notices->unblessed}) {
 }
 if (@message_ids) {
     my $zip = Archive::Zip->new();
-    my $zipFile = "kirjasto-finvoice-".$today. ".zip";
+    my $zipFile = $config."-kirjasto-finvoice-".$today. ".zip";
 
     chdir $tmppath;
     my @files = <*.xml>;
@@ -149,7 +149,7 @@ if (@message_ids) {
     foreach my $file (@zipfiles) {
 
         system ("sshpass -p $finvoiceconfig->{password} sftp $finvoiceconfig->{username}\@$finvoiceconfig->{host} > /dev/null 2>&1 << EOF
-        cd IN
+        cd $finvoiceconfig->{filepath}
         put $tmppath$file
         bye
         EOF") == 0 or die "system failed: $!";

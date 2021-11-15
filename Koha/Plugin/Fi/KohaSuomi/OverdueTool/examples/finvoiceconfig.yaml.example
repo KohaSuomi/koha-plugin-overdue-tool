@@ -5,6 +5,7 @@ name:
     host:
     username:
     password:
+    filepath: "/foo/bar/"
 name:
     host:
     username:

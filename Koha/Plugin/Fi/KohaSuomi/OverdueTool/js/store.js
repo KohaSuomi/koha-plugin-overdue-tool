@@ -33,6 +33,7 @@ const store = new Vuex.Store({
     overduefines: '',
     accountNumber: '',
     bicCode: '',
+    messageId: '',
   },
   mutations: {
     addError(state, value) {
@@ -153,6 +154,9 @@ const store = new Vuex.Store({
       state.notice = '';
       state.notice += value;
     },
+    setMessageId(state, value) {
+      state.messageId = value;
+    },
   },
   actions: {
     fetchOverdues({ commit, state }) {
@@ -206,6 +210,7 @@ const store = new Vuex.Store({
         .post('/api/v1/invoices/' + payload.borrowernumber, payload.params)
         .then((response) => {
           commit('setNotice', response.data.notice);
+          commit('setMessageId', response.data.message_id);
           commit('showLoader', false);
         })
         .catch((error) => {
@@ -253,6 +258,18 @@ const store = new Vuex.Store({
       commit('addStartDate', startDate);
       let lastDate = endDate.setYear(endDate.getFullYear() - state.maxYears);
       commit('addLastDate', lastDate);
+    },
+    editNotice({ commit, state }, status) {
+      commit('showLoader', true);
+      commit('removeErrors');
+      axios
+        .put('/api/v1/notices/' + state.messageId, { status: status })
+        .then(() => {
+          commit('showLoader', false);
+        })
+        .catch((error) => {
+          commit('addError', error.response.data.error);
+        });
     },
   },
   getters: {

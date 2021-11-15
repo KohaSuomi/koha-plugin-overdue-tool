@@ -12,6 +12,7 @@ new Vue({
     return {
       fi: vdp_translation_fi.js,
       showPDF: false,
+      preview: true,
     };
   },
   mounted() {
@@ -95,10 +96,14 @@ new Vue({
       store.dispatch('fetchOverdues');
       this.activate();
     },
-    previewPDF() {
+    previewPDF(preview) {
+      this.preview = preview;
       this.showPDF = true;
     },
     printPDF() {
+      if (!this.preview) {
+        store.dispatch('editNotice', 'sent');
+      }
       printJS({
         printable: 'printDoc',
         type: 'html',

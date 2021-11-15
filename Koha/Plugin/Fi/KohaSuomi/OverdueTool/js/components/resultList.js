@@ -106,6 +106,7 @@ const resultList = Vue.component('result-list', {
       this.isActive = !this.isActive;
     },
     createInvoice: function (letter_code, preview) {
+      this.newcheckouts = [];
       this.newcheckouts = this.result.checkouts.slice(0);
       this.removecheckouts.forEach((element) => {
         let index = this.newcheckouts.findIndex(
@@ -145,7 +146,7 @@ const resultList = Vue.component('result-list', {
     },
     previewPDF: function () {
       this.createInvoice('ODUECLAIM', this.onlyPreview());
-      this.$parent.previewPDF();
+      this.$parent.previewPDF(this.onlyPreview());
     },
     onlyPreview: function () {
       let retval = false;

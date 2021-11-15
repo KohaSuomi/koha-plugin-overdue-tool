@@ -1,6 +1,6 @@
 # Koha-Suomi Overdue tool plugin
 
-This plugin is for getting export report from KohaSuomiServices
+This plugin is for sending Finvoice invoices and printing PDF invoices.
 
 # Installing
 

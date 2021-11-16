@@ -34,6 +34,7 @@ const store = new Vuex.Store({
     accountNumber: '',
     bicCode: '',
     messageId: '',
+    businessId: '',
   },
   mutations: {
     addError(state, value) {
@@ -131,6 +132,9 @@ const store = new Vuex.Store({
     },
     addBicCode(state, value) {
       state.bicCode = value;
+    },
+    addBusinessId(state, value) {
+      state.businessId = value;
     },
     showLoader(state, value) {
       state.showLoader = value;

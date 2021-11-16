@@ -33,7 +33,8 @@ sub set_group_settings {
                     overduefines =>  Mojo::JSON->false,
                     invoicefine => '',
                     accountnumber => '',
-                    biccode => ''
+                    biccode => '',
+                    businessid => '',
                 };
                 push @{$categories}, $settings;
             }
@@ -46,7 +47,7 @@ sub set_group_settings {
 sub get_group_settings {
     my ( $saved, $group ) = @_;
 
-    my ($increment, $addreferencenumber, $addreplacementprice, $debarment, $overduefines, $invoicefine, $accountnumber, $biccode);
+    my ($increment, $addreferencenumber, $addreplacementprice, $debarment, $overduefines, $invoicefine, $accountnumber, $biccode, $businessid);
     
     foreach my $s (@{$saved}) {
         if ($s->{groupname} eq $group) {
@@ -58,11 +59,12 @@ sub get_group_settings {
             $invoicefine = $s->{invoicefine};
             $accountnumber = $s->{accountnumber};
             $biccode = $s->{biccode};
+            $businessid = $s->{businessid};
 
         }
     }
     
-    return ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine, $accountnumber, $biccode);
+    return ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine, $accountnumber, $biccode, $businessid);
 }
 
 sub get_branch_settings {

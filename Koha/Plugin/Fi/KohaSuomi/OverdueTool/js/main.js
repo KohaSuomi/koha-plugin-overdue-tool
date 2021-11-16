@@ -31,6 +31,7 @@ new Vue({
     store.commit('addLibraryGroup', jsondata.librarygroup);
     store.commit('addAccountNumber', jsondata.accountnumber);
     store.commit('addBicCode', jsondata.biccode);
+    store.commit('addBusinessId', jsondata.businessid);
     store.commit('addCategoryCodes', jsondata.overduerules.categorycodes);
     store.dispatch('setDates', jsondata.overduerules);
     this.fetch();

@@ -129,6 +129,7 @@ const resultList = Vue.component('result-list', {
         librarygroup: this.$store.state.libraryGroup,
         accountnumber: this.$store.state.accountNumber,
         biccode: this.$store.state.bicCode,
+        businessid: this.$store.state.businessId,
         lang: this.result.lang,
         letter_code: letter_code,
       };

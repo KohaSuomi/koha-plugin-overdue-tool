@@ -17,12 +17,12 @@
     </MessageDetails>
   </MessageTransmissionDetails>
   <SellerPartyDetails>
-    <SellerPartyIdentifier>6666666-5</SellerPartyIdentifier>
-    <SellerOrganisationName>Kirjasto</SellerOrganisationName>
+    <SellerPartyIdentifier><<businessid>></SellerPartyIdentifier>
+    <SellerOrganisationName><<branches.branchname>></SellerOrganisationName>
     <SellerPostalAddressDetails>  
-      <SellerStreetName>Testikatu 1</SellerStreetName>
-      <SellerTownName>Helsinki</SellerTownName>
-      <SellerPostCodeIdentifier>00100</SellerPostCodeIdentifier>
+      <SellerStreetName><<branches.branchaddress1>></SellerStreetName>
+      <SellerTownName><<branches.branchcity>></SellerTownName>
+      <SellerPostCodeIdentifier><<branches.branchzip>></SellerPostCodeIdentifier>
       <CountryCode>FI</CountryCode>
       <CountryName>Suomi</CountryName>
     </SellerPostalAddressDetails>

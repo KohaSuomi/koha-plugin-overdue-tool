@@ -11,6 +11,7 @@ const patronData = Vue.component('patrondata', {
   },
   methods: {
     getPatron() {
+      this.patron = {};
       axios
         .get('/api/v1/patrons/' + this.borrowernumber)
         .then((response) => {

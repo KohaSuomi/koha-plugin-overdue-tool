@@ -164,6 +164,7 @@ const store = new Vuex.Store({
   },
   actions: {
     fetchOverdues({ commit, state }) {
+      commit('addResults', []);
       commit('removeErrors');
       commit('showLoader', true);
       var searchParams = new URLSearchParams();

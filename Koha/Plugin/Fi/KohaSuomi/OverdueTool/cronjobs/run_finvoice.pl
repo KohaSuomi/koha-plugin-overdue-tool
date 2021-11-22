@@ -54,17 +54,19 @@ Usage: $0 OUTPUT_DIRECTORY
 
   -p --path   Config file path for sftp (Mandatory). See example file config.yaml.example.
   -c --config  Config name. See example file config.yaml.example. (Mandatory)
+  -v --validate  Validate the Finvoice messages.
 
 USAGE
     exit $_[0];
 }
 
-my ( $help, $config, $path);
+my ( $help, $config, $path, $validate);
 
 GetOptions(
     'h|help'  => \$help,
     'p|path=s' => \$path,
     'c|config=s' => \$config,
+    'v|validate' => \$validate
 ) || usage(1);
 
 usage(0) if ($help);
@@ -111,7 +113,7 @@ foreach my $notice (@{$notices->unblessed}) {
     my $doc = process_xml($notice);
     my $xmlschema = XML::LibXML::Schema->new(location => $xsd);
 	eval {$xmlschema->validate($doc);};
-    if ($@) {
+    if ($@ && $validate) {
         print "$notice->{message_id} failed with $@\n";
         C4::Letters::_set_message_status(
         { message_id => $notice->{message_id}, status => 'failed', delivery_note => "Finvoice template error, check logs." } );

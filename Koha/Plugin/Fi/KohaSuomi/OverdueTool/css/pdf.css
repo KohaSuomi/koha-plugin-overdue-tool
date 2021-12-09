@@ -20,7 +20,7 @@
 }
 .preview .content,
 .preview .recipient {
-  margin-top: 20mm;
+  margin-top: 0mm;
   /* margin-left: 21mm;
   margin-right: 21mm; */
   /* padding-bottom: 21mm; */
@@ -52,7 +52,7 @@
 }
 
 .preview .sender {
-  padding-bottom: 30mm;
+  padding-bottom: 0mm;
 }
 .preview .billheader,
 .preview .billfooter {

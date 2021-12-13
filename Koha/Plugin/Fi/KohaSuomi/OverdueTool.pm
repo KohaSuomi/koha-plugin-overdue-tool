@@ -14,14 +14,14 @@ use JSON;
 use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Config;
 
 ## Here we set our plugin version
-our $VERSION = "1.4.9";
+our $VERSION = "1.5.0";
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {
     name            => 'Laskutustyökalu',
     author          => 'Johanna Räisä',
     date_authored   => '2020-12-28',
-    date_updated    => "2021-12-09",
+    date_updated    => "2021-12-13",
     minimum_version => '17.05.00.000',
     maximum_version => undef,
     version         => $VERSION,
@@ -136,8 +136,9 @@ sub tool_view {
 
     my $branch = C4::Context->userenv->{'branch'};
     my $branchsettings = get_branch_settings($branch);
+    my $groupsettings = $self->retrieve_data('groupsettings') || '[]';
     my $overduerules = check_overdue_rules($branch, $self->retrieve_data("delaymonths"));
-    my ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine, $accountnumber, $biccode, $businessid) = get_group_settings(JSON::from_json($self->retrieve_data('groupsettings')), $branchsettings->{librarygroup});
+    my ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine, $accountnumber, $biccode, $businessid) = get_group_settings(JSON::from_json($groupsettings), $branchsettings->{librarygroup});
     
     my $json = {
         userlibrary => $branch,

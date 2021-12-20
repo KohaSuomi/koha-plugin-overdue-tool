@@ -35,6 +35,8 @@ const store = new Vuex.Store({
     bicCode: '',
     messageId: '',
     businessId: '',
+    patronMessage: '',
+    guaranteeMessage: '',
   },
   mutations: {
     addError(state, value) {
@@ -135,6 +137,12 @@ const store = new Vuex.Store({
     },
     addBusinessId(state, value) {
       state.businessId = value;
+    },
+    addPatronMessage(state, value) {
+      state.patronMessage = value;
+    },
+    addGuaranteeMessage(state, value) {
+      state.guaranteeMessage = value;
     },
     showLoader(state, value) {
       state.showLoader = value;

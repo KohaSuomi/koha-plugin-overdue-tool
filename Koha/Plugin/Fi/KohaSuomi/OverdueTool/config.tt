@@ -144,6 +144,14 @@
                                                             <label for="invoicefine">Laskutuslisä</label>
                                                             <input type="text" class="form-control" name="invoicefine"  v-model="group.invoicefine"/>
                                                         </li>
+                                                        <li class="list-group-item">
+                                                            <label for="patronmessage">Viesti asiakkaalle</label>
+                                                            <input type="text" class="form-control" name="patronmessage"  v-model="group.patronmessage"/>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <label for="guaranteemessage">Viesti huollettavalle</label>
+                                                            <input type="text" class="form-control" name="guaranteemessage"  v-model="group.guaranteemessage"/>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                             </form>

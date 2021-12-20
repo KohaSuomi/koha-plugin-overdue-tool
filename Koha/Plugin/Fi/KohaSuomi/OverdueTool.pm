@@ -138,7 +138,7 @@ sub tool_view {
     my $branchsettings = get_branch_settings($branch);
     my $groupsettings = $self->retrieve_data('groupsettings') || '[]';
     my $overduerules = check_overdue_rules($branch, $self->retrieve_data("delaymonths"));
-    my ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine, $accountnumber, $biccode, $businessid) = get_group_settings(JSON::from_json($groupsettings), $branchsettings->{librarygroup});
+    my ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine, $accountnumber, $biccode, $businessid, $patronmessage, $guaranteemessage) = get_group_settings(JSON::from_json($groupsettings), $branchsettings->{librarygroup});
     
     my $json = {
         userlibrary => $branch,
@@ -157,7 +157,9 @@ sub tool_view {
         invoicefine => $invoicefine,
         accountnumber => $accountnumber,
         biccode => $biccode,
-        businessid => $businessid
+        businessid => $businessid,
+        patronmessage => $patronmessage, 
+        guaranteemessage => $guaranteemessage
     };
     $template->param(
         data => JSON::to_json($json)

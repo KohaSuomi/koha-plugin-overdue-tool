@@ -131,10 +131,15 @@ const resultList = Vue.component('result-list', {
         accountnumber: this.$store.state.accountNumber,
         biccode: this.$store.state.bicCode,
         businessid: this.$store.state.businessId,
+        patronmessage: this.$store.state.patronMessage,
+        guaranteemessage: this.$store.state.guaranteeMessage,
         lang: this.result.lang,
         letter_code: letter_code,
       };
-      params.guarantee = this.result.borrowernumber;
+
+      if (this.result.guarantorid) {
+        params.guarantee = this.result.borrowernumber;
+      }
       if (preview) {
         params.preview = true;
       }

@@ -35,6 +35,8 @@ sub set_group_settings {
                     accountnumber => '',
                     biccode => '',
                     businessid => '',
+                    patronmessage => '',
+                    guaranteemessage => ''
                 };
                 push @{$categories}, $settings;
             }
@@ -47,7 +49,7 @@ sub set_group_settings {
 sub get_group_settings {
     my ( $saved, $group ) = @_;
 
-    my ($increment, $addreferencenumber, $addreplacementprice, $debarment, $overduefines, $invoicefine, $accountnumber, $biccode, $businessid);
+    my ($increment, $addreferencenumber, $addreplacementprice, $debarment, $overduefines, $invoicefine, $accountnumber, $biccode, $businessid, $patronmessage, $guaranteemessage);
     
     foreach my $s (@{$saved}) {
         if ($s->{groupname} eq $group) {
@@ -60,11 +62,13 @@ sub get_group_settings {
             $accountnumber = $s->{accountnumber};
             $biccode = $s->{biccode};
             $businessid = $s->{businessid};
+            $patronmessage = $s->{patronmessage};
+            $guaranteemessage = $s->{guaranteemessage};
 
         }
     }
     
-    return ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine, $accountnumber, $biccode, $businessid);
+    return ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine, $accountnumber, $biccode, $businessid, $patronmessage, $guaranteemessage);
 }
 
 sub get_branch_settings {

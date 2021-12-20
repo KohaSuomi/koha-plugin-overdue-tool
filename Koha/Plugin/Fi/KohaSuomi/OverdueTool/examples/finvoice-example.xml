@@ -34,7 +34,7 @@
     </SellerAccountDetails>
   </SellerInformationDetails>
   <BuyerPartyDetails>
-    <BuyerPartyIdentifier><<ssn>></BuyerPartyIdentifier>                             
+    <BuyerPartyIdentifier></BuyerPartyIdentifier>                             
     <BuyerOrganisationName><<borrowers.firstname>> <<borrowers.surname>></BuyerOrganisationName>
     <BuyerPostalAddressDetails>
       <BuyerStreetName><<borrowers.address>></BuyerStreetName>

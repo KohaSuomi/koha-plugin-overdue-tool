@@ -5,6 +5,7 @@ use Exporter;
 use XML::LibXML;
 use Encode qw(decode encode);
 use POSIX qw(strftime);
+use C4::KohaSuomi::SSN::Access;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(process_xml);
@@ -20,6 +21,10 @@ sub process_xml {
     $timestamp .= ':00';
     $doc->findnodes("Finvoice/MessageTransmissionDetails/MessageDetails/MessageIdentifier")->[0]->appendTextNode($notice->{message_id});
     $doc->findnodes("Finvoice/MessageTransmissionDetails/MessageDetails/MessageTimeStamp")->[0]->appendTextNode($timestamp);
+
+    my $ssn = GetSSNByBorrowerNumber ( $notice->{borrowernumber} );
+
+    $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerPartyIdentifier")->[0]->appendTextNode($ssn);
 
     return $doc;
 }

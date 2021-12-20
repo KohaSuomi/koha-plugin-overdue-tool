@@ -88,7 +88,7 @@ sub get_branch_settings {
     }
     $sth->finish;
 
-    my @branches = Koha::LibraryCategories->find( $branchgroup )->libraries;
+    my @branches = Koha::LibraryCategories->find( $branchgroup )->libraries if Koha::LibraryCategories->find( $branchgroup );
     my @branchcodes;
     if (@branches) {
         foreach my $branch (@branches) {
@@ -114,33 +114,31 @@ sub check_overdue_rules {
     my $sth;
     $sth = $dbh->prepare("SELECT * FROM overduerules WHERE branchcode = ?");
     $sth->execute($branch);
-    if ($sth->fetchrow_hashref) {
-        while (my $row = $sth->fetchrow_hashref) {
+    if ( $sth->rows > 0 ) {
+        for ( my $i = 0 ; $i < $sth->rows ; $i++ ) {
+            my $row = $sth->fetchrow_hashref;
             if ($row->{delay3} && $row->{letter3}) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay3};
                 $delayperiod = '3';
                 $fine = $row->{fine3};
-                next;
             } elsif ($row->{delay2} && $row->{letter2}) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay2};
                 $delayperiod = '2';
                 $fine = $row->{fine2};
-                next;
             } elsif ($row->{delay1} && $row->{letter1}) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay1};
                 $delayperiod = '1';
                 $fine = $row->{fine1};
-                next;
             }
         }
-        $sth->finish;
     } else {
         my $isth = $dbh->prepare("SELECT * FROM overduerules WHERE branchcode = ''");
         $isth->execute();
-        while (my $row = $isth->fetchrow_hashref) {
+        for ( my $i = 0 ; $i < $isth->rows ; $i++ ) {
+            my $row = $isth->fetchrow_hashref;
             if ($row->{delay3} && $row->{letter3}) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay3};
@@ -160,7 +158,6 @@ sub check_overdue_rules {
         }
         $isth->finish;
     }
-
     $delay{delaytime} = $delaytime;
     $delay{delayperiod} = $delayperiod;
     $delay{delayfine} = $fine;

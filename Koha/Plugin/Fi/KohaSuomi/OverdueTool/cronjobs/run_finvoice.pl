@@ -60,13 +60,14 @@ USAGE
     exit $_[0];
 }
 
-my ( $help, $config, $path, $validate);
+my ( $help, $config, $path, $validate, $xsd);
 
 GetOptions(
-    'h|help'  => \$help,
-    'p|path=s' => \$path,
+    'h|help'     => \$help,
+    'p|path=s'   => \$path,
     'c|config=s' => \$config,
-    'v|validate' => \$validate
+    'v|validate' => \$validate,
+    'xsd=s'        => \$xsd
 ) || usage(1);
 
 usage(0) if ($help);
@@ -89,6 +90,11 @@ if(!$config) {
     exit;
 }
 
+if ($validate && !$xsd) {
+    print "Define path to xsd file\n";
+    exit;
+}
+
 my $configfile = eval { YAML::XS::LoadFile($path) };
 exit unless $configfile->{$config};
 my $finvoiceconfig = $configfile->{$config};
@@ -104,7 +110,6 @@ my $today     = output_pref( { dt => dt_from_string, dateonly => 1, dateformat =
 my $notices = Koha::Notice::Messages->search({letter_code => 'FINVOICE', status => 'pending', from_address => {'=' => [@librarycodes]}});
 exit unless $notices;
 
-my $xsd = "$FindBin::Bin/../finvoice/Finvoice3.0.xsd";
 my $tmppath = $output_directory ."/tmp/";
 
 my @message_ids;

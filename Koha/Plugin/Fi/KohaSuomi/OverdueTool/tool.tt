@@ -72,8 +72,8 @@
 							<li class="nav-item pr-2 pl-2">
 								<vuejs-datepicker :value="endDate" :disabled-dates="disabledEndDates" :language="fi" format="dd.MM.yyyy" @selected="updateEndDate($event)"></vuejs-datepicker>
 							</li>
-							<li>
-								<span @click="toggleFilters()"><i class='fas fa-filter text-info' style='font-size:24px'></i></span>
+							<li class="nav-item pr-2 pl-2">
+								<span @click="toggleFilters()" role="button"><i class='fas fa-filter text-info' style='font-size:24px'></i></span>
 							</li>
 						</ul>
 						<div v-if="showFilters">

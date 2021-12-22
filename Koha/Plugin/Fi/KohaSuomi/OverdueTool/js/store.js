@@ -305,7 +305,7 @@ const store = new Vuex.Store({
         let sum = 0;
         patron.checkouts.forEach((checkout) => {
           if (checkout.replacementprice) {
-            sum += Math.ceil(checkout.replacementprice);
+            sum += Math.round(checkout.replacementprice);
           }
         });
         if (sum >= minimumSum) {

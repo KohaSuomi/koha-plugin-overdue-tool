@@ -14,7 +14,7 @@ use JSON;
 use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Config;
 
 ## Here we set our plugin version
-our $VERSION = "1.5.2";
+our $VERSION = "1.5.3";
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {

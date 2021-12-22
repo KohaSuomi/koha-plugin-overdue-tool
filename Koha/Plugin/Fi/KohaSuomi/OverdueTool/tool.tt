@@ -11,7 +11,7 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
 		<!-- Custom styles for this template-->
-		<script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
+		<script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
 		<script src="https://unpkg.com/vuex@3.6.2/dist/vuex.min.js"></script>
 		<script src="https://unpkg.com/vuejs-datepicker"></script>
 		<script src="https://unpkg.com/vuejs-datepicker/dist/locale/translations/fi.js"></script>
@@ -65,42 +65,39 @@
 						</div>
 					</div>
 					<div v-else>
-						<ul class="nav nav-pills mb-3 mt-3">
-							<li class="nav-item pr-2">
-								<vuejs-datepicker :value="startDate" :language="fi" format="dd.MM.yyyy" @selected="updateStartDate($event)"></vuejs-datepicker>
-							</li>
-							<li class="nav-item pr-2 pl-2">
-								<vuejs-datepicker :value="endDate" :disabled-dates="disabledEndDates" :language="fi" format="dd.MM.yyyy" @selected="updateEndDate($event)"></vuejs-datepicker>
-							</li>
-							<li class="nav-item pr-2 pl-2">
-								<span @click="toggleFilters()" role="button"><i class='fas fa-filter text-info' style='font-size:24px'></i></span>
-							</li>
-						</ul>
-						<div v-if="showFilters">
-							<div class="alert alert-info pb-0" role="alert">
-								<ul class="nav">
-									<li class="nav-item pl-2">
-										<label for="invoiced" class="btn btn-default">Näytä laskutetut <input type="checkbox" id="invoiced" @change="changeInvoiced($event)" class="badgebox" ><span class="badge">&check;</span></label>
-									</li>
-									<li class="nav-item pl-2">
-										<div class="row">
-											<label for="categorycode" class="col-sm-5 col-form-label">Asiakasryhmä</label>
-											<div class="col-sm-6">
-												<select class="form-control bg-default" id="categorycode" @change="onCategoryChange($event)">
-													<option :value="selectCategory"></option>
-													<option v-for="code in selectCategory" :value="code">{{code}}</option>
-												</select>
-											</div>
-										<div>
-									</li>
-									<li class="nav-item pl-2">
-										<div class="form-group row">
-											<label for="formControlRange" class="col-sm-5 col-form-label pr-1">Minimi summa: <span id="rangeval">10</span>€</label>
-											<input type="range" @change="filterResults($event)" min="0" max="50" step="5" value="10" class="form-control-range col-sm-5" id="formControlRange" onInput="$('#rangeval').html($(this).val())">
+						<div class="alert alert-info pb-0" role="alert">
+							<ul class="nav">
+								<li class="nav-item pr-2">
+									<div class="pt-1">
+										<vuejs-datepicker :value="startDate" :language="fi" format="dd.MM.yyyy" @selected="updateStartDate($event)"></vuejs-datepicker>
+									</div>
+								</li>
+								<li class="nav-item pr-2 pl-2">
+									<div class="pt-1">
+										<vuejs-datepicker :value="endDate" :disabled-dates="disabledEndDates" :language="fi" format="dd.MM.yyyy" @selected="updateEndDate($event)"></vuejs-datepicker>
+									</div>
+								</li>
+								<li class="nav-item pl-2">
+									<label for="invoiced" class="btn btn-default">Näytä laskutetut <input type="checkbox" id="invoiced" @change="changeInvoiced($event)" class="badgebox" ><span class="badge">&check;</span></label>
+								</li>
+								<li class="nav-item pl-2">
+									<div class="row">
+										<label for="categorycode" class="col-sm-5 col-form-label">Asiakasryhmä</label>
+										<div class="col-sm-6">
+											<select class="form-control bg-default" id="categorycode" @change="onCategoryChange($event)">
+												<option :value="selectCategory"></option>
+												<option v-for="code in selectCategory" :value="code">{{code}}</option>
+											</select>
 										</div>
-									</li>
-								</ul>
-							</div>
+									<div>
+								</li>
+								<li class="nav-item pl-2">
+									<div class="form-group row">
+										<label for="formControlRange" class="col-sm-5 col-form-label pr-1">Minimi summa: <span id="rangeval">10</span>€</label>
+										<input type="range" @change="filterResults($event)" min="0" max="50" step="5" value="10" class="form-control-range col-sm-5" id="formControlRange" onInput="$('#rangeval').html($(this).val())">
+									</div>
+								</li>
+							</ul>
 						</div>
 						<div>
 						<nav v-bind:class="{'d-none': pages == 1 }" aria-label="Page navigation">
@@ -234,7 +231,6 @@
 		<script>
 			feather.replace();
 			var jsondata = JSON.parse('[% data %]');
-			console.log(jsondata);
 		</script>
 		<script type="module" src="[% PLUGIN_PATH %]/js/main.js"></script>
 		<link rel="stylesheet" href="[% PLUGIN_PATH %]/css/pdf.css">

@@ -75,6 +75,12 @@
 							<li class="nav-item pl-2">
 								<label for="invoiced" class="btn btn-primary">Näytä laskutetut <input type="checkbox" id="invoiced" @change="changeInvoiced($event)" class="badgebox" ><span class="badge">&check;</span></label>
 							</li>
+							<li class="nav-item pl-2">
+								<select class="form-control" id="categorycode" @change="onCategoryChange($event)">
+									<option :value="selectCategory">Valitse asiakasryhmä</option>
+									<option v-for="code in selectCategory" :value="code">{{code}}</option>
+								</select>
+							</li>
 						</ul>
 						<div>
 						<nav v-bind:class="{'d-none': pages == 1 }" aria-label="Page navigation example">

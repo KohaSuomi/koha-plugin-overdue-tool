@@ -13,6 +13,7 @@ new Vue({
       fi: vdp_translation_fi.js,
       showPDF: false,
       preview: true,
+      selectCategory: [],
     };
   },
   mounted() {
@@ -36,6 +37,7 @@ new Vue({
     store.commit('addGuaranteeMessage', jsondata.guaranteemessage);
     store.commit('addCategoryCodes', jsondata.overduerules.categorycodes);
     store.dispatch('setDates', jsondata.overduerules);
+    this.selectCategory = jsondata.overduerules.categorycodes;
     this.fetch();
   },
   computed: {
@@ -150,6 +152,10 @@ new Vue({
     },
     changePage(page) {
       store.dispatch('changePage', page);
+      this.fetch();
+    },
+    onCategoryChange(e) {
+      store.commit('addCategoryCodes', [e.target.value]);
       this.fetch();
     },
     pageHide(page) {

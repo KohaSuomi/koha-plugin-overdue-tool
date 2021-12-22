@@ -14,6 +14,7 @@ new Vue({
       showPDF: false,
       preview: true,
       selectCategory: [],
+      showFilters: false,
     };
   },
   mounted() {
@@ -160,6 +161,9 @@ new Vue({
     },
     pageHide(page) {
       return store.getters.pageHide(page);
+    },
+    toggleFilters() {
+      this.showFilters = !this.showFilters;
     },
     activate() {
       $('.page-link').removeClass('bg-primary text-white');

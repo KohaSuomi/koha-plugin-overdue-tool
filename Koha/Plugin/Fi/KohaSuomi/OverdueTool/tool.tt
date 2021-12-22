@@ -72,16 +72,30 @@
 							<li class="nav-item pr-2 pl-2">
 								<vuejs-datepicker :value="endDate" :disabled-dates="disabledEndDates" :language="fi" format="dd.MM.yyyy" @selected="updateEndDate($event)"></vuejs-datepicker>
 							</li>
-							<li class="nav-item pl-2">
-								<label for="invoiced" class="btn btn-primary">Näytä laskutetut <input type="checkbox" id="invoiced" @change="changeInvoiced($event)" class="badgebox" ><span class="badge">&check;</span></label>
-							</li>
-							<li class="nav-item pl-2">
-								<select class="form-control" id="categorycode" @change="onCategoryChange($event)">
-									<option :value="selectCategory">Valitse asiakasryhmä</option>
-									<option v-for="code in selectCategory" :value="code">{{code}}</option>
-								</select>
+							<li>
+								<span @click="toggleFilters()"><i class='fas fa-filter text-info' style='font-size:24px'></i></span>
 							</li>
 						</ul>
+						<div v-if="showFilters">
+							<div class="alert alert-info pb-0" role="alert">
+								<ul class="nav">
+									<li class="nav-item pl-2">
+										<label for="invoiced" class="btn btn-default">Näytä laskutetut <input type="checkbox" id="invoiced" @change="changeInvoiced($event)" class="badgebox" ><span class="badge">&check;</span></label>
+									</li>
+									<li class="nav-item pl-2">
+										<div class="row">
+											<label for="categorycode" class="col-sm-5 col-form-label">Asiakasryhmä</label>
+											<div class="col-sm-6">
+												<select class="form-control bg-default" id="categorycode" @change="onCategoryChange($event)">
+													<option :value="selectCategory"></option>
+													<option v-for="code in selectCategory" :value="code">{{code}}</option>
+												</select>
+											</div>
+										<div>
+									</li>
+								</ul>
+							</div>
+						</div>
 						<div>
 						<nav v-bind:class="{'d-none': pages == 1 }" aria-label="Page navigation example">
 							<ul class="pagination">

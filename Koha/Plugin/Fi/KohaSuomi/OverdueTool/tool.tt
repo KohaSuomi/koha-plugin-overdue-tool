@@ -100,34 +100,12 @@
 							</ul>
 						</div>
 						<div>
-						<nav v-bind:class="{'d-none': pages == 1 }" aria-label="Page navigation">
-							<ul class="pagination">
-							<li class="page-item">
-								<a class="page-link" v-bind:class="{'text-muted bg-muted cursor-default': page == 1 }" href="#" v-on:click="decreasePage" aria-label="Previous">
-								<span aria-hidden="true">&laquo;</span>
-								<span class="sr-only">Edellinen</span>
-								</a>
-							</li>
-							<li v-for="page in pages"><a class="page-link" v-bind:class="{'d-none': pageHide(page)}" href="#" :data-current="page" v-on:click="changePage(page)">{{page}}</a></li>
-							<li class="page-item">
-								<a class="page-link" href="#" v-bind:class="{'text-muted bg-muted cursor-default': page == pages }" v-on:click="increasePage" aria-label="Next">
-								<span aria-hidden="true">&raquo;</span>
-								<span class="sr-only">Seuraava</span>
-								</a>
-							</li>
-							</ul>
-						</nav>
-						<div :class="{'d-none': !showLoader }">
-							<div class="row w-100 p-3">
-								<div class="col text-center">
-									<i class="fas fa-circle-notch fa-spin fa-3x"></i>
-								</div>
-							</div>
+						<div :class="{'d-none': showLoader }" v-if="!results.length" class="alert alert-warning" role="alert">
+							Aikavälillä ei ole laskutettavia lainoja!
 						</div>
-						<div :class="{'d-none': showLoader }"  v-if="results.length">
+						<div v-else>
 							<div>
-								<b v-if="offset == 0"> Tulokset: 1 - {{resultOffset}} / {{totalResults}} </b>
-								<b v-else>Tulokset: {{offset}} - {{resultOffset}} / {{totalResults}}</b>
+								<b> Tuloksia: {{totalResults}} </b>
 							</div>
 							<div class="row d-table w-100 p-3 border-bottom" style="table-layout:fixed;">
 								<ul class="list-inline d-table-row font-weight-bold">
@@ -144,26 +122,13 @@
 								v-bind:result="result">
 							</div>
 						</div>
-						<div :class="{'d-none': showLoader }" v-else class="alert alert-warning" role="alert">
-							Aikavälillä ei ole laskutettavia lainoja!
+						<div :class="{'d-none': !showLoader }">
+							<div class="row w-100 p-3">
+								<div class="col text-center">
+									<i class="fas fa-circle-notch fa-spin fa-3x"></i>
+								</div>
+							</div>
 						</div>
-						<nav v-bind:class="{'d-none': pages == 1 }" aria-label="Page navigation" class="mt-3">
-							<ul class="pagination">
-							<li class="page-item">
-								<a class="page-link" v-bind:class="{'text-muted bg-muted cursor-default': page == 1 }" href="#" v-on:click="decreasePage" aria-label="Previous">
-								<span aria-hidden="true">&laquo;</span>
-								<span class="sr-only">Edellinen</span>
-								</a>
-							</li>
-							<li v-for="page in pages"><a class="page-link" v-bind:class="{'d-none': pageHide(page)}" href="#" :data-current="page" v-on:click="changePage(page)">{{page}}</a></li>
-							<li class="page-item">
-								<a class="page-link" href="#" v-bind:class="{'text-muted bg-muted cursor-default': page == pages }" v-on:click="increasePage" aria-label="Next">
-								<span aria-hidden="true">&raquo;</span>
-								<span class="sr-only">Seuraava</span>
-								</a>
-							</li>
-							</ul>
-						</nav>
 					</div>
 				</div>
 				</main>

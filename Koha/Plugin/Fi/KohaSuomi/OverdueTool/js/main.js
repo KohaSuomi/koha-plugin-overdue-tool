@@ -133,22 +133,6 @@ new Vue({
       store.commit('addEndDate', value);
       this.fetch();
     },
-    increasePage() {
-      if (this.page != this.pages) {
-        store.commit('increasePage');
-        store.commit('increaseOffset');
-        store.dispatch('showPages', this.page);
-        this.fetch();
-      }
-    },
-    decreasePage() {
-      if (this.page != 1) {
-        store.commit('decreasePage');
-        store.commit('decreaseOffset');
-        store.dispatch('showPages', this.page);
-        this.fetch();
-      }
-    },
     changeInvoiced(e) {
       if (this.invoiced == false) {
         store.commit('invoiced', true);
@@ -157,19 +141,12 @@ new Vue({
       }
       this.fetch();
     },
-    changePage(page) {
-      store.dispatch('changePage', page);
-      this.fetch();
-    },
     onCategoryChange(e) {
       store.commit('addCategoryCodes', [e.target.value]);
       this.fetch();
     },
     filterResults(e) {
       this.results = e.target.value;
-    },
-    pageHide(page) {
-      return store.getters.pageHide(page);
     },
     toggleFilters() {
       this.showFilters = !this.showFilters;

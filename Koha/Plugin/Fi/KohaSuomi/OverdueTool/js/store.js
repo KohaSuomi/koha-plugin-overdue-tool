@@ -4,7 +4,7 @@ const store = new Vuex.Store({
     errors: [],
     offset: 0,
     page: 1,
-    limit: 20,
+    limit: 5,
     pages: 1,
     startCount: 1,
     endPage: 11,
@@ -47,6 +47,9 @@ const store = new Vuex.Store({
     },
     addResults(state, value) {
       state.results = value;
+    },
+    pushResults(state, value) {
+      state.results.push(value);
     },
     addTotalResults(state, value) {
       state.totalResults = value;
@@ -147,14 +150,8 @@ const store = new Vuex.Store({
     showLoader(state, value) {
       state.showLoader = value;
     },
-    increasePage(state) {
-      state.page++;
-    },
     increaseOffset(state) {
       state.offset = state.offset + state.limit;
-    },
-    decreasePage(state) {
-      state.page--;
     },
     decreaseOffset(state) {
       state.offset = state.offset - state.limit;
@@ -171,8 +168,9 @@ const store = new Vuex.Store({
     },
   },
   actions: {
-    fetchOverdues({ commit, state }) {
+    fetchOverdues({ dispatch, commit, state }) {
       commit('addResults', []);
+      commit('addOffset', 0);
       commit('removeErrors');
       commit('showLoader', true);
       var searchParams = new URLSearchParams();
@@ -185,36 +183,57 @@ const store = new Vuex.Store({
       searchParams.append('invoiced', state.invoiced);
       searchParams.append('libraries', state.libraries);
       searchParams.append('offset', state.offset);
-      searchParams.append('limit', state.limit);
+      searchParams.append('sort', 'borrowernumber');
+      searchParams.append('limit', 1);
 
       axios
         .get('/api/v1/checkouts/overdues', {
           params: searchParams,
         })
         .then((response) => {
-          commit('addResults', response.data.records);
           commit('addTotalResults', response.data.total);
           commit('newPagesValue', Math.ceil(response.data.total / state.limit));
-
-          if (response.data.records.length < state.limit) {
-            commit(
-              'addResultOffset',
-              state.offset + response.data.records.length
-            );
-          } else {
-            commit(
-              'addResultOffset',
-              response.data.records.length * state.page
-            );
-          }
-          if (state.pages == 0) {
-            commit('newPagesValue', 1);
-          }
-          commit('showLoader', false);
+          dispatch('fetchAllOverdues');
         })
         .catch((error) => {
           commit('addError', error.response.data.error);
         });
+    },
+    async fetchAllOverdues({ commit, state }) {
+      var searchParams = new URLSearchParams();
+      searchParams.append('startdate', state.startDate);
+      searchParams.append('enddate', state.endDate);
+      searchParams.append('invoicelibrary', state.invoiceLibrary);
+      searchParams.append('lastdate', state.lastDate);
+      searchParams.append('categorycodes', state.categorycodes);
+      searchParams.append('invoicedstatus', state.notforloanStatus);
+      searchParams.append('invoiced', state.invoiced);
+      searchParams.append('libraries', state.libraries);
+      searchParams.append('sort', 'borrowernumber');
+      searchParams.append('limit', 5);
+      const promises = [];
+      let offset = 0;
+      for (let i = 0; i < state.pages; i++) {
+        searchParams.append('offset', offset);
+        promises.push(
+          axios
+            .get('/api/v1/checkouts/overdues', {
+              params: searchParams,
+            })
+            .then((response) => {
+              response.data.records.forEach((element) => {
+                commit('pushResults', element);
+              });
+            })
+            .catch((error) => {
+              commit('addError', error.response.data.error);
+            })
+        );
+        offset = offset + 5;
+      }
+      await Promise.all(promises).then(() => {
+        commit('showLoader', false);
+      });
     },
     sendOverdues({ commit, state }, payload) {
       commit('showLoader', true);
@@ -286,16 +305,6 @@ const store = new Vuex.Store({
     },
   },
   getters: {
-    pageHide: (state) => (page) => {
-      if (state.pages > 5) {
-        if (state.endPage <= page && state.startCount < page) {
-          return true;
-        }
-        if (state.endPage >= page && state.startCount > page) {
-          return true;
-        }
-      }
-    },
     disabledEndDates: (state) => {
       return { from: new Date(state.endDate) };
     },

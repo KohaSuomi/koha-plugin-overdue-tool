@@ -102,6 +102,9 @@ new Vue({
     notice() {
       return store.state.notice;
     },
+    invoiceLetters() {
+      return store.state.invoiceLetters;
+    },
   },
   methods: {
     fetch() {
@@ -111,6 +114,21 @@ new Vue({
     previewPDF(preview) {
       this.preview = preview;
       this.showPDF = true;
+    },
+    allFinvoices() {
+      if (this.$refs.resultComponentRef) {
+        this.$refs.resultComponentRef.forEach((element) => {
+          element.createInvoice('FINVOICE', false);
+        });
+      }
+    },
+    allPDFs() {
+      if (this.$refs.resultComponentRef) {
+        this.$refs.resultComponentRef.forEach((element) => {
+          element.createInvoice('ODUECLAIM', true, true);
+        });
+        this.previewPDF(true);
+      }
     },
     printPDF() {
       if (!this.preview) {

@@ -37,6 +37,7 @@ const store = new Vuex.Store({
     businessId: '',
     patronMessage: '',
     guaranteeMessage: '',
+    clearFetch: false,
   },
   mutations: {
     addError(state, value) {
@@ -156,15 +157,22 @@ const store = new Vuex.Store({
     decreaseOffset(state) {
       state.offset = state.offset - state.limit;
     },
-    modifyReplacementPrice(state, payload) {
-      state.results.checkouts[payload.index].replacementprice = payload.value;
+    modifyResults(state, payload) {
+      state.results[payload.index] = payload.value;
     },
     setNotice(state, value) {
       state.notice = '';
+      state.notice = value;
+    },
+    setNotices(state, value) {
       state.notice += value;
+      state.notice += '<div style="page-break-after: always;"></div>';
     },
     setMessageId(state, value) {
       state.messageId = value;
+    },
+    setClearFetch(state, value) {
+      state.clearFetch = value;
     },
   },
   actions: {
@@ -215,6 +223,10 @@ const store = new Vuex.Store({
       let offset = 0;
       for (let i = 0; i < state.pages; i++) {
         searchParams.append('offset', offset);
+        offset = offset + 5;
+        if (offset == state.offset) {
+          continue;
+        }
         promises.push(
           axios
             .get('/api/v1/checkouts/overdues', {
@@ -222,14 +234,16 @@ const store = new Vuex.Store({
             })
             .then((response) => {
               response.data.records.forEach((element) => {
-                commit('pushResults', element);
+                if (offset == state.offset) {
+                  commit('pushResults', element);
+                }
               });
             })
             .catch((error) => {
               commit('addError', error.response.data.error);
             })
         );
-        offset = offset + 5;
+        commit('addOffset', offset);
       }
       await Promise.all(promises).then(() => {
         commit('showLoader', false);
@@ -241,8 +255,12 @@ const store = new Vuex.Store({
       axios
         .post('/api/v1/invoices/' + payload.borrowernumber, payload.params)
         .then((response) => {
-          commit('setNotice', response.data.notice);
-          commit('setMessageId', response.data.message_id);
+          if (payload.all) {
+            commit('setNotices', response.data.notice);
+          } else {
+            commit('setNotice', response.data.notice);
+            commit('setMessageId', response.data.message_id);
+          }
           commit('showLoader', false);
         })
         .catch((error) => {

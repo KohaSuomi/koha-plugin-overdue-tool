@@ -106,7 +106,7 @@ const resultList = Vue.component('result-list', {
     activate: function () {
       this.isActive = !this.isActive;
     },
-    createInvoice: function (letter_code, preview) {
+    createInvoice: function (letter_code, preview, all) {
       this.newcheckouts = [];
       this.newcheckouts = this.result.checkouts.slice(0);
       this.removecheckouts.forEach((element) => {
@@ -149,6 +149,7 @@ const resultList = Vue.component('result-list', {
       this.$store.dispatch('sendOverdues', {
         borrowernumber: patronid,
         params: params,
+        all: all,
       });
     },
     previewPDF: function () {

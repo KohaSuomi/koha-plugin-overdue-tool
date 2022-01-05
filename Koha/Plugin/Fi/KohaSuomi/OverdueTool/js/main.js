@@ -104,6 +104,7 @@ new Vue({
   },
   methods: {
     fetch() {
+      this.buttonLoader = false;
       store.dispatch('fetchOverdues');
       this.activate();
     },
@@ -186,6 +187,7 @@ new Vue({
       this.fetch();
     },
     filterResults(e) {
+      this.buttonLoader = false;
       this.sumFilter = e.target.value;
     },
     toggleFilters() {

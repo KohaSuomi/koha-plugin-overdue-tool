@@ -134,6 +134,9 @@ const resultList = Vue.component('result-list', {
         patronmessage: this.$store.state.patronMessage,
         guaranteemessage: this.$store.state.guaranteeMessage,
         lang: this.result.lang,
+        surname: this.result.surname,
+        firstname: this.result.firstname,
+        cardnumber: this.result.cardnumber,
         letter_code: letter_code,
       };
 

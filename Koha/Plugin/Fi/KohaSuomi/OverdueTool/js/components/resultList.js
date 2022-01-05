@@ -1,5 +1,5 @@
 const patronData = Vue.component('patrondata', {
-  template: '<div>{{patron.firstname}} - {{patron.surname}}</div>',
+  template: '<div>{{patron.surname}}, {{patron.firstname}}</div>',
   props: ['borrowernumber'],
   data() {
     return {

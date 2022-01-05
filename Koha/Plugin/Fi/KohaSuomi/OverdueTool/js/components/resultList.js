@@ -1,9 +1,11 @@
 const patronData = Vue.component('patrondata', {
-  template: '<div>{{patron.surname}}, {{patron.firstname}}</div>',
+  template:
+    '<div><i v-if="loader" class="fas fa-circle-notch fa-spin"></i><span v-else>{{patron.surname}}, {{patron.firstname}}</span></div>',
   props: ['borrowernumber'],
   data() {
     return {
       patron: {},
+      loader: true,
     };
   },
   mounted() {
@@ -16,9 +18,11 @@ const patronData = Vue.component('patrondata', {
         .get('/api/v1/patrons/' + this.borrowernumber)
         .then((response) => {
           this.patron = response.data;
+          this.loader = false;
         })
         .catch((error) => {
           this.$store.commit('addError', error.response.data.error);
+          this.loader = false;
         });
     },
   },

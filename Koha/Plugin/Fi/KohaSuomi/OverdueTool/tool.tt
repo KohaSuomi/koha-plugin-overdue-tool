@@ -93,8 +93,8 @@
 								</li>
 								<li class="nav-item pl-2">
 									<div class="form-group row">
-										<label for="formControlRange" class="col-sm-5 col-form-label pr-1">Minimi summa: <span id="rangeval">10</span>€</label>
-										<input type="range" @change="filterResults($event)" min="0" max="50" step="5" value="10" class="form-control-range col-sm-5" id="formControlRange" onInput="$('#rangeval').html($(this).val())">
+										<label for="formControlRange" class="col-sm-5 col-form-label pr-1">Minimi summa: <span id="rangeval">{{sumFilter}}</span>€</label>
+										<input type="range" @change="filterResults($event)" min="0" max="50" step="5" :value="sumFilter" class="form-control-range col-sm-5" id="formControlRange" onInput="$('#rangeval').html($(this).val())">
 									</div>
 								</li>
 								<li class="nav-item pl-2">

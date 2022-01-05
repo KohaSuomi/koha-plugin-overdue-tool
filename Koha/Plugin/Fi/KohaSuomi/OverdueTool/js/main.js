@@ -43,13 +43,8 @@ new Vue({
     this.fetch();
   },
   computed: {
-    results: {
-      get: function () {
-        return store.getters.filterResultsBySum(this.sumFilter);
-      },
-      set: function (val) {
-        this.sumFilter = val;
-      },
+    results() {
+      return store.getters.filterResultsBySum(this.sumFilter);
     },
     totalResults() {
       return store.state.totalResults;
@@ -164,7 +159,7 @@ new Vue({
       this.fetch();
     },
     filterResults(e) {
-      this.results = e.target.value;
+      this.sumFilter = e.target.value;
     },
     toggleFilters() {
       this.showFilters = !this.showFilters;

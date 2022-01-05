@@ -11,7 +11,7 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
 		<!-- Custom styles for this template-->
-		<script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
+		<script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
 		<script src="https://unpkg.com/vuex@3.6.2/dist/vuex.min.js"></script>
 		<script src="https://unpkg.com/vuejs-datepicker"></script>
 		<script src="https://unpkg.com/vuejs-datepicker/dist/locale/translations/fi.js"></script>
@@ -97,10 +97,11 @@
 										<input type="range" @change="filterResults($event)" min="0" max="50" step="5" :value="sumFilter" class="form-control-range col-sm-5" id="formControlRange" onInput="$('#rangeval').html($(this).val())">
 									</div>
 								</li>
-								<li class="nav-item pl-2">
+								<li v-if="results.length" :class="{'d-none': showLoader }" class="nav-item pl-2">
 									<div class="form-group row">
 										<div v-for="letter in invoiceLetters" class="mr-2">
-											<button v-if="letter == 'FINVOICE'"class="btn btn-info" v-on:click="allFinvoices">Luo Finvoice:t</button>
+											<button v-if="letter == 'FINVOICE'"class="btn btn-info" v-on:click="allFinvoices" :disabled='buttonLoader'><i v-if="buttonLoader" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo Finvoice:t</span></button>
+											<button v-if="letter == 'EINVOICE'"class="btn btn-info" v-on:click="allEinvoices" :disabled='buttonLoader'><i v-if="buttonLoader" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo e-laskut</span></button>
 											<button v-if="letter == 'ODUECLAIM'"class="btn btn-info" v-on:click="allPDFs">Luo PDF:t</button>
 										</div>
 									</div>
@@ -162,7 +163,7 @@
 							<span v-if="!invoiced" v-for="letter in invoiceLetters">
 								<button v-if="letter != 'ODUECLAIM'" class="btn btn-success" v-on:click="createInvoice(letter)">Luo {{letter | lowercase}}</button>
 							</span>
-							<button class="btn btn-success" v-on:click="previewPDF">PDF</button>
+							<button class="btn btn-success" v-on:click="previewPDF(false)">PDF</button>
 						</li>
 					</ul>
 				</div>

@@ -16,6 +16,7 @@ new Vue({
       selectCategory: [],
       showFilters: false,
       sumFilter: 10,
+      buttonLoader: false,
     };
   },
   mounted() {
@@ -110,19 +111,45 @@ new Vue({
       this.preview = preview;
       this.showPDF = true;
     },
-    allFinvoices() {
+    async allFinvoices() {
       if (this.$refs.resultComponentRef) {
-        this.$refs.resultComponentRef.forEach((element) => {
-          element.createInvoice('FINVOICE', false);
+        this.buttonLoader = true;
+        await Promise.all(
+          this.$refs.resultComponentRef.map(async (element) => {
+            await element.createInvoice('FINVOICE', false);
+          })
+        ).then(() => {
+          this.buttonLoader = false;
         });
       }
     },
-    allPDFs() {
+    async allPDFs() {
       if (this.$refs.resultComponentRef) {
-        this.$refs.resultComponentRef.forEach((element) => {
-          element.createInvoice('ODUECLAIM', true, true);
-        });
+        store.commit('showLoader', true);
         this.previewPDF(true);
+        await Promise.all(
+          this.$refs.resultComponentRef.map(async (element) => {
+            await element.createInvoice(
+              'ODUECLAIM',
+              element.onlyPreview(),
+              true
+            );
+          })
+        ).then(() => {
+          store.commit('showLoader', false);
+        });
+      }
+    },
+    async allEinvoices() {
+      if (this.$refs.resultComponentRef) {
+        this.buttonLoader = true;
+        await Promise.all(
+          this.$refs.resultComponentRef.map(async (element) => {
+            await element.createInvoice('EINVOICE', false);
+          })
+        ).then(() => {
+          this.buttonLoader = false;
+        });
       }
     },
     printPDF() {

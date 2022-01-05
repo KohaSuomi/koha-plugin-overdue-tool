@@ -249,14 +249,16 @@ const store = new Vuex.Store({
         commit('showLoader', false);
       });
     },
-    sendOverdues({ commit, state }, payload) {
+    async sendOverdues({ dispatch, commit }, payload) {
       commit('showLoader', true);
       commit('removeErrors');
-      axios
+      return axios
         .post('/api/v1/invoices/' + payload.borrowernumber, payload.params)
         .then((response) => {
           if (payload.all) {
             commit('setNotices', response.data.notice);
+            commit('setMessageId', response.data.message_id);
+            dispatch('editNotice', 'sent');
           } else {
             commit('setNotice', response.data.notice);
             commit('setMessageId', response.data.message_id);

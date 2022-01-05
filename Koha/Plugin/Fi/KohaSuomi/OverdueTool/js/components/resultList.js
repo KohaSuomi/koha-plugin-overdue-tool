@@ -140,6 +140,11 @@ const resultList = Vue.component('result-list', {
         letter_code: letter_code,
       };
 
+      if (letter_code == 'EINVOICE') {
+        params.letter_code = 'ODUECLAIM';
+        params.message_transport_type = 'print';
+      }
+
       if (this.result.guarantorid) {
         params.guarantee = this.result.borrowernumber;
       }
@@ -149,20 +154,20 @@ const resultList = Vue.component('result-list', {
       let patronid = this.result.guarantorid
         ? this.result.guarantorid
         : this.result.borrowernumber;
-      this.$store.dispatch('sendOverdues', {
+      return this.$store.dispatch('sendOverdues', {
         borrowernumber: patronid,
         params: params,
         all: all,
       });
     },
-    previewPDF: function () {
-      this.createInvoice('ODUECLAIM', this.onlyPreview());
+    previewPDF: function (all) {
+      this.createInvoice('ODUECLAIM', this.onlyPreview(), all);
       this.$parent.previewPDF(this.onlyPreview());
     },
     onlyPreview: function () {
       let retval = false;
       this.$store.state.invoiceLetters.forEach((element) => {
-        if (element == 'FINVOICE') {
+        if (element == 'FINVOICE' || element == 'EINVOICE') {
           retval = true;
         }
       });

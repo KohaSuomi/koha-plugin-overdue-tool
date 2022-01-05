@@ -88,6 +88,10 @@ sub get_branch_settings {
         if ($categorycode =~ /Finvoice/i) {
             push @invoiceletter, 'FINVOICE';
         }
+
+        if ($categorycode =~ /Einvoice/i) {
+            push @invoiceletter, 'EINVOICE';
+        }
         
     }
     $sth->finish;

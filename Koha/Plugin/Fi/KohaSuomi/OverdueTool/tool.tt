@@ -85,7 +85,7 @@
 										<label for="categorycode" class="col-sm-5 col-form-label">Asiakasryhmä</label>
 										<div class="col-sm-6">
 											<select class="form-control bg-default" id="categorycode" @change="onCategoryChange($event)">
-												<option :value="selectCategory"></option>
+												<option value=""></option>
 												<option v-for="code in selectCategory" :value="code">{{code}}</option>
 											</select>
 										</div>

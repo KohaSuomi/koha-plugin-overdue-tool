@@ -328,9 +328,12 @@ const store = new Vuex.Store({
     disabledEndDates: (state) => {
       return { from: new Date(state.endDate) };
     },
-    filterResultsBySum: (state) => (minimumSum) => {
+    filterResultsBySum: (state) => (minimumSum, categoryfilter) => {
       let filteredResults = [];
       state.results.forEach((patron) => {
+        if (categoryfilter && categoryfilter != patron.categorycode) {
+          return;
+        }
         let sum = 0;
         patron.checkouts.forEach((checkout) => {
           if (checkout.replacementprice) {

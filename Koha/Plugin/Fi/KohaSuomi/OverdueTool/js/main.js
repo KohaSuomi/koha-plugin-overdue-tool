@@ -17,6 +17,7 @@ new Vue({
       showFilters: false,
       sumFilter: 10,
       buttonLoader: false,
+      categoryfilter: '',
     };
   },
   mounted() {
@@ -45,7 +46,10 @@ new Vue({
   },
   computed: {
     results() {
-      return store.getters.filterResultsBySum(this.sumFilter);
+      return store.getters.filterResultsBySum(
+        this.sumFilter,
+        this.categoryfilter
+      );
     },
     totalResults() {
       return store.state.totalResults;
@@ -183,8 +187,7 @@ new Vue({
       this.fetch();
     },
     onCategoryChange(e) {
-      store.commit('addCategoryCodes', [e.target.value]);
-      this.fetch();
+      this.categoryfilter = e.target.value;
     },
     filterResults(e) {
       this.buttonLoader = false;

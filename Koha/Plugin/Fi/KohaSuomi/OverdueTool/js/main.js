@@ -105,9 +105,13 @@ new Vue({
     invoiceLetters() {
       return store.state.invoiceLetters;
     },
+    created() {
+      return store.state.created;
+    },
   },
   methods: {
     fetch() {
+      store.commit('setCreated', false);
       this.buttonLoader = false;
       store.dispatch('fetchOverdues');
       this.activate();
@@ -125,6 +129,7 @@ new Vue({
           })
         ).then(() => {
           this.buttonLoader = false;
+          store.commit('setCreated', true);
         });
       }
     },
@@ -154,6 +159,7 @@ new Vue({
           })
         ).then(() => {
           this.buttonLoader = false;
+          store.commit('setCreated', true);
         });
       }
     },
@@ -168,6 +174,7 @@ new Vue({
       });
     },
     back() {
+      store.commit('setCreated', false);
       this.showPDF = false;
     },
     updateStartDate(value) {

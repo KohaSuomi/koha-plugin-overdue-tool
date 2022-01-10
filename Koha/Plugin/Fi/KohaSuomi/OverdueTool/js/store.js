@@ -37,7 +37,7 @@ const store = new Vuex.Store({
     businessId: '',
     patronMessage: '',
     guaranteeMessage: '',
-    clearFetch: false,
+    created: false,
   },
   mutations: {
     addError(state, value) {
@@ -171,8 +171,8 @@ const store = new Vuex.Store({
     setMessageId(state, value) {
       state.messageId = value;
     },
-    setClearFetch(state, value) {
-      state.clearFetch = value;
+    setCreated(state, value) {
+      state.created = value;
     },
   },
   actions: {
@@ -251,6 +251,7 @@ const store = new Vuex.Store({
     },
     async sendOverdues({ dispatch, commit }, payload) {
       commit('showLoader', true);
+      commit('setCreated', false);
       commit('removeErrors');
       return axios
         .post('/api/v1/invoices/' + payload.borrowernumber, payload.params)
@@ -264,6 +265,7 @@ const store = new Vuex.Store({
             commit('setMessageId', response.data.message_id);
           }
           commit('showLoader', false);
+          commit('setCreated', true);
         })
         .catch((error) => {
           commit('addError', error.response.data.error);

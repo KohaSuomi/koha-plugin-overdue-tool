@@ -41,6 +41,9 @@
 							<li v-for="error in errors">{{ error }}</li>
 						</ul>
 					</div>
+					<div class="alert alert-success" role="alert" v-if="created">
+						<b>Luonti onnistui!</b>
+					</div>
 					<div v-if="showPDF">
 						<ul class="nav nav-pills mb-3 mt-3 justify-content-center">
 							<li class="nav-item pr-2">

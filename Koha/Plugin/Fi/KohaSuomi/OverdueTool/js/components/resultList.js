@@ -1,7 +1,7 @@
 const patronData = Vue.component('patrondata', {
   template:
-    '<div><i v-if="loader" class="fas fa-circle-notch fa-spin"></i><span v-else>{{patron.surname}}, {{patron.firstname}}</span></div>',
-  props: ['borrowernumber'],
+    '<div><i v-if="loader" class="fas fa-circle-notch fa-spin"></i><span v-else><span class="d-block">{{patron.surname}}, {{patron.firstname}}</span><span class="guarantorssnkey">{{guarantorssnkey}}</span></span></div>',
+  props: ['borrowernumber', 'guarantorssnkey'],
   data() {
     return {
       patron: {},

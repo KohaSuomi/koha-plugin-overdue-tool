@@ -150,10 +150,11 @@
 					<ul class="list-inline w-100 d-table-row">
 						<li class="list-inline-item d-table-cell">
 							<span class="d-block"><a :href="'/cgi-bin/koha/members/moremember.pl?borrowernumber='+result.borrowernumber" target="_blank">{{result.cardnumber}}</a></span>
-							<span>{{result.firstname}} {{result.surname}} ({{result.dateofbirth}})</span>
+							<span class="d-block">{{result.firstname}} {{result.surname}} ({{result.dateofbirth}})</span>
+							<span class="patronssnkey">{{result.patronssnkey}}</span>
 						</li>
 						<li class="list-inline-item d-table-cell">
-							<patrondata v-if="result.guarantorid" :borrowernumber="result.guarantorid"></patrondata>
+							<patrondata v-if="result.guarantorid" :borrowernumber="result.guarantorid" :guarantorssnkey="result.guarantorssnkey"></patrondata>
 						</li>
 						<li class="list-inline-item d-table-cell">
 							{{result.address}}, {{result.zipcode}} {{result.city}}

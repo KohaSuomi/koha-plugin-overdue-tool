@@ -165,7 +165,8 @@
 						<li class="list-inline-item d-table-cell">
 							<button class="btn btn-info" v-on:click="activate"><i class='fas fa-angle-down' :class="{'fa-angle-up': isActive}" style='font-size:24px'></i></button>
 							<span v-if="!invoiced" v-for="letter in invoiceLetters">
-								<button v-if="letter != 'ODUECLAIM'" class="btn btn-success" v-on:click="createInvoice(letter)">Luo {{letter | lowercase}}</button>
+								<button v-if="letter != 'ODUECLAIM' && letter != 'EINVOICE'" class="btn btn-success" v-on:click="createInvoice(letter)">Luo {{letter | lowercase}}</button>
+								<button v-if="letter == 'EINVOICE'" class="btn btn-success" v-on:click="createInvoice(letter)">Luo e-lasku</button>
 							</span>
 							<button class="btn btn-success" v-on:click="previewPDF(false)">PDF</button>
 						</li>

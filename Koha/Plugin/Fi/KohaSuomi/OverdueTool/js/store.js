@@ -323,6 +323,17 @@ const store = new Vuex.Store({
           commit('addError', error.response.data.error);
         });
     },
+    updateRepalcementPrice({ commit }, payload) {
+      commit('removeErrors');
+      axios
+        .patch('/api/v1/items/' + payload.itemnumber, {
+          replacementprice: payload.replacementprice,
+        })
+        .then(() => {})
+        .catch((error) => {
+          commit('addError', error.response.data.error);
+        });
+    },
   },
   getters: {
     disabledEndDates: (state) => {

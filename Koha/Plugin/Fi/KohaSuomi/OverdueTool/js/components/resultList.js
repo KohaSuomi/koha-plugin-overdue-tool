@@ -119,7 +119,8 @@ const resultList = Vue.component('result-list', {
         );
         this.newcheckouts.splice(index, 1);
       });
-      let params = {
+      let params = {};
+      params = {
         module: 'circulation',
         branchcode: this.$store.state.userLibrary,
         repeat_type: 'item',
@@ -188,6 +189,10 @@ const resultList = Vue.component('result-list', {
         );
       }
       this.result.checkouts[index].replacementprice = val.replace(/\,/g, '.');
+      this.$store.dispatch('updateRepalcementPrice', {
+        itemnumber: this.result.checkouts[index].itemnumber,
+        replacementprice: val.replace(/\,/g, '.'),
+      });
     },
     selectedPrice(val, itemnumber) {
       if (val == false) {

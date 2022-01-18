@@ -1,12 +1,12 @@
 .a4-width {
-  max-width: 922px;
+  max-width: 229mm;
 }
 .preview .header,
 .preview .footer {
-  margin-top: 20mm;
-  margin-left: 21mm;
-  margin-right: 21mm;
-  height: 30mm;
+  margin-top: 0mm;
+  margin-left: 20mm;
+  margin-right: 13mm;
+  height: 40mm;
   position: relative;
 }
 .preview .footer {
@@ -14,13 +14,14 @@
   margin-top: 40mm;
 }
 .preview .recipient {
-  margin-left: 21mm;
-  margin-right: 21mm;
-  height: 30mm;
+  margin-top: 0mm;
+  margin-left: 20mm;
+  margin-right: 13mm;
+  height: 40mm;
 }
 .preview .content,
 .preview .recipient {
-  margin-top: 0mm;
+  margin-top: 5mm;
   /* margin-left: 21mm;
   margin-right: 21mm; */
   /* padding-bottom: 21mm; */
@@ -71,8 +72,8 @@
   height: 0.5mm;
 }
 .preview .summary {
-  position: relative;
-  float: right;
+  display: flex;
+  justify-content: flex-end;
 }
 .preview ul.info {
   padding: 0;

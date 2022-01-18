@@ -12,6 +12,7 @@ const store = new Vuex.Store({
     totalResults: 0,
     startDate: '',
     endDate: '',
+    disableDate: '',
     libraries: [],
     invoiceLibrary: '',
     maxYears: 1,
@@ -66,6 +67,9 @@ const store = new Vuex.Store({
     },
     addEndDate(state, value) {
       state.endDate = moment(value).format('YYYY-MM-DD');
+    },
+    addDisableDate(state, value) {
+      state.disableDate = moment(value).format('YYYY-MM-DD');
     },
     addLastDate(state, value) {
       state.lastDate = moment(value).format('YYYY-MM-DD');
@@ -314,6 +318,9 @@ const store = new Vuex.Store({
       let today = new Date();
       let endDate = today.setDate(today.getDate() - payload.delaytime);
       commit('addEndDate', endDate);
+      if (!state.disableDate) {
+        commit('addDisableDate', endDate);
+      }
       endDate = new Date(endDate);
       let startDate = endDate.setMonth(
         endDate.getMonth() - payload.delaymonths
@@ -348,7 +355,7 @@ const store = new Vuex.Store({
   },
   getters: {
     disabledEndDates: (state) => {
-      return { from: new Date(state.endDate) };
+      return { from: new Date(state.disableDate) };
     },
     filterResultsBySum: (state) => (minimumSum, categoryfilter) => {
       let filteredResults = [];

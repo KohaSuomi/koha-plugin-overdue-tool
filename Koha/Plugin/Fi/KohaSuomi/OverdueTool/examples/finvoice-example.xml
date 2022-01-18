@@ -18,11 +18,11 @@
   </MessageTransmissionDetails>
   <SellerPartyDetails>
     <SellerPartyIdentifier><<businessid>></SellerPartyIdentifier>
-    <SellerOrganisationName><<branches.branchname>></SellerOrganisationName>
+    <SellerOrganisationName><<grouplibrary>></SellerOrganisationName>
     <SellerPostalAddressDetails>  
-      <SellerStreetName><<branches.branchaddress1>></SellerStreetName>
-      <SellerTownName><<branches.branchcity>></SellerTownName>
-      <SellerPostCodeIdentifier><<branches.branchzip>></SellerPostCodeIdentifier>
+      <SellerStreetName><<groupaddress>></SellerStreetName>
+      <SellerTownName><<groupzipcode>></SellerTownName>
+      <SellerPostCodeIdentifier><<groupcity>></SellerPostCodeIdentifier>
       <CountryCode>FI</CountryCode>
       <CountryName>Suomi</CountryName>
     </SellerPostalAddressDetails>

@@ -14,14 +14,14 @@ use JSON;
 use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Config;
 
 ## Here we set our plugin version
-our $VERSION = "1.6.0";
+our $VERSION = "1.6.1";
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {
     name            => 'Laskutustyökalu',
     author          => 'Johanna Räisä',
     date_authored   => '2020-12-28',
-    date_updated    => "2022-01-18",
+    date_updated    => "2022-01-19",
     minimum_version => '17.05.00.000',
     maximum_version => undef,
     version         => $VERSION,
@@ -138,7 +138,7 @@ sub tool_view {
     my $branchsettings = get_branch_settings($branch);
     my $groupsettings = $self->retrieve_data('groupsettings') || '[]';
     my $overduerules = check_overdue_rules($branch, $self->retrieve_data("delaymonths"));
-    my ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine, $accountnumber, $biccode, $businessid, $patronmessage, $guaranteemessage) = get_group_settings(JSON::from_json($groupsettings), $branchsettings->{librarygroup});
+    my $newsettings = get_group_settings(JSON::from_json($groupsettings), $branchsettings->{librarygroup});
     
     my $json = {
         userlibrary => $branch,
@@ -149,17 +149,23 @@ sub tool_view {
         overduerules => $overduerules,
         invoicelibrary => $self->retrieve_data('invoicelibrary'),
         invoicenotforloan => $self->retrieve_data('invoicenotforloan'),
-        debarment => $debarment,
-        addreplacementprice   => $addreplacementprice,
-        addreferencenumber  => $addreferencenumber,
-        increment   => $increment,
-        overduefines => $overduefines,
-        invoicefine => $invoicefine,
-        accountnumber => $accountnumber,
-        biccode => $biccode,
-        businessid => $businessid,
-        patronmessage => $patronmessage, 
-        guaranteemessage => $guaranteemessage
+        debarment => $newsettings->{debarment},
+        addreplacementprice   => $newsettings->{addreplacementprice},
+        addreferencenumber  => $newsettings->{addreferencenumber},
+        increment   => $newsettings->{increment},
+        overduefines => $newsettings->{overduefines},
+        invoicefine => $newsettings->{invoicefine},
+        accountnumber => $newsettings->{accountnumber},
+        biccode => $newsettings->{biccode},
+        businessid => $newsettings->{businessid},
+        patronmessage => $newsettings->{patronmessage}, 
+        guaranteemessage => $newsettings->{guaranteemessage},
+        grouplibrary => $newsettings->{grouplibrary},
+        groupaddress => $newsettings->{groupaddress},
+        groupzipcode => $newsettings->{groupzipcode}, 
+        groupcity => $newsettings->{groupcity},
+        groupphone => $newsettings->{groupphone},
+
     };
     $template->param(
         data => JSON::to_json($json)

@@ -97,6 +97,26 @@
                                                     <h6>{{group.groupname}}</h6>
                                                     <ul class="list-group list-group-sm">
                                                         <li class="list-group-item">
+                                                            <label for="grouplibrary">Laskuttajan nimi</label>
+                                                            <input type="text" class="form-control" name="grouplibrary"  v-model="group.grouplibrary"/>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <label for="groupaddress">Laskuttajan osoite</label>
+                                                            <input type="text" class="form-control" name="groupaddress"  v-model="group.groupaddress"/>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <label for="groupzipcode">Laskuttajan postinumero</label>
+                                                            <input type="text" class="form-control" name="groupzipcode"  v-model="group.groupzipcode"/>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <label for="groupcity">Laskuttajan postitoimipaikka</label>
+                                                            <input type="text" class="form-control" name="groupcity"  v-model="group.groupcity"/>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <label for="groupphone">Laskuttajan puhelinnumero</label>
+                                                            <input type="text" class="form-control" name="groupphone"  v-model="group.groupphone"/>
+                                                        </li>
+                                                        <li class="list-group-item">
                                                             <label for="businessid">Y-tunnus</label>
                                                             <input type="text" class="form-control" name="businessid"  v-model="group.businessid"/>
                                                         </li>

@@ -25,7 +25,12 @@ sub set_group_settings {
             }
             if ($add) {
                 my $settings = {
-                    groupname => $category->{categorycode}, 
+                    groupname => $category->{categorycode},
+                    grouplibrary => '',
+                    groupaddress => '',
+                    groupzipcode => '', 
+                    groupcity => '',
+                    groupphone => '',
                     increment => '', 
                     addreferencenumber => Mojo::JSON->false, 
                     debarment => Mojo::JSON->false, 
@@ -49,26 +54,16 @@ sub set_group_settings {
 sub get_group_settings {
     my ( $saved, $group ) = @_;
 
-    my ($increment, $addreferencenumber, $addreplacementprice, $debarment, $overduefines, $invoicefine, $accountnumber, $biccode, $businessid, $patronmessage, $guaranteemessage);
+    my $groupsettings = {};
     
     foreach my $s (@{$saved}) {
         if ($s->{groupname} eq $group) {
-            $increment = $s->{increment};
-            $addreferencenumber = $s->{addreferencenumber};
-            $debarment = $s->{debarment};
-            $addreplacementprice = $s->{addreplacementprice};
-            $overduefines = $s->{overduefines};
-            $invoicefine = $s->{invoicefine};
-            $accountnumber = $s->{accountnumber};
-            $biccode = $s->{biccode};
-            $businessid = $s->{businessid};
-            $patronmessage = $s->{patronmessage};
-            $guaranteemessage = $s->{guaranteemessage};
+            $groupsettings = $s;
 
         }
     }
     
-    return ($addreferencenumber, $increment, $debarment, $addreplacementprice, $overduefines, $invoicefine, $accountnumber, $biccode, $businessid, $patronmessage, $guaranteemessage);
+    return $groupsettings;
 }
 
 sub get_branch_settings {

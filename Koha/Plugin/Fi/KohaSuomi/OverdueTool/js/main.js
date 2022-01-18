@@ -40,6 +40,11 @@ new Vue({
     store.commit('addPatronMessage', jsondata.patronmessage);
     store.commit('addGuaranteeMessage', jsondata.guaranteemessage);
     store.commit('addCategoryCodes', jsondata.overduerules.categorycodes);
+    store.commit('addGroupLibrary', jsondata.grouplibrary);
+    store.commit('addGroupAddress', jsondata.groupaddress);
+    store.commit('addGroupCity', jsondata.groupcity);
+    store.commit('addGroupZipcode', jsondata.groupzipcode);
+    store.commit('addGroupPhone', jsondata.groupphone);
     store.dispatch('setDates', jsondata.overduerules);
     this.selectCategory = jsondata.overduerules.categorycodes;
     this.fetch();

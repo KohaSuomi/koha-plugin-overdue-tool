@@ -143,6 +143,11 @@ const resultList = Vue.component('result-list', {
         firstname: this.result.firstname,
         cardnumber: this.result.cardnumber,
         letter_code: letter_code,
+        grouplibrary: this.$store.state.groupLibrary,
+        groupaddress: this.$store.state.groupAddress,
+        groupcity: this.$store.state.groupCity,
+        groupzipcode: this.$store.state.groupZipcode,
+        groupphone: this.$store.state.groupPhone,
       };
 
       if (letter_code == 'EINVOICE') {

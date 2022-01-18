@@ -39,6 +39,11 @@ const store = new Vuex.Store({
     patronMessage: '',
     guaranteeMessage: '',
     created: false,
+    groupLibrary: '',
+    groupAddress: '',
+    groupCity: '',
+    groupZipcode: '',
+    groupPhone: '',
   },
   mutations: {
     addError(state, value) {
@@ -177,6 +182,21 @@ const store = new Vuex.Store({
     },
     setCreated(state, value) {
       state.created = value;
+    },
+    addGroupLibrary(state, value) {
+      state.groupLibrary = value;
+    },
+    addGroupAddress(state, value) {
+      state.groupAddress = value;
+    },
+    addGroupCity(state, value) {
+      state.groupCity = value;
+    },
+    addGroupZipcode(state, value) {
+      state.groupZipcode = value;
+    },
+    addGroupPhone(state, value) {
+      state.groupPhone = value;
     },
   },
   actions: {

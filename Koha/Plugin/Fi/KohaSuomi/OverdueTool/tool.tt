@@ -103,9 +103,9 @@
 								<li v-if="results.length" :class="{'d-none': showLoader }" class="nav-item pl-2">
 									<div class="form-group row">
 										<div v-for="letter in invoiceLetters" class="mr-2">
-											<button v-if="letter == 'FINVOICE'"class="btn btn-info" v-on:click="allFinvoices" :disabled='buttonLoader'><i v-if="buttonLoader" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo Finvoice:t</span></button>
-											<button v-if="letter == 'EINVOICE'"class="btn btn-info" v-on:click="allEinvoices" :disabled='buttonLoader'><i v-if="buttonLoader" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo e-laskut</span></button>
-											<button v-if="letter == 'ODUECLAIM'"class="btn btn-info" v-on:click="allPDFs">Luo PDF:t</button>
+											<button v-if="letter == 'FINVOICE'"class="btn btn-info" v-on:click="allFinvoices" :disabled='buttonLoader.finvoice'><i v-if="buttonLoader.finvoice" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo Finvoice:t</span></button>
+											<button v-if="letter == 'EINVOICE'"class="btn btn-info" v-on:click="allEinvoices" :disabled='buttonLoader.einvoice'><i v-if="buttonLoader.einvoice" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo e-laskut</span></button>
+											<button v-if="letter == 'ODUECLAIM'"class="btn btn-info" :disabled='buttonLoader.pdf' v-on:click="allPDFs"><i v-if="buttonLoader.pdf" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo PDF:t</span></button>
 										</div>
 									</div>
 								</li>
@@ -174,6 +174,7 @@
 				</div>
 				<div class="row d-none w-100 p-3" :class="{'d-table': isActive, 'odd-cell': index % 2 !== 0 }">
 					<ul class="list-inline d-table-row font-weight-bold">
+						<li class="list-inline-item d-table-cell"></li>
 						<li class="list-inline-item d-table-cell">Laskuta</li>
 						<li class="list-inline-item d-table-cell">Eräpäivä</li>
 						<li class="list-inline-item d-table-cell">Nidenumero</li>
@@ -181,6 +182,7 @@
 						<li class="list-inline-item d-table-cell">Nimeke</li>
 					</ul>
 					<ul class="list-inline w-100 d-table-row" v-for="(checkout, index) in result.checkouts" :key="checkout.itemnumber">
+						<li class="list-inline-item d-table-cell">{{index + 1}}</li>
 						<li>
 							<selectprice @change="selectedPrice" :itemnumber="checkout.itemnumber" :replacementprice="checkout.replacementprice"></selectprice>
 						</li>

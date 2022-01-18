@@ -251,21 +251,30 @@ const store = new Vuex.Store({
     },
     async sendOverdues({ dispatch, commit }, payload) {
       commit('showLoader', true);
-      commit('setCreated', false);
       commit('removeErrors');
+      commit('setCreated', false);
       return axios
         .post('/api/v1/invoices/' + payload.borrowernumber, payload.params)
         .then((response) => {
-          if (payload.all) {
+          if (
+            payload.all &&
+            payload.params.letter_code == 'ODUECLAIM' &&
+            !payload.params.message_transport_type
+          ) {
             commit('setNotices', response.data.notice);
             commit('setMessageId', response.data.message_id);
-            dispatch('editNotice', 'sent');
+            if (!payload.params.preview) {
+              dispatch('editNotice', 'sent');
+            }
+          } else if (payload.all) {
+            commit('setNotice', response.data.notice);
+            commit('setMessageId', response.data.message_id);
           } else {
             commit('setNotice', response.data.notice);
             commit('setMessageId', response.data.message_id);
+            commit('setCreated', true);
           }
           commit('showLoader', false);
-          commit('setCreated', true);
         })
         .catch((error) => {
           commit('addError', error.response.data.error);

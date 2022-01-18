@@ -16,7 +16,7 @@ new Vue({
       selectCategory: [],
       showFilters: false,
       sumFilter: 10,
-      buttonLoader: false,
+      buttonLoader: { pdf: false, finvoice: false, einvoice: false },
       categoryfilter: '',
     };
   },
@@ -112,7 +112,6 @@ new Vue({
   methods: {
     fetch() {
       store.commit('setCreated', false);
-      this.buttonLoader = false;
       store.dispatch('fetchOverdues');
       this.activate();
     },
@@ -122,21 +121,23 @@ new Vue({
     },
     async allFinvoices() {
       if (this.$refs.resultComponentRef) {
-        this.buttonLoader = true;
+        this.buttonLoader.finvoice = true;
+        store.commit('setCreated', false);
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
-            await element.createInvoice('FINVOICE', false);
+            await element.createInvoice('FINVOICE', false, true);
           })
         ).then(() => {
-          this.buttonLoader = false;
+          this.buttonLoader.finvoice = false;
           store.commit('setCreated', true);
         });
       }
     },
     async allPDFs() {
       if (this.$refs.resultComponentRef) {
-        store.commit('showLoader', true);
-        this.previewPDF(true);
+        store.commit('setNotice', '');
+        this.buttonLoader.pdf = true;
+        store.commit('setCreated', false);
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
             await element.createInvoice(
@@ -146,19 +147,22 @@ new Vue({
             );
           })
         ).then(() => {
-          store.commit('showLoader', false);
+          this.previewPDF(true);
+          this.buttonLoader.pdf = false;
+          store.commit('setCreated', true);
         });
       }
     },
     async allEinvoices() {
       if (this.$refs.resultComponentRef) {
-        this.buttonLoader = true;
+        this.buttonLoader.einvoice = true;
+        store.commit('setCreated', false, true);
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
             await element.createInvoice('EINVOICE', false);
           })
         ).then(() => {
-          this.buttonLoader = false;
+          this.buttonLoader.einvoice = false;
           store.commit('setCreated', true);
         });
       }
@@ -186,11 +190,7 @@ new Vue({
       this.fetch();
     },
     changeInvoiced(e) {
-      if (this.invoiced == false) {
-        store.commit('invoiced', true);
-      } else {
-        store.commit('invoiced', false);
-      }
+      store.commit('invoiced', e.target.checked);
       this.fetch();
     },
     onCategoryChange(e) {

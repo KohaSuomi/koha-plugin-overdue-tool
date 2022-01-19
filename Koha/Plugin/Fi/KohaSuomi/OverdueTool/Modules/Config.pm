@@ -120,17 +120,17 @@ sub check_overdue_rules {
     if ( $sth->rows > 0 ) {
         for ( my $i = 0 ; $i < $sth->rows ; $i++ ) {
             my $row = $sth->fetchrow_hashref;
-            if ($row->{delay3} && $row->{letter3}) {
+            if ($row->{delay3}) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay3};
                 $delayperiod = '3';
                 $fine = $row->{fine3};
-            } elsif ($row->{delay2} && $row->{letter2}) {
+            } elsif ($row->{delay2} && !$delayperiod) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay2};
                 $delayperiod = '2';
                 $fine = $row->{fine2};
-            } elsif ($row->{delay1} && $row->{letter1}) {
+            } elsif ($row->{delay1} && !$delayperiod) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay1};
                 $delayperiod = '1';
@@ -142,17 +142,17 @@ sub check_overdue_rules {
         $isth->execute();
         for ( my $i = 0 ; $i < $isth->rows ; $i++ ) {
             my $row = $isth->fetchrow_hashref;
-            if ($row->{delay3} && $row->{letter3}) {
+            if ($row->{delay3}) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay3};
                 $delayperiod = '3';
                 $fine = $row->{fine3};
-            } elsif ($row->{delay2} && $row->{letter2} && !$delayperiod) {
+            } elsif ($row->{delay2} && !$delayperiod) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay2};
                 $delayperiod = '2';
                 $fine = $row->{fine2};
-            } elsif ($row->{delay1} && $row->{letter1} && !$delayperiod) {
+            } elsif ($row->{delay1} && !$delayperiod) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay1};
                 $delayperiod = '1';

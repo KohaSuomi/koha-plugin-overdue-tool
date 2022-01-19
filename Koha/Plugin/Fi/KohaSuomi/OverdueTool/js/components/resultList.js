@@ -194,7 +194,7 @@ const resultList = Vue.component('result-list', {
         );
       }
       this.result.checkouts[index].replacementprice = val.replace(/\,/g, '.');
-      this.$store.dispatch('updateRepalcementPrice', {
+      this.$store.dispatch('updateReplacementPrice', {
         itemnumber: this.result.checkouts[index].itemnumber,
         replacementprice: val.replace(/\,/g, '.'),
       });

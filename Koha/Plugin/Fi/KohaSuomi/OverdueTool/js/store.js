@@ -228,7 +228,7 @@ const store = new Vuex.Store({
           dispatch('fetchAllOverdues');
         })
         .catch((error) => {
-          commit('addError', error.response.data.error);
+          commit('addError', error.message + ':' + error.response.data.error);
         });
     },
     async fetchAllOverdues({ commit, state }) {
@@ -264,7 +264,10 @@ const store = new Vuex.Store({
               });
             })
             .catch((error) => {
-              commit('addError', error.response.data.error);
+              commit(
+                'addError',
+                error.message + ':' + error.response.data.error
+              );
             })
         );
         commit('addOffset', offset);
@@ -301,7 +304,7 @@ const store = new Vuex.Store({
           commit('showLoader', false);
         })
         .catch((error) => {
-          commit('addError', error.response.data.error);
+          commit('addError', error.message + ':' + error.response.data.error);
         });
     },
     changePage({ commit, state }, payload) {
@@ -358,10 +361,10 @@ const store = new Vuex.Store({
           commit('showLoader', false);
         })
         .catch((error) => {
-          commit('addError', error.response.data.error);
+          commit('addError', error.message + ':' + error.response.data.error);
         });
     },
-    updateRepalcementPrice({ commit }, payload) {
+    updateReplacementPrice({ commit }, payload) {
       commit('removeErrors');
       axios
         .patch('/api/v1/items/' + payload.itemnumber, {
@@ -369,7 +372,7 @@ const store = new Vuex.Store({
         })
         .then(() => {})
         .catch((error) => {
-          commit('addError', error.response.data.error);
+          commit('addError', error.message + ':' + error.response.data.error);
         });
     },
   },

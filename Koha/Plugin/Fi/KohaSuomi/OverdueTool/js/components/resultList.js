@@ -21,7 +21,13 @@ const patronData = Vue.component('patrondata', {
           this.loader = false;
         })
         .catch((error) => {
-          this.$store.commit('addError', error.response.data.error);
+          let err = error.message;
+          if (error.response.data.error) {
+            err += ':' + error.response.data.error;
+          } else {
+            err += ', check the logs';
+          }
+          commit('addError', err);
           this.loader = false;
         });
     },

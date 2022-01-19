@@ -228,7 +228,13 @@ const store = new Vuex.Store({
           dispatch('fetchAllOverdues');
         })
         .catch((error) => {
-          commit('addError', error.message + ':' + error.response.data.error);
+          let err = error.message;
+          if (error.response.data.error) {
+            err += ':' + error.response.data.error;
+          } else {
+            err += ', check the logs';
+          }
+          commit('addError', err);
         });
     },
     async fetchAllOverdues({ commit, state }) {
@@ -264,10 +270,13 @@ const store = new Vuex.Store({
               });
             })
             .catch((error) => {
-              commit(
-                'addError',
-                error.message + ':' + error.response.data.error
-              );
+              let err = error.message;
+              if (error.response.data.error) {
+                err += ':' + error.response.data.error;
+              } else {
+                err += ', check the logs';
+              }
+              commit('addError', err);
             })
         );
         commit('addOffset', offset);
@@ -304,7 +313,13 @@ const store = new Vuex.Store({
           commit('showLoader', false);
         })
         .catch((error) => {
-          commit('addError', error.message + ':' + error.response.data.error);
+          let err = error.message;
+          if (error.response.data.error) {
+            err += ': ' + error.response.data.error;
+          } else {
+            err += ', check the logs';
+          }
+          commit('addError', err);
         });
     },
     changePage({ commit, state }, payload) {
@@ -361,7 +376,13 @@ const store = new Vuex.Store({
           commit('showLoader', false);
         })
         .catch((error) => {
-          commit('addError', error.message + ':' + error.response.data.error);
+          let err = error.message;
+          if (error.response.data.error) {
+            err += ':' + error.response.data.error;
+          } else {
+            err += ', check the logs';
+          }
+          commit('addError', err);
         });
     },
     updateReplacementPrice({ commit }, payload) {
@@ -372,7 +393,13 @@ const store = new Vuex.Store({
         })
         .then(() => {})
         .catch((error) => {
-          commit('addError', error.message + ':' + error.response.data.error);
+          let err = error.message;
+          if (error.response.data.error) {
+            err += ':' + error.response.data.error;
+          } else {
+            err += ', check the logs';
+          }
+          commit('addError', err);
         });
     },
   },

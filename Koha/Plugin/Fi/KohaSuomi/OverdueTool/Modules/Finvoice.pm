@@ -6,6 +6,7 @@ use XML::LibXML;
 use Encode qw(decode encode);
 use POSIX qw(strftime);
 use C4::KohaSuomi::SSN::Access;
+use Text::Unaccent;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(process_xml);
@@ -26,5 +27,44 @@ sub process_xml {
 
     $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerPartyIdentifier")->[0]->appendTextNode($ssn);
 
+    my $name = $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerOrganisationName")->[0];
+    my $newname = _escape_string($name->textContent);
+    $name->removeChildNodes;
+    $name->appendText($newname); 
+
+    for my $invoicerow ($doc->findnodes("Finvoice/InvoiceRow")) {
+        my ($row) = $invoicerow->findnodes('ArticleName');
+        my $newvalue = _escape_string($row->textContent);
+        $row->removeChildNodes;
+        $row->appendText($newvalue); 
+    }
+
     return $doc;
+}
+
+
+sub _escape_string {
+    my ($string) = @_;
+    my $newstring;
+    my @chars = split(//, $string);
+    
+    foreach my $char (@chars) {
+        my $oldchar = $char;
+        unless ( $char =~ /[A-Za-z0-9ÅåÄäÖöÉéÜüÁá]/ ) {
+            $char = 'Z'  if $char eq 'Ʒ';
+            $char = 'z'  if $char eq 'ʒ';
+            $char = 'B'  if $char eq 'ß';
+            $char = '\'' if $char eq 'ʻ';
+            $char = 'e'  if $char eq '€';
+            $char = unac_string( 'utf-8', $char ) if "$oldchar" eq "$char";
+        }
+        $newstring .= $char;
+    }
+
+    $newstring =~ s/&/&amp;/sg;
+    $newstring =~ s/</&lt;/sg;
+    $newstring =~ s/>/&gt;/sg;
+    $newstring =~ s/"/&quot;/sg;
+    
+    return $newstring;
 }

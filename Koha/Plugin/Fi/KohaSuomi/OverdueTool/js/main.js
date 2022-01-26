@@ -121,6 +121,7 @@ new Vue({
       this.activate();
     },
     previewPDF(preview) {
+      store.commit('setNotice', '');
       this.preview = preview;
       this.showPDF = true;
     },

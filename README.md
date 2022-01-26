@@ -1,6 +1,6 @@
 # Koha-Suomi Overdue tool plugin
 
-This plugin is for sending Finvoice invoices and printing PDF invoices.
+This plugin is for creating and sending Finvoice, letter and PDF invoices.
 
 # Installing
 

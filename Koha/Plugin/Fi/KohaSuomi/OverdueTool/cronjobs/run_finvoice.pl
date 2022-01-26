@@ -52,9 +52,10 @@ Usage: $0 OUTPUT_DIRECTORY
   Will print all waiting print notices to
   OUTPUT_DIRECTORY .
 
-  -p --path   Config file path for sftp (Mandatory). See example file config.yaml.example.
-  -c --config  Config name. See example file config.yaml.example. (Mandatory)
-  -v --validate  Validate the Finvoice messages.
+  -p --path         Config file path for sftp (Mandatory). See example file config.yaml.example.
+  -c --config       Config name. See example file config.yaml.example. (Mandatory)
+  -v --validate     Validate the Finvoice messages.
+  --xsd             XSD file path for validation.
 
 USAGE
     exit $_[0];
@@ -121,7 +122,7 @@ foreach my $notice (@{$notices->unblessed}) {
     if ($@ && $validate) {
         print "$notice->{message_id} failed with $@\n";
         C4::Letters::_set_message_status(
-        { message_id => $notice->{message_id}, status => 'failed', delivery_note => "Finvoice template error, check logs." } );
+        { message_id => $notice->{message_id}, status => 'failed', delivery_note => "Finvoice template error, check the logs." } );
     } else {
         my $xmlFile = $notice->{from_address}.'_'.$notice->{borrowernumber}."_".$today. ".xml";
         #Write xml to file

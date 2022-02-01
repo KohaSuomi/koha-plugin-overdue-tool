@@ -17,9 +17,11 @@ new Vue({
     save() {
       this.saved = false;
       var url = new URL(window.location.href);
-      url.searchParams.set('method', 'api');
+      // url.searchParams.set('method', 'api');
       axios
-        .get(url.href, {
+        .post(url.href, {
+          method: 'api',
+          class: 'Koha::Plugin::Fi::KohaSuomi::OverdueTool',
           params: {
             invoicelibrary: this.invoicelibrary,
             delaymonths: this.delaymonths,

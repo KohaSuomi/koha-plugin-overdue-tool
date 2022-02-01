@@ -123,7 +123,6 @@
 								<ul class="list-inline d-table-row font-weight-bold">
 									<li class="list-inline-item d-table-cell">Lainaaja</li>
 									<li class="list-inline-item d-table-cell">Takaaja</li>
-									<li class="list-inline-item d-table-cell">Osoite</li>
 									<li class="list-inline-item d-table-cell">Toiminnot</li>
 								</ul>
 							</div>
@@ -153,14 +152,11 @@
 					<ul class="list-inline w-100 d-table-row">
 						<li class="list-inline-item d-table-cell">
 							<span class="d-block"><a :href="'/cgi-bin/koha/members/moremember.pl?borrowernumber='+result.borrowernumber" target="_blank">{{result.cardnumber}}</a></span>
-							<span class="d-block">{{result.firstname}} {{result.surname}} ({{result.dateofbirth}})</span>
-							<span class="patronssnkey">{{result.patronssnkey}}</span>
+							<span class="d-block">{{result.firstname}} {{result.surname}} ({{result.dateofbirth}}, {{result.patronssnkey}})</span>
+							<span class="d-block">{{result.address}}, {{result.zipcode}} {{result.city}}</span>
 						</li>
 						<li class="list-inline-item d-table-cell">
 							<patrondata v-if="result.guarantorid" :borrowernumber="result.guarantorid" :guarantorssnkey="result.guarantorssnkey"></patrondata>
-						</li>
-						<li class="list-inline-item d-table-cell">
-							{{result.address}}, {{result.zipcode}} {{result.city}}
 						</li>
 						<li class="list-inline-item d-table-cell">
 							<button class="btn btn-info" v-on:click="activate"><i class='fas fa-angle-down' :class="{'fa-angle-up': isActive}" style='font-size:24px'></i></button>

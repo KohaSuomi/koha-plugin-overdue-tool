@@ -409,6 +409,11 @@ const store = new Vuex.Store({
     },
     filterResultsBySum: (state) => (minimumSum, categoryfilter) => {
       let filteredResults = [];
+      let min = minimumSum;
+      const sumFilter = localStorage.getItem('sumFilter');
+      if (sumFilter) {
+        min = sumFilter;
+      }
       state.results.forEach((patron) => {
         if (categoryfilter && categoryfilter != patron.categorycode) {
           return;
@@ -419,7 +424,7 @@ const store = new Vuex.Store({
             sum += Math.round(checkout.replacementprice);
           }
         });
-        if (sum >= minimumSum) {
+        if (sum >= min) {
           filteredResults.push(patron);
         }
       });

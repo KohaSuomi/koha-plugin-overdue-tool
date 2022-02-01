@@ -48,6 +48,10 @@ new Vue({
     store.dispatch('setDates', jsondata.overduerules);
     this.selectCategory = jsondata.overduerules.categorycodes;
     this.fetch();
+    const sumFilter = localStorage.getItem('sumFilter');
+    if (sumFilter) {
+      this.sumFilter = sumFilter;
+    }
   },
   computed: {
     results() {
@@ -204,6 +208,7 @@ new Vue({
     },
     filterResults(e) {
       this.buttonLoader = false;
+      localStorage.setItem('sumFilter', e.target.value);
       this.sumFilter = e.target.value;
     },
     toggleFilters() {

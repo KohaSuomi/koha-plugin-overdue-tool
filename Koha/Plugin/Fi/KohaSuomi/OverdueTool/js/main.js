@@ -124,8 +124,10 @@ new Vue({
       store.dispatch('fetchOverdues');
       this.activate();
     },
-    previewPDF(preview) {
-      store.commit('setNotice', '');
+    previewPDF(preview, all) {
+      if (!all) {
+        store.commit('setNotice', '');
+      }
       this.preview = preview;
       this.showPDF = true;
     },
@@ -157,7 +159,7 @@ new Vue({
             );
           })
         ).then(() => {
-          this.previewPDF(true);
+          this.previewPDF(true, true);
           this.buttonLoader.pdf = false;
           store.commit('setCreated', true);
         });

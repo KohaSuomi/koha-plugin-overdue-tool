@@ -108,6 +108,9 @@ const resultList = Vue.component('result-list', {
     invoiceLetters() {
       return this.$store.state.invoiceLetters;
     },
+    letterFilter() {
+      return this.$store.getters.filterLetters;
+    },
     invoiced() {
       return this.$store.state.invoiced;
     },

@@ -430,6 +430,23 @@ const store = new Vuex.Store({
       });
       return filteredResults;
     },
+    filterLetters: (state) => {
+      let letters = state.invoiceLetters;
+      let remove = false;
+      let odueindex;
+      for (let i = 0; i < letters.length; i++) {
+        if (letters[i] == 'FINVOICE' || letters[i] == 'EINVOICE') {
+          remove = true;
+        }
+        if (letters[i] == 'ODUECLAIM') {
+          odueindex = i;
+        }
+      }
+      if (remove) {
+        letters.splice(odueindex, 1);
+      }
+      return letters;
+    },
   },
 });
 

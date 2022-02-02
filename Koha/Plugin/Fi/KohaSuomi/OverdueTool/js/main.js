@@ -19,6 +19,7 @@ new Vue({
       pdfBtn: false,
       einvoiceBtn: false,
       finvoiceBtn: false,
+      previewBtn: false,
       categoryfilter: '',
     };
   },
@@ -147,22 +148,26 @@ new Vue({
         });
       }
     },
-    async allPDFs() {
+    async allPDFs(preview) {
       if (this.$refs.resultComponentRef) {
         store.commit('setNotice', '');
-        this.pdfBtn = true;
+        if (preview) {
+          this.previewBtn = true;
+        } else {
+          this.pdfBtn = true;
+        }
         store.commit('setCreated', false);
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
-            await element.createInvoice(
-              'ODUECLAIM',
-              element.onlyPreview(),
-              true
-            );
+            await element.createInvoice('ODUECLAIM', preview, true);
           })
         ).then(() => {
-          this.previewPDF(true, true);
-          this.pdfBtn = false;
+          this.previewPDF(preview, true);
+          if (preview) {
+            this.previewBtn = false;
+          } else {
+            this.pdfBtn = false;
+          }
           store.commit('setCreated', true);
         });
       }

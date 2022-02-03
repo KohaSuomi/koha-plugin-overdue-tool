@@ -16,7 +16,9 @@ new Vue({
       selectCategory: [],
       showFilters: false,
       sumFilter: 10,
-      buttonLoader: { pdf: false, finvoice: false, einvoice: false },
+      pdfBtn: false,
+      einvoiceBtn: false,
+      finvoiceBtn: false,
       categoryfilter: '',
     };
   },
@@ -133,14 +135,14 @@ new Vue({
     },
     async allFinvoices() {
       if (this.$refs.resultComponentRef) {
-        this.buttonLoader.finvoice = true;
+        this.finvoiceBtn = true;
         store.commit('setCreated', false);
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
             await element.createInvoice('FINVOICE', false, true);
           })
         ).then(() => {
-          this.buttonLoader.finvoice = false;
+          this.finvoiceBtn = false;
           store.commit('setCreated', true);
         });
       }
@@ -148,7 +150,7 @@ new Vue({
     async allPDFs() {
       if (this.$refs.resultComponentRef) {
         store.commit('setNotice', '');
-        this.buttonLoader.pdf = true;
+        this.pdfBtn = true;
         store.commit('setCreated', false);
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
@@ -160,21 +162,21 @@ new Vue({
           })
         ).then(() => {
           this.previewPDF(true, true);
-          this.buttonLoader.pdf = false;
+          this.pdfBtn = false;
           store.commit('setCreated', true);
         });
       }
     },
     async allEinvoices() {
       if (this.$refs.resultComponentRef) {
-        this.buttonLoader.einvoice = true;
+        this.einvoiceBtn = true;
         store.commit('setCreated', false, true);
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
             await element.createInvoice('EINVOICE', false);
           })
         ).then(() => {
-          this.buttonLoader.einvoice = false;
+          this.einvoiceBtn = false;
           store.commit('setCreated', true);
         });
       }

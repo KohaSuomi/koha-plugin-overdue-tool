@@ -103,9 +103,9 @@
 								<li v-if="results.length" :class="{'d-none': showLoader }" class="nav-item pl-2">
 									<div class="form-group row">
 										<div v-for="letter in invoiceLetters" class="mr-2">
-											<button v-if="letter == 'FINVOICE'"class="btn btn-info" v-on:click="allFinvoices" :disabled='buttonLoader.finvoice'><i v-if="buttonLoader.finvoice" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo Finvoice:t</span></button>
-											<button v-if="letter == 'EINVOICE'"class="btn btn-info" v-on:click="allEinvoices" :disabled='buttonLoader.einvoice'><i v-if="buttonLoader.einvoice" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo e-laskut</span></button>
-											<button v-if="letter == 'ODUECLAIM'"class="btn btn-info" :disabled='buttonLoader.pdf' v-on:click="allPDFs"><i v-if="buttonLoader.pdf" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo PDF:t</span></button>
+											<button v-if="letter == 'FINVOICE'"class="btn btn-info" v-on:click="allFinvoices" :disabled='finvoiceBtn'><i v-if="finvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo Finvoice:t</span></button>
+											<button v-if="letter == 'EINVOICE'"class="btn btn-info" v-on:click="allEinvoices" :disabled='einvoiceBtn'><i v-if="einvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo e-laskut</span></button>
+											<button v-if="letter == 'ODUECLAIM'"class="btn btn-info" :disabled='pdfBtn' v-on:click="allPDFs"><i v-if="pdfBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo PDF:t</span></button>
 										</div>
 									</div>
 								</li>

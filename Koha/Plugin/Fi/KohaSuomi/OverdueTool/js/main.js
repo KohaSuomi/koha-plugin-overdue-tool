@@ -187,9 +187,6 @@ new Vue({
       }
     },
     printPDF() {
-      if (!this.preview) {
-        store.dispatch('editNotice', 'sent');
-      }
       printJS({
         printable: 'printDoc',
         type: 'html',

@@ -299,9 +299,6 @@ const store = new Vuex.Store({
           ) {
             commit('setNotices', response.data.notice);
             commit('setMessageId', response.data.message_id);
-            if (!payload.params.preview) {
-              dispatch('editNotice', 'sent');
-            }
           } else if (payload.all) {
             commit('setNotice', response.data.notice);
             commit('setMessageId', response.data.message_id);
@@ -309,6 +306,13 @@ const store = new Vuex.Store({
             commit('setNotice', response.data.notice);
             commit('setMessageId', response.data.message_id);
             commit('setCreated', true);
+          }
+          if (
+            !payload.params.preview &&
+            payload.params.letter_code == 'ODUECLAIM' &&
+            !payload.params.message_transport_type
+          ) {
+            dispatch('editNotice', 'sent');
           }
           commit('showLoader', false);
         })

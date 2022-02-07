@@ -173,11 +173,13 @@ const resultList = Vue.component('result-list', {
       let patronid = this.result.guarantorid
         ? this.result.guarantorid
         : this.result.borrowernumber;
-      return this.$store.dispatch('sendOverdues', {
-        borrowernumber: patronid,
-        params: params,
-        all: all,
-      });
+      if (this.newcheckouts.length) {
+        return this.$store.dispatch('sendOverdues', {
+          borrowernumber: patronid,
+          params: params,
+          all: all,
+        });
+      }
     },
     previewPDF: function (all) {
       this.createInvoice('ODUECLAIM', this.onlyPreview(), all);

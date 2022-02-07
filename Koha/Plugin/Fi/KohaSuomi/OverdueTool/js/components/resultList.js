@@ -181,9 +181,9 @@ const resultList = Vue.component('result-list', {
         });
       }
     },
-    previewPDF: function (all) {
-      this.createInvoice('ODUECLAIM', this.onlyPreview(), all);
-      this.$parent.previewPDF(this.onlyPreview());
+    previewPDF: function (preview, all) {
+      this.createInvoice('ODUECLAIM', preview, all);
+      this.$parent.previewPDF(preview);
     },
     onlyPreview: function () {
       let retval = false;

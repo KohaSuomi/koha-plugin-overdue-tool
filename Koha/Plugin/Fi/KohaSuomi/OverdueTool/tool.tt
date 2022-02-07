@@ -164,9 +164,9 @@
 							<span v-if="!invoiced" v-for="letter in letterFilter">
 								<button v-if="letter != 'ODUECLAIM' && letter != 'EINVOICE'" class="btn btn-success" v-on:click="createInvoice(letter)">Luo {{letter | lowercase}}</button>
 								<button v-if="letter == 'EINVOICE'" class="btn btn-success" v-on:click="createInvoice(letter)">Luo e-lasku</button>
-								<button v-if="letter == 'ODUECLAIM'" class="btn btn-success" v-on:click="previewPDF(false)">Luo pdf-lasku</button>
+								<button v-if="letter == 'ODUECLAIM'" class="btn btn-success" v-on:click="previewPDF(false, false)">Luo pdf-lasku</button>
 							</span>
-							<button class="btn btn-success" v-on:click="previewPDF(true)">Jäljennös</button>
+							<button class="btn btn-success" v-on:click="previewPDF(true, true)">Jäljennös</button>
 						</li>
 					</ul>
 				</div>

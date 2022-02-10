@@ -55,6 +55,11 @@ new Vue({
     if (sumFilter) {
       this.sumFilter = sumFilter;
     }
+    const pluginVersion = localStorage.getItem('invoicePluginVersion');
+    if (pluginVersion != jsondata.pluginversion) {
+      $('#reloadModal').modal('show');
+      localStorage.setItem('invoicePluginVersion', jsondata.pluginversion);
+    }
   },
   computed: {
     results() {

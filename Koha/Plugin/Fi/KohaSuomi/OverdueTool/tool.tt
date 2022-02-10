@@ -96,8 +96,8 @@
 								</li>
 								<li class="nav-item pl-2">
 									<div class="form-group row">
-										<label for="formControlRange" class="col-sm-5 col-form-label pr-1">Minimi summa: <span id="rangeval">{{sumFilter}}</span>€</label>
-										<input type="range" @change="filterResults($event)" min="0" max="50" step="5" :value="sumFilter" class="form-control-range col-sm-5" id="formControlRange" onInput="$('#rangeval').html($(this).val())">
+										<label for="formControlRange" class="col-sm-6 col-form-label pr-1">Minimi summa: <span id="rangeval">{{sumFilter}}</span>€</label>
+										<input type="range" @change="filterResults($event)" min="0" max="100" step="5" :value="sumFilter" class="form-control-range col-sm-5" id="formControlRange" onInput="$('#rangeval').html($(this).val())">
 									</div>
 								</li>
 								<li v-if="results.length" :class="{'d-none': showLoader }" class="nav-item pl-2">
@@ -145,6 +145,22 @@
 					</div>
 				</div>
 				</main>
+			</div>
+			<!-- Modal -->
+			<div class="modal fade" id="reloadModal" tabindex="-1" role="dialog" aria-labelledby="reloadModalLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Lataa sivu uudelleen</h5>
+					</div>
+					<div class="modal-body">
+						Laskutustyökalu on päivittynyt, lataa sivu uudelleen.
+					</div>	
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" onclick="location.reload(true);" >Lataa</button>
+					</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<template id="list-items">

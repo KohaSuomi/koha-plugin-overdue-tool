@@ -16,6 +16,7 @@ PASS=`xmlstarlet sel -t -v 'yazgfs/config/pass' $KOHA_CONF`
 
 mysql --user=$USER --password="$PASS" --port=$PORT --host=$HOST $DATABASE << END
 DELETE FROM plugin_data where plugin_class = 'Koha::Plugin::Fi::KohaSuomi::OverdueTool';
+DELETE FROM plugin_methods where plugin_class = 'Koha::Plugin::Fi::KohaSuomi::OverdueTool';
 INSERT INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','__INSTALLED__','1');
 INSERT INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','__INSTALLED_VERSION__','${VERSION}');
 INSERT INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','__ENABLED__','1');

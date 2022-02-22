@@ -1,114 +1,131 @@
 package Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Config;
 
+# Copyright 2022 Koha-Suomi Oy
+#
+# This file is part of Koha.
+#
+# Koha is free software; you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# Koha is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Koha; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 use Modern::Perl;
-use Exporter;
+use Carp;
+use Scalar::Util qw( blessed );
+use Try::Tiny;
+use JSON;
+use Koha::Libraries;
+use Koha::Plugin::Fi::KohaSuomi::OverdueTool;
 use C4::Context;
-use Koha::LibraryCategories;
-use Mojo::JSON;
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw(get_branch_settings check_overdue_rules set_group_settings get_group_settings);
+=head new
 
-sub set_group_settings {
-    my ( $saved ) = @_;
-    my $library_categories = Koha::LibraryCategories->search({});
-    my $categories = $saved;
-    foreach my $category (@{$library_categories->unblessed}) {
-        if ($category->{categorycode} =~ /LASKU/i) {
-            my $add = 1;
-            if ($saved) {
-                foreach my $s (@{$saved}) {
-                    if ($s->{groupname} eq $category->{categorycode}) {
-                        $add = 0;
-                    }
-                }
-            }
-            if ($add) {
-                my $settings = {
-                    groupname => $category->{categorycode},
-                    grouplibrary => '',
-                    groupaddress => '',
-                    groupzipcode => '', 
-                    groupcity => '',
-                    groupphone => '',
-                    increment => '', 
-                    addreferencenumber => Mojo::JSON->false, 
-                    debarment => Mojo::JSON->false, 
-                    addreplacementprice => Mojo::JSON->false,
-                    overduefines =>  Mojo::JSON->false,
-                    invoicefine => '',
-                    accountnumber => '',
-                    biccode => '',
-                    businessid => '',
-                    patronmessage => '',
-                    guaranteemessage => ''
-                };
-                push @{$categories}, $settings;
-            }
-        }
-    }
-    
-    return $categories;
+    my $config = Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Config->new($params);
+
+=cut
+
+sub new {
+    my ($class, $params) = @_;
+    my $self = {};
+    $self->{_params} = $params;
+    bless($self, $class);
+    return $self;
+
 }
 
-sub get_group_settings {
-    my ( $saved, $group ) = @_;
+sub _validateNew {
+    my ($class, $params) = @_;
 
-    my $groupsettings = {};
-    
-    foreach my $s (@{$saved}) {
-        if ($s->{groupname} eq $group) {
-            $groupsettings = $s;
-
-        }
+    unless ($params->{invoicelibrary}) {
+        die "Missing invoicelibrary value";
     }
-    
-    return $groupsettings;
+
+    unless ($params->{delaymonths}) {
+        die "Missing delaymonths value";
+    }
+
+    unless ($params->{maxyears}) {
+        die "Missing maxyears value";
+    }
+
+    unless ($params->{invoicenotforloan}) {
+        die "Missing invoicenotforloan value";
+    }
+
+    unless ($params->{groupsettings}) {
+        die "Missing groupsettings value";
+    }
 }
 
-sub get_branch_settings {
-    my ( $userbranch ) = @_;
-
-    my $dbh = C4::Context->dbh;
-    my $sth = $dbh->prepare("SELECT categorycode FROM branchrelations WHERE branchcode = ?");
-    $sth->execute($userbranch);
-    my $branchgroup;
-    my @invoiceletter;
-    push @invoiceletter,'ODUECLAIM';
-    while (my $categorycode = $sth->fetchrow_array) {
-        if ($categorycode =~ /LASKU/i) {
-            $branchgroup = $categorycode;
-        }
-
-        if ($categorycode =~ /Finvoice/i) {
-            push @invoiceletter, 'FINVOICE';
-        }
-
-        if ($categorycode =~ /Einvoice/i) {
-            push @invoiceletter, 'EINVOICE';
-        }
-        
-    }
-    $sth->finish;
-
-    my @branches = Koha::LibraryCategories->find( $branchgroup )->libraries if Koha::LibraryCategories->find( $branchgroup );
-    my @branchcodes;
-    if (@branches) {
-        foreach my $branch (@branches) {
-            push @branchcodes, $branch->branchcode;
-        }
-    } else {
-        push @branchcodes, $userbranch;
-    }
-
-    return {librarygroup => $branchgroup, libraries => \@branchcodes, invoiceletters => \@invoiceletter};
+sub getInvoiceLibrary {
+    return shift->{_params}->{invoicelibrary};
 }
 
-sub check_overdue_rules {
-    my ( $branch, $delaymonths ) = @_;
+sub getDelayMonths {
+    return shift->{_params}->{delaymonths};
+}
+
+sub getMaxYears {
+    return shift->{_params}->{maxyears};
+}
+
+sub getInvoiceNotForLoan {
+    return shift->{_params}->{invoicenotforloan};
+}
+
+sub getGroupSettings {
+    return shift->{_params}->{groupsettings};
+}
+
+sub getPlugin() {
+    return Koha::Plugin::Fi::KohaSuomi::OverdueTool->new();
+}
+
+sub setConfig() {
+    my ($self) = @_;   
+    $self->_validateNew($self->{_params});
+    $self->getPlugin()->store_data(
+        {
+            delaymonths           => $self->getDelayMonths(),
+            maxyears              => $self->getMaxYears(),
+            invoicelibrary        => $self->getInvoiceLibrary(),
+            invoicenotforloan     => $self->getInvoiceNotForLoan(),
+            groupsettings         => $self->getGroupSettings(),
+
+        }
+    );
+}
+
+sub getConfig() {
+    my ($self) = @_;
+
+    my $branch = C4::Context->userenv->{'branch'};
+    my $delaymonths = $self->getPlugin()->retrieve_data('delaymonths') || 1;
+    warn Data::Dumper::Dumper $self;
+    return {
+        userlibrary => $branch,
+        libraries => Koha::Libraries->search( {}, { columns => ["branchcode", "branchname"], order_by => ['branchname'] } )->unblessed,
+        delaymonths => $self->getPlugin()->retrieve_data('delaymonths') || 1,
+        maxyears => $self->getPlugin()->retrieve_data('maxyears') || 1,
+        invoicelibrary => $self->getPlugin()->retrieve_data('invoicelibrary') || 'issuebranch',
+        invoicenotforloan => $self->getPlugin()->retrieve_data('invoicenotforloan') || 6,
+        overduerules => $self->checkOverdueRules($branch, $delaymonths),
+        groupsettings => JSON::from_json($self->getPlugin()->retrieve_data('groupsettings')) || [],
+    };
+}
+
+sub checkOverdueRules {
+    my ( $self, $branch, $delaymonths ) = @_;
 
     my %delay;
-    my $fine;
     my $delayperiod;
     my $delaytime;
     my @categorycodes;
@@ -124,17 +141,14 @@ sub check_overdue_rules {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay3};
                 $delayperiod = '3';
-                $fine = $row->{fine3};
             } elsif ($row->{delay2} && !$delayperiod) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay2};
                 $delayperiod = '2';
-                $fine = $row->{fine2};
             } elsif ($row->{delay1} && !$delayperiod) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay1};
                 $delayperiod = '1';
-                $fine = $row->{fine1};
             }
         }
     } else {
@@ -146,27 +160,25 @@ sub check_overdue_rules {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay3};
                 $delayperiod = '3';
-                $fine = $row->{fine3};
             } elsif ($row->{delay2} && !$delayperiod) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay2};
                 $delayperiod = '2';
-                $fine = $row->{fine2};
             } elsif ($row->{delay1} && !$delayperiod) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay1};
                 $delayperiod = '1';
-                $fine = $row->{fine1};
             }
         }
         $isth->finish;
     }
     $delay{delaytime} = $delaytime;
     $delay{delayperiod} = $delayperiod;
-    $delay{delayfine} = $fine;
     $delay{delaymonths} = 0+$delaymonths;
     $delay{categorycodes} = \@categorycodes;
 
     return \%delay;
 
 }
+
+1;

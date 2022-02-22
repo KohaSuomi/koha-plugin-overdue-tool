@@ -17,7 +17,7 @@ const store = new Vuex.Store({
     invoiceLibrary: '',
     maxYears: 1,
     lastDate: '',
-    invoiceLetters: [],
+    invoiceType: '',
     userLibrary: '',
     notforloanStatus: '',
     invoiced: false,
@@ -106,7 +106,7 @@ const store = new Vuex.Store({
     addMaxYears(state, value) {
       state.maxYears = value;
     },
-    addInvoiceLetters(state, value) {
+    addInvoiceType(state, value) {
       state.invoiceLetters = value;
     },
     addUserLibrary(state, value) {
@@ -200,6 +200,34 @@ const store = new Vuex.Store({
     },
   },
   actions: {
+    setSettings({ dispatch, commit, state }, payload) {
+      commit('addInvoiceLibrary', payload.invoicelibrary);
+      commit('addMaxYears', payload.maxyears);
+      commit('addUserLibrary', payload.userlibrary);
+      commit('addNotForLoanStatus', payload.invoicenotforloan);
+      payload.groupsettings.forEach((group) => {
+        group.grouplibraries.forEach((lib) => {
+          if (lib.branchcode == state.userLibrary) {
+            commit('addLibraries', group.grouplibraries);
+            commit('addInvoiceType', group.invoicetype);
+            commit('debarment', group.debarment);
+            commit('addReplacementPrice', group.addreplacementprice);
+            commit('addReferenceNumber', group.addreferencenumber);
+            commit('addInvoiceFine', group.invoicefine);
+            commit('addOverdueFines', group.overduefines);
+            commit('addIncrement', group.increment);
+            commit('addLibraryGroup', group.librarygroup);
+            commit('addAccountNumber', group.accountnumber);
+            commit('addBicCode', group.biccode);
+            commit('addBusinessId', group.businessid);
+            commit('addPatronMessage', group.patronmessage);
+            commit('addGuaranteeMessage', group.guaranteemessage);
+          }
+        });
+      });
+      commit('addCategoryCodes', payload.overduerules.categorycodes);
+      dispatch('setDates', payload.overduerules);
+    },
     fetchOverdues({ dispatch, commit, state }) {
       commit('addResults', []);
       commit('addOffset', 0);

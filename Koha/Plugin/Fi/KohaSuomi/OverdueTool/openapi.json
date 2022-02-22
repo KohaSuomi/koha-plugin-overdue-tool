@@ -1,0 +1,68 @@
+{
+  "/overdues/config/": {
+    "get": {
+      "x-mojo-to": "Fi::KohaSuomi::OverdueTool::Controllers::ConfigController#get",
+      "operationId": "GetOverdueConfig",
+      "tags": [
+        "overdues"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "Overdue tool config",
+          "schema": {
+            "type": "object"
+          }
+        },
+        "404": {
+          "description": "An error occured",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "description": "Config not found",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "put": {
+      "x-mojo-to": "Fi::KohaSuomi::OverdueTool::Controllers::ConfigController#set",
+      "operationId": "SetOverdueConfig",
+      "tags": [
+        "overdues"
+      ],
+      "parameters": [
+        {
+          "name": "body",
+          "in": "body",
+          "description": "Config object",
+          "required": true,
+          "schema": {
+            "type": "object"
+          }
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "Success message",
+          "schema": {
+            "type": "object"
+          }
+        }
+      },
+      "x-koha-authorization": {
+        "permissions": {
+          "plugins": "configure"
+        }
+      }
+    }
+  }
+}

@@ -24,42 +24,8 @@ new Vue({
     };
   },
   mounted() {
-    store.commit('addInvoiceLibrary', jsondata.invoicelibrary);
-    store.commit('addMaxYears', jsondata.maxyears);
-    store.commit('addLibraries', jsondata.libraries);
-    store.commit('addInvoiceLetters', jsondata.invoiceletters);
-    store.commit('addUserLibrary', jsondata.userlibrary);
-    store.commit('addNotForLoanStatus', jsondata.invoicenotforloan);
-    store.commit('debarment', jsondata.debarment);
-    store.commit('addReplacementPrice', jsondata.addreplacementprice);
-    store.commit('addReferenceNumber', jsondata.addreferencenumber);
-    store.commit('addInvoiceFine', jsondata.invoicefine);
-    store.commit('addOverdueFines', jsondata.overduefines);
-    store.commit('addIncrement', jsondata.increment);
-    store.commit('addLibraryGroup', jsondata.librarygroup);
-    store.commit('addAccountNumber', jsondata.accountnumber);
-    store.commit('addBicCode', jsondata.biccode);
-    store.commit('addBusinessId', jsondata.businessid);
-    store.commit('addPatronMessage', jsondata.patronmessage);
-    store.commit('addGuaranteeMessage', jsondata.guaranteemessage);
-    store.commit('addCategoryCodes', jsondata.overduerules.categorycodes);
-    store.commit('addGroupLibrary', jsondata.grouplibrary);
-    store.commit('addGroupAddress', jsondata.groupaddress);
-    store.commit('addGroupCity', jsondata.groupcity);
-    store.commit('addGroupZipcode', jsondata.groupzipcode);
-    store.commit('addGroupPhone', jsondata.groupphone);
-    store.dispatch('setDates', jsondata.overduerules);
-    this.selectCategory = jsondata.overduerules.categorycodes;
-    this.fetch();
-    const sumFilter = localStorage.getItem('sumFilter');
-    if (sumFilter) {
-      this.sumFilter = sumFilter;
-    }
-    const pluginVersion = localStorage.getItem('invoicePluginVersion');
-    if (pluginVersion != jsondata.pluginversion) {
-      $('#reloadModal').modal('show');
-      localStorage.setItem('invoicePluginVersion', jsondata.pluginversion);
-    }
+    this.getConfig();
+    //this.fetch();
   },
   computed: {
     results() {
@@ -127,6 +93,31 @@ new Vue({
     },
   },
   methods: {
+    getConfig() {
+      axios
+        .get('/api/v1/contrib/kohasuomi/overdues/config')
+        .then((response) => {
+          console.log(response.data);
+          store.dispatch('setSettings', response.data);
+          this.selectCategory = response.data.overduerules.categorycodes;
+          const sumFilter = localStorage.getItem('sumFilter');
+          if (sumFilter) {
+            this.sumFilter = sumFilter;
+          }
+          const pluginVersion = localStorage.getItem('invoicePluginVersion');
+          if (pluginVersion != response.data.pluginversion) {
+            $('#reloadModal').modal('show');
+            localStorage.setItem(
+              'invoicePluginVersion',
+              response.data.pluginversion
+            );
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          store.commit('addErrors', error.response.data.error);
+        });
+    },
     fetch() {
       store.commit('setCreated', false);
       store.dispatch('fetchOverdues');

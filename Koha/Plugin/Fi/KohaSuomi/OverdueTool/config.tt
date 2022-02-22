@@ -10,9 +10,11 @@
 		<!-- Bootstrap core CSS -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://unpkg.com/vue-multiselect@2.1.0/dist/vue-multiselect.min.css">
 		<!-- Custom styles for this template-->
 		<script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
 		<script src="https://unpkg.com/vuex@3.6.2/dist/vuex.min.js"></script>
+        <script src="https://unpkg.com/vue-multiselect@2.1.0"></script>
 		<script src="https://unpkg.com/vuejs-datepicker"></script>
 		<script src="https://unpkg.com/vuejs-datepicker/dist/locale/translations/fi.js"></script>
 		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -62,16 +64,12 @@
                                 <div class="card">
                                     <div class="card-body tab-content">
                                         <div class="tab-pane active" id="default">
-                                            <h6>Yleiset</h6>
+                                            <h5>Yleiset</h5>
                                             <hr>
                                             <form>
                                                 <div class="form-group">
                                                     <label for="invoicelibrary">Laskuttava kirjasto:</label>
-                                                    <select class="form-control" id="invoicelibrary" v-model="invoicelibrary">
-                                                        <option></option>
-                                                        <option value="issuebranch">Lainaajakirjasto</option>
-                                                        <option value="itembranch">Omistajakirjasto</option>
-                                                    </select>
+                                                    <multiselect v-model="invoicelibrary" value="value" :options="invoiceLibraries.map(type => type.value)" :searchable="false" :custom-label="opt => invoiceLibraries.find(x => x.value == opt).name" :close-on-select="true" :show-labels="false" placeholder="Valitse"></multiselect>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="delaymonths">Näytä lainat eräpäivästä </label>
@@ -90,12 +88,37 @@
                                             </form>
                                         </div>
                                         <div class="tab-pane" id="groups">
-                                            <h6>Ryhmäasetukset</h6>
-                                            <hr>
-                                            <form>
-                                                <div class="form-group mb-0" v-for="(group, index) in groupsettings">
-                                                    <h6>{{group.groupname}}</h6>
+                                            <div class="row"><div class="col-sm-12"><h5>Ryhmäasetukset</h5>
+                                            </div><div class="col-sm-12">
+                                                <div class="input-group mb-3">
+                                                    <div class="dropdown float-left mr-2">
+                                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            Valitse ryhmä
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            <a class="dropdown-item" href="#" @click="clearGroup()">Tyhjennä</a>
+                                                            <a class="dropdown-item" href="#" v-for="(group, index) in groupsettings" @click="updateGroup($event, group)">{{group.groupname}}</a>
+                                                        </div>
+                                                    </div>
+                                                    <button v-if="showGroup" class="btn btn-danger mr-2" @click="removeGroup()">Poista {{group.groupname}}</button>
+                                                    <input type="text" class="form-control" name="groupname"  v-model="groupname" placeholder="Uusi ryhmä" aria-label="Uusi ryhmä"/>
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-success" @click="createGroup()">Luo ryhmä</button></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <form v-if="showGroup">
+                                                <div class="form-group mb-0">
+                                                    <div class="col-sm-12 pt-3"><h5>{{group.groupname}}</h5></div>
                                                     <ul class="list-group list-group-sm">
+                                                        <li class="list-group-item">
+                                                            <label for="libraries">Kirjastopisteet</label>
+                                                            <multiselect v-model="group.grouplibraries" :options="groupLibraries" :multiple="true" placeholder="Valitse" label="branchname" :close-on-select="false" track-by="branchname" :show-labels="false"></multiselect>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <label for="grouplibrary">Laskutustapa</label>
+                                                            <multiselect v-model="group.invoicetype" :options="invoiceTypes.map(type => type.value)" :custom-label="opt => invoiceTypes.find(x => x.value == opt).name" :searchable="false" label="name" track-by="name" :close-on-select="true" :show-labels="false" placeholder="Valitse"></multiselect>
+                                                        </li>
                                                         <li class="list-group-item">
                                                             <label for="grouplibrary">Laskuttajan nimi</label>
                                                             <input type="text" class="form-control" name="grouplibrary"  v-model="group.grouplibrary"/>
@@ -177,7 +200,7 @@
                                             </form>
                                         </div>
                                         <div class="mt-3">
-                                            <button type="button" class="btn btn-primary" @click="save()">Tallenna</button>
+                                            <button type="button" class="btn btn-primary" @click="setConfig()">Tallenna</button>
                                         </div>
                                     </div>
                                 </div>
@@ -198,7 +221,6 @@
 		<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
 		<script>
 			feather.replace();
-			var jsondata = JSON.parse('[% data %]');
 		</script>
 		<script type="module" src="[% PLUGIN_PATH %]/js/config.js"></script>
 	</body>

@@ -109,17 +109,20 @@ sub getConfig() {
 
     my $branch = C4::Context->userenv->{'branch'};
     my $delaymonths = $self->getPlugin()->retrieve_data('delaymonths') || 1;
-    warn Data::Dumper::Dumper $self;
-    return {
+    my $config = {
         userlibrary => $branch,
         libraries => Koha::Libraries->search( {}, { columns => ["branchcode", "branchname"], order_by => ['branchname'] } )->unblessed,
         delaymonths => $self->getPlugin()->retrieve_data('delaymonths') || 1,
         maxyears => $self->getPlugin()->retrieve_data('maxyears') || 1,
         invoicelibrary => $self->getPlugin()->retrieve_data('invoicelibrary') || 'issuebranch',
         invoicenotforloan => $self->getPlugin()->retrieve_data('invoicenotforloan') || 6,
-        overduerules => $self->checkOverdueRules($branch, $delaymonths),
-        groupsettings => JSON::from_json($self->getPlugin()->retrieve_data('groupsettings')) || [],
+        overduerules => $self->checkOverdueRules($branch, $delaymonths) || [],
+        groupsettings => $self->getPlugin()->retrieve_data('groupsettings') || '[]',
     };
+    
+    $config->{groupsettings} = JSON::from_json($config->{groupsettings}) if $config->{groupsettings};
+
+    return $config;
 }
 
 sub checkOverdueRules {

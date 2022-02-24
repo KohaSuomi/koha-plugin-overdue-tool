@@ -11,7 +11,11 @@
 }
 .preview .footer {
   clear: both;
-  margin-top: 40mm;
+  margin-top: 20mm;
+  margin-left: 0mm;
+  margin-right: 0mm;
+  padding: 0 10mm;
+  border-top: 1px solid #dee2e6;
 }
 .preview .recipient {
   margin-top: 0mm;
@@ -42,14 +46,14 @@
   padding: 0.75rem;
   padding-right: 0.75rem;
   vertical-align: top;
-  border-top: 1px solid #dee2e6;
+  /* border-top: 1px solid #dee2e6; */
 }
 
 .preview .content .table tr td {
   padding: 0.75rem;
   padding-right: 0.75rem;
   vertical-align: top;
-  border-top: 1px solid #dee2e6;
+  /* border-top: 1px solid #dee2e6; */
 }
 
 .preview .sender {
@@ -67,7 +71,7 @@
   left: 0;
 }
 .preview hr {
-  background: #000000;
+  background: #dee2e6;
   border: 0;
   height: 0.5mm;
 }

@@ -109,6 +109,7 @@ sub getConfig() {
 
     my $branch = C4::Context->userenv->{'branch'};
     my $delaymonths = $self->getPlugin()->retrieve_data('delaymonths') || 1;
+    
     my $config = {
         userlibrary => $branch,
         libraries => Koha::Libraries->search( {}, { columns => ["branchcode", "branchname"], order_by => ['branchname'] } )->unblessed,
@@ -118,6 +119,7 @@ sub getConfig() {
         invoicenotforloan => $self->getPlugin()->retrieve_data('invoicenotforloan') || 6,
         overduerules => $self->checkOverdueRules($branch, $delaymonths) || [],
         groupsettings => $self->getPlugin()->retrieve_data('groupsettings') || '[]',
+        pluginversion => $self->getPlugin()->{metadata}->{version},
     };
     
     $config->{groupsettings} = JSON::from_json($config->{groupsettings}) if $config->{groupsettings};

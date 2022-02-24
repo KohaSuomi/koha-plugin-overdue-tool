@@ -105,11 +105,8 @@ const resultList = Vue.component('result-list', {
     }
   },
   computed: {
-    invoiceLetters() {
-      return this.$store.state.invoiceLetters;
-    },
-    letterFilter() {
-      return this.$store.getters.filterLetters;
+    invoiceType() {
+      return this.$store.state.invoiceType;
     },
     invoiced() {
       return this.$store.state.invoiced;
@@ -119,7 +116,7 @@ const resultList = Vue.component('result-list', {
     activate: function () {
       this.isActive = !this.isActive;
     },
-    createInvoice: function (letter_code, preview, all) {
+    createInvoice: function (preview, all) {
       this.newcheckouts = [];
       this.newcheckouts = this.result.checkouts.slice(0);
       this.removecheckouts.forEach((element) => {
@@ -151,7 +148,7 @@ const resultList = Vue.component('result-list', {
         surname: this.result.surname,
         firstname: this.result.firstname,
         cardnumber: this.result.cardnumber,
-        letter_code: letter_code,
+        letter_code: 'ODUECLAIM',
         grouplibrary: this.$store.state.groupLibrary,
         groupaddress: this.$store.state.groupAddress,
         groupcity: this.$store.state.groupCity,
@@ -159,9 +156,12 @@ const resultList = Vue.component('result-list', {
         groupphone: this.$store.state.groupPhone,
       };
 
-      if (letter_code == 'EINVOICE') {
-        params.letter_code = 'ODUECLAIM';
+      if (this.invoiceType == 'FINVOICE' && !preview) {
+        params.message_transport_type = 'finvoice';
+      } else if (this.invoiceType == 'EINVOICE' && !preview) {
         params.message_transport_type = 'print';
+      } else {
+        params.message_transport_type = 'pdf';
       }
 
       if (this.result.guarantorid) {
@@ -182,17 +182,8 @@ const resultList = Vue.component('result-list', {
       }
     },
     previewPDF: function (preview, all) {
-      this.createInvoice('ODUECLAIM', preview, all);
+      this.createInvoice(preview, all);
       this.$parent.previewPDF(preview);
-    },
-    onlyPreview: function () {
-      let retval = false;
-      this.$store.state.invoiceLetters.forEach((element) => {
-        if (element == 'FINVOICE' || element == 'EINVOICE') {
-          retval = true;
-        }
-      });
-      return retval;
     },
     newPrice(val, index) {
       var intvalue = Math.floor(val);

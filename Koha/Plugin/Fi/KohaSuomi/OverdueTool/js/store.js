@@ -19,19 +19,19 @@ const store = new Vuex.Store({
     lastDate: '',
     invoiceType: '',
     userLibrary: '',
+    libraryGroup: '',
     notforloanStatus: '',
     invoiced: false,
-    debarment: '',
-    addReplacementPrice: '',
-    addReferenceNumber: '',
-    libraryGroup: '',
+    debarment: false,
+    addReplacementPrice: false,
+    addReferenceNumber: false,
     categorycodes: [],
     resultOffset: 0,
     showLoader: false,
     notice: '',
     increment: '',
     invoicefine: '',
-    overduefines: '',
+    overduefines: false,
     accountNumber: '',
     bicCode: '',
     messageId: '',
@@ -97,9 +97,6 @@ const store = new Vuex.Store({
     addLibraries(state, value) {
       state.libraries = value;
     },
-    addLibraryGroup(state, value) {
-      state.libraryGroup = value;
-    },
     addInvoiceLibrary(state, value) {
       state.invoiceLibrary = value;
     },
@@ -107,10 +104,13 @@ const store = new Vuex.Store({
       state.maxYears = value;
     },
     addInvoiceType(state, value) {
-      state.invoiceLetters = value;
+      state.invoiceType = value;
     },
     addUserLibrary(state, value) {
       state.userLibrary = value;
+    },
+    addLibraryGroup(state, value) {
+      state.libraryGroup = value;
     },
     addNotForLoanStatus(state, value) {
       state.notforloanStatus = value;
@@ -208,20 +208,36 @@ const store = new Vuex.Store({
       payload.groupsettings.forEach((group) => {
         group.grouplibraries.forEach((lib) => {
           if (lib.branchcode == state.userLibrary) {
-            commit('addLibraries', group.grouplibraries);
+            let libArray = group.grouplibraries.map(function (obj) {
+              return obj.branchcode;
+            });
+            commit('addLibraries', libArray);
             commit('addInvoiceType', group.invoicetype);
-            commit('debarment', group.debarment);
-            commit('addReplacementPrice', group.addreplacementprice);
-            commit('addReferenceNumber', group.addreferencenumber);
+            if (group.debarment) {
+              commit('debarment', group.debarment);
+            }
+            if (group.addreplacementprice) {
+              commit('addReplacementPrice', group.addreplacementprice);
+            }
+            if (group.addreferencenumber) {
+              commit('addReferenceNumber', group.addreferencenumber);
+            }
             commit('addInvoiceFine', group.invoicefine);
-            commit('addOverdueFines', group.overduefines);
+            if (group.overduefines) {
+              commit('addOverdueFines', group.overduefines);
+            }
+            commit('addLibraryGroup', group.groupname);
             commit('addIncrement', group.increment);
-            commit('addLibraryGroup', group.librarygroup);
             commit('addAccountNumber', group.accountnumber);
             commit('addBicCode', group.biccode);
             commit('addBusinessId', group.businessid);
             commit('addPatronMessage', group.patronmessage);
             commit('addGuaranteeMessage', group.guaranteemessage);
+            commit('addGroupLibrary', group.grouplibrary);
+            commit('addGroupAddress', group.groupaddress);
+            commit('addGroupZipcode', group.groupzipcode);
+            commit('addGroupCity', group.groupcity);
+            commit('addGroupPhone', group.groupphone);
           }
         });
       });
@@ -247,7 +263,7 @@ const store = new Vuex.Store({
       searchParams.append('limit', 1);
 
       axios
-        .get('/api/v1/checkouts/overdues', {
+        .get('/api/v1/contrib/kohasuomi/overdues', {
           params: searchParams,
         })
         .then((response) => {
@@ -287,7 +303,7 @@ const store = new Vuex.Store({
         }
         promises.push(
           axios
-            .get('/api/v1/checkouts/overdues', {
+            .get('/api/v1/contrib/kohasuomi/overdues', {
               params: searchParams,
             })
             .then((response) => {
@@ -318,13 +334,12 @@ const store = new Vuex.Store({
       commit('removeErrors');
       commit('setCreated', false);
       return axios
-        .post('/api/v1/invoices/' + payload.borrowernumber, payload.params)
+        .post(
+          '/api/v1/contrib/kohasuomi/invoices/' + payload.borrowernumber,
+          payload.params
+        )
         .then((response) => {
-          if (
-            payload.all &&
-            payload.params.letter_code == 'ODUECLAIM' &&
-            !payload.params.message_transport_type
-          ) {
+          if (payload.all && !payload.params.message_transport_type == 'pdf') {
             commit('setNotices', response.data.notice);
             commit('setMessageId', response.data.message_id);
           } else if (payload.all) {
@@ -337,8 +352,7 @@ const store = new Vuex.Store({
           }
           if (
             !payload.params.preview &&
-            payload.params.letter_code == 'ODUECLAIM' &&
-            !payload.params.message_transport_type
+            payload.params.message_transport_type == 'pdf'
           ) {
             dispatch('editNotice', 'sent');
           }

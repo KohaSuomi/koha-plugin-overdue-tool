@@ -25,7 +25,6 @@ new Vue({
   },
   mounted() {
     this.getConfig();
-    //this.fetch();
   },
   computed: {
     results() {
@@ -85,8 +84,8 @@ new Vue({
     notice() {
       return store.state.notice;
     },
-    invoiceLetters() {
-      return store.state.invoiceLetters;
+    invoiceType() {
+      return store.state.invoiceType;
     },
     created() {
       return store.state.created;
@@ -112,6 +111,7 @@ new Vue({
               response.data.pluginversion
             );
           }
+          this.fetch();
         })
         .catch((error) => {
           console.log(error);
@@ -136,7 +136,7 @@ new Vue({
         store.commit('setCreated', false);
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
-            await element.createInvoice('FINVOICE', false, true);
+            await element.createInvoice(false, true);
           })
         ).then(() => {
           this.finvoiceBtn = false;
@@ -155,7 +155,7 @@ new Vue({
         store.commit('setCreated', false);
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
-            await element.createInvoice('ODUECLAIM', preview, true);
+            await element.createInvoice(preview, true);
           })
         ).then(() => {
           this.previewPDF(preview, true);
@@ -174,7 +174,7 @@ new Vue({
         store.commit('setCreated', false, true);
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
-            await element.createInvoice('EINVOICE', false);
+            await element.createInvoice(false, false);
           })
         ).then(() => {
           this.einvoiceBtn = false;

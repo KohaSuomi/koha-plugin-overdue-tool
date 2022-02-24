@@ -102,12 +102,10 @@
 								</li>
 								<li v-if="results.length" :class="{'d-none': showLoader }" class="nav-item pl-2">
 									<div class="form-group row">
-										<div v-for="letter in invoiceLetters" class="mr-2">
-											<button v-if="letter == 'FINVOICE'"class="btn btn-info" v-on:click="allFinvoices" :disabled='finvoiceBtn'><i v-if="finvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo Finvoice:t</span></button>
-											<button v-if="letter == 'EINVOICE'"class="btn btn-info" v-on:click="allEinvoices" :disabled='einvoiceBtn'><i v-if="einvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo e-laskut</span></button>
-											<button v-if="letter == 'ODUECLAIM'"class="btn btn-info" :disabled='pdfBtn' v-on:click="allPDFs(false)"><i v-if="pdfBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo PDF:t</span></button>
-										</div>
-										<button class="btn btn-info" :disabled='previewBtn' v-on:click="allPDFs(true)"><i v-if="previewBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Jäljennökset</span></button>
+										<button v-if="invoiceType == 'FINVOICE'"class="btn btn-info" v-on:click="allFinvoices" :disabled='finvoiceBtn'><i v-if="finvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo Finvoice:t</span></button>
+										<button v-if="invoiceType == 'EINVOICE'"class="btn btn-info" v-on:click="allEinvoices" :disabled='einvoiceBtn'><i v-if="einvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo e-laskut</span></button>
+										<button v-if="invoiceType == 'ODUECLAIM'"class="btn btn-info" :disabled='pdfBtn' v-on:click="allPDFs(false)"><i v-if="pdfBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo PDF:t</span></button>
+										<button class="btn btn-info ml-1" :disabled='previewBtn' v-on:click="allPDFs(true)"><i v-if="previewBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Jäljennökset</span></button>
 									</div>
 								</li>
 							</ul>
@@ -177,10 +175,10 @@
 						</li>
 						<li class="list-inline-item d-table-cell">
 							<button class="btn btn-info" v-on:click="activate"><i class='fas fa-angle-down' :class="{'fa-angle-up': isActive}" style='font-size:24px'></i></button>
-							<span v-if="!invoiced" v-for="letter in letterFilter">
-								<button v-if="letter != 'ODUECLAIM' && letter != 'EINVOICE'" class="btn btn-success" v-on:click="createInvoice(letter)">Luo {{letter | lowercase}}</button>
-								<button v-if="letter == 'EINVOICE'" class="btn btn-success" v-on:click="createInvoice(letter)">Luo e-lasku</button>
-								<button v-if="letter == 'ODUECLAIM'" class="btn btn-success" v-on:click="previewPDF(false, false)">Luo pdf-lasku</button>
+							<span v-if="!invoiced">
+								<button v-if="invoiceType == 'FINVOICE'" class="btn btn-success" v-on:click="createInvoice(false)">Luo Finvoice</button>
+								<button v-if="invoiceType == 'EINVOICE'" class="btn btn-success" v-on:click="createInvoice(false)">Luo e-lasku</button>
+								<button v-if="invoiceType == 'ODUECLAIM'" class="btn btn-success" v-on:click="previewPDF(false, false)">Luo pdf-lasku</button>
 							</span>
 							<button class="btn btn-success" v-on:click="previewPDF(true, true)">Jäljennös</button>
 						</li>

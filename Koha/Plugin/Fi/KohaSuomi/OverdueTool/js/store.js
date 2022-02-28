@@ -434,7 +434,7 @@ const store = new Vuex.Store({
     updateReplacementPrice({ commit }, payload) {
       commit('removeErrors');
       axios
-        .patch('/api/v1/items/' + payload.itemnumber, {
+        .patch('/api/v1/contrib/kohasuomi/items/' + payload.itemnumber, {
           replacementprice: payload.replacementprice,
         })
         .then(() => {})

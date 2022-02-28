@@ -76,7 +76,7 @@ sub configure {
 sub install() {
     my ( $self, $args ) = @_;
 
-    return $self->table_inserts();
+    $self->table_inserts();
     
 }
 
@@ -94,7 +94,7 @@ sub upgrade {
 sub uninstall() {
     my ( $self, $args ) = @_;
 
-    return $self->table_deletes();
+    $self->table_deletes();
 }
 
 sub api_routes {
@@ -116,21 +116,17 @@ sub table_inserts {
     my ( $self ) = @_;
 
     my $dbh = C4::Context->dbh;
-    return $dbh->do(q{
-        INSERT INTO message_transport_types (message_transport_type) VALUES ('finvoice');
-        INSERT INTO message_transport_types (message_transport_type) VALUES ('pdf');
-        INSERT INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','invoicenumber','1');
-    });
+    $dbh->do("INSERT INTO message_transport_types (message_transport_type) VALUES ('finvoice');");
+    $dbh->do("INSERT INTO message_transport_types (message_transport_type) VALUES ('pdf');");
+    $dbh->do("INSERT INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','invoicenumber','1');");
 }
 
 sub table_deletes {
     my ( $self ) = @_;
 
     my $dbh = C4::Context->dbh;
-    return $dbh->do(q{
-        DELETE FROM message_transport_types where message_transport_type = 'finvoice';
-        DELETE FROM message_transport_types where message_transport_type = 'pdf';
-    });
+    $dbh->do("DELETE FROM message_transport_types where message_transport_type = 'finvoice';");
+    $dbh->do("DELETE FROM message_transport_types where message_transport_type = 'pdf';");
 }
 
 1;

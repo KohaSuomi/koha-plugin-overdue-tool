@@ -15,6 +15,7 @@ sub process_xml {
     my ( $notice ) = @_;
 
     my $parser = XML::LibXML->new(recover => 1);
+    $notice->{content} =~ s/&/&amp;/sg;
     my $data = Encode::encode( "iso-8859-15", $notice->{content});
     my $doc = $parser->load_xml(string => $data);
     my $timestamp = strftime "%Y-%m-%dT%H:%M:%S%z", localtime;
@@ -27,16 +28,16 @@ sub process_xml {
 
     $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerPartyIdentifier")->[0]->appendTextNode($ssn);
 
-    my $name = $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerOrganisationName")->[0];
-    my $newname = _escape_string($name->textContent);
-    $name->removeChildNodes;
-    $name->appendText($newname); 
+    # my $name = $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerOrganisationName")->[0];
+    # my $newname = _escape_string($name->textContent);
+    # $name->removeChildNodes;
+    # $name->appendText($newname); 
 
     for my $invoicerow ($doc->findnodes("Finvoice/InvoiceRow")) {
         my ($row) = $invoicerow->findnodes('ArticleName');
         my $newvalue = _escape_string($row->textContent);
         $row->removeChildNodes;
-        $row->appendText($newvalue); 
+        $row->appendText($newvalue);
     }
 
     return $doc;
@@ -61,10 +62,10 @@ sub _escape_string {
         $newstring .= $char;
     }
 
-    $newstring =~ s/&/&amp;/sg;
+    #$newstring =~ s/&/&amp;/sg;
     $newstring =~ s/</&lt;/sg;
     $newstring =~ s/>/&gt;/sg;
     $newstring =~ s/"/&quot;/sg;
-    
+
     return $newstring;
 }

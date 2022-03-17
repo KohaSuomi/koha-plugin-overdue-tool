@@ -24,9 +24,6 @@ DELETE FROM message_transport_types where message_transport_type = 'finvoice';
 DELETE FROM message_transport_types where message_transport_type = 'pdf';
 INSERT INTO message_transport_types (message_transport_type) VALUES ('finvoice');
 INSERT INTO message_transport_types (message_transport_type) VALUES ('pdf');
-INSERT INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','__INSTALLED__','1');
-INSERT INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','__INSTALLED_VERSION__','${VERSION}');
-INSERT INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','__ENABLED__','1');
 INSERT INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','invoicenumber','1');
 END
 

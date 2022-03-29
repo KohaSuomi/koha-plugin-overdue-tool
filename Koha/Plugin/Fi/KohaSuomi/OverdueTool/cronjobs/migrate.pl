@@ -35,20 +35,23 @@ use Koha::Plugin::Fi::KohaSuomi::OverdueTool;
 my $plugin = Koha::Plugin::Fi::KohaSuomi::OverdueTool->new();
 $plugin->retrieve_data('groupsettings');
 my $groupsettings = JSON::from_json($plugin->retrieve_data('groupsettings'));
-my @groups = Koha::Library::Groups->get_root_groups();
+my $dbh = C4::Context->dbh;
+my $groups = $dbh->selectall_arrayref("SELECT * FROM library_groups", { Slice => {} });
 foreach my $setting (@$groupsettings) {
-    foreach my $group (@groups) {
-        if ($group->description =~ /$setting->{groupname}/ ) {
+    foreach my $group (@$groups) {
+        if ($group->{description} =~ /$setting->{groupname}/ ) {
+            my $sub = Koha::Library::Groups->find($group->{id});
             delete $setting->{grouplibraries} if $setting->{grouplibraries};
-            foreach my $library (@{$group->libraries->unblessed}) {
+            foreach my $library (@{$sub->libraries->unblessed}) {
                 push @{$setting->{grouplibraries}}, {branchname => $library->{branchname}, branchcode => $library->{branchcode}};
             }
         }
     }
 
-    foreach my $group (@groups) {
-        if ($group->description =~ /EINVOICE/) {
-            foreach my $library (@{$group->libraries->unblessed}) {
+    foreach my $group (@$groups) {
+        my $sub = Koha::Library::Groups->find($group->{id});
+        if ($group->{description} =~ /EINVOICE/) {
+            foreach my $library (@{$sub->libraries->unblessed}) {
                 foreach my $branch (@{$setting->{grouplibraries}}) {
                     if ($branch->{branchcode} eq $library->{branchcode}) {
                         $setting->{invoicetype} = 'EINVOICE';
@@ -57,8 +60,8 @@ foreach my $setting (@$groupsettings) {
                 
             }
         }
-        if ($group->description =~ /FINVOICE/) {
-            foreach my $library (@{$group->libraries->unblessed}) {
+        if ($group->{description} =~ /FINVOICE/) {
+            foreach my $library (@{$sub->libraries->unblessed}) {
                 foreach my $branch (@{$setting->{grouplibraries}}) {
                     if ($branch->{branchcode} eq $library->{branchcode}){
                         $setting->{invoicetype} = 'FINVOICE';
@@ -67,8 +70,8 @@ foreach my $setting (@$groupsettings) {
                 
             }
         }
-        if ($group->description =~ /ODUECLAIM/) {
-            foreach my $library (@{$group->libraries->unblessed}) {
+        if ($group->{description} =~ /ODUECLAIM/) {
+            foreach my $library (@{$sub>libraries->unblessed}) {
                 foreach my $branch (@{$setting->{grouplibraries}}) {
                     if ($branch->{branchcode} eq $library->{branchcode}) {
                         $setting->{invoicetype} = 'ODUECLAIM';
@@ -79,11 +82,11 @@ foreach my $setting (@$groupsettings) {
         }
     }
 }
+
 $plugin->store_data({
     groupsettings => JSON::to_json($groupsettings)
 });
 
-my $dbh = C4::Context->dbh;
 $dbh->do("INSERT INTO message_transport_types (message_transport_type) VALUES ('finvoice');");
 $dbh->do("INSERT INTO message_transport_types (message_transport_type) VALUES ('pdf');");
 $dbh->do("INSERT INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','invoicenumber','1');");

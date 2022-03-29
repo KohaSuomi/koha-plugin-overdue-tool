@@ -84,6 +84,9 @@ $plugin->store_data({
 });
 
 my $dbh = C4::Context->dbh;
+$dbh->do("INSERT INTO message_transport_types (message_transport_type) VALUES ('finvoice');");
+$dbh->do("INSERT INTO message_transport_types (message_transport_type) VALUES ('pdf');");
+$dbh->do("INSERT INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','invoicenumber','1');");
 $dbh->do("UPDATE letter set code = 'ODUECLAIM', message_transport_type = 'finvoice' where code = 'FINVOICE' and message_transport_type = 'invoice';");
 $dbh->do("UPDATE letter set message_transport_type = 'pdf' where code = 'ODUECLAIM' and message_transport_type = 'invoice';");
 

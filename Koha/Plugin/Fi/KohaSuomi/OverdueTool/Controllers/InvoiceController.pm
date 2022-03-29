@@ -100,8 +100,8 @@ sub set {
                 $totalfines = $totalfines + $item->{overduefine};
             }
             my $biblio = {
-                title => $repeat->{title},
-                author => $repeat->{author},
+                title => _escape_string($repeat->{title}),
+                author => _escape_string($repeat->{author}),
             };
             
             push @items, {"items" => $item, "biblio" => $biblio, "biblioitems" => $repeat->{biblionumber}};
@@ -228,6 +228,17 @@ sub set {
         warn Data::Dumper::Dumper $_;
         return $c->render(status => 500, openapi => {message => 'Something went wrong!'});
     };
+}
+
+sub _escape_string {
+    my ($string) = @_;
+
+    $string =~ s/&/&amp;/sg;
+    $string =~ s/</&lt;/sg;
+    $string =~ s/>/&gt;/sg;
+    $string =~ s/"/&quot;/sg;
+    
+    return $string;
 }
 
 sub _reference_number {

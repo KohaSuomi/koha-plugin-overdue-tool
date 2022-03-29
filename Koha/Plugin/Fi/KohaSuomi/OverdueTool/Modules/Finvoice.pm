@@ -27,10 +27,10 @@ sub process_xml {
 
     #$doc->findnodes("Finvoice/BuyerPartyDetails/BuyerPartyIdentifier")->[0]->appendTextNode($ssn);
 
-    my $name = $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerOrganisationName")->[0];
-    my $newname = _escape_string($name->textContent);
-    $name->removeChildNodes;
-    $name->appendText($newname); 
+    # my $name = $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerOrganisationName")->[0];
+    # my $newname = _escape_string($name->textContent);
+    # $name->removeChildNodes;
+    # $name->appendText($newname); 
 
     for my $invoicerow ($doc->findnodes("Finvoice/InvoiceRow")) {
         my ($row) = $invoicerow->findnodes('ArticleName');
@@ -60,11 +60,6 @@ sub _escape_string {
         }
         $newstring .= $char;
     }
-
-    $newstring =~ s/&/&amp;/sg;
-    $newstring =~ s/</&lt;/sg;
-    $newstring =~ s/>/&gt;/sg;
-    $newstring =~ s/"/&quot;/sg;
     
     return $newstring;
 }

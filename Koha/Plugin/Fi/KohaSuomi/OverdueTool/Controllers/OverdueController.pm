@@ -22,6 +22,7 @@ use Try::Tiny;
 
 use Koha::Checkouts;
 use Koha::Patron::Attributes;
+use C4::Context;
 
 =head1 API
 
@@ -95,6 +96,7 @@ sub get {
         my $patron = Koha::Patrons->find($checkout->{borrowernumber})->unblessed;
         my $patronssnkey = Koha::Patron::Attributes->search({borrowernumber => $checkout->{borrowernumber}, code => 'SSN'})->next;
         $patronssnkey = $patronssnkey->attribute if $patronssnkey;
+        $patron->{guarantorid} = get_guarantor_id($checkout->{borrowernumber});
         my $guarantorssnkey = Koha::Patron::Attributes->search({borrowernumber => $patron->{guarantorid}, code => 'SSN'})->next if $patron->{guarantorid};
         $guarantorssnkey = $guarantorssnkey->attribute if $guarantorssnkey;
         $borrowercheckouts = {
@@ -121,6 +123,17 @@ sub get {
         total => $checkouts_count,
         records => $results
     });
+}
+
+sub get_guarantor_id {
+    my ($patron_id) = @_;
+
+    my $dbh = C4::Context->dbh;
+    my $sth=$dbh->prepare('SELECT guarantor_id FROM borrower_relationships WHERE guarantee_id = ?');
+
+    $sth->execute($patron_id) or return 0;
+    my @guarantors=$sth->fetchrow_array();
+    return $guarantors[0];
 }
 
 =head3 _populate_paging_params

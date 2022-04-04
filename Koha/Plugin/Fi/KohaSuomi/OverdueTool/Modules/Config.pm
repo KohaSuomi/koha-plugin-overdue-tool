@@ -146,11 +146,11 @@ sub checkOverdueRules {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay3};
                 $delayperiod = '3';
-            } elsif ($row->{delay2} && !$delayperiod) {
+            } elsif ($row->{delay2} && (!$delayperiod || $delayperiod eq '2')) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay2};
                 $delayperiod = '2';
-            } elsif ($row->{delay1} && !$delayperiod) {
+            } elsif ($row->{delay1} && (!$delayperiod || $delayperiod eq '1')) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay1};
                 $delayperiod = '1';
@@ -165,11 +165,11 @@ sub checkOverdueRules {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay3};
                 $delayperiod = '3';
-            } elsif ($row->{delay2} && !$delayperiod) {
+            } elsif ($row->{delay2} && (!$delayperiod || $delayperiod eq '2')) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay2};
                 $delayperiod = '2';
-            } elsif ($row->{delay1} && !$delayperiod) {
+            } elsif ($row->{delay1} && (!$delayperiod || $delayperiod eq '1')) {
                 push @categorycodes, $row->{categorycode};
                 $delaytime = $row->{delay1};
                 $delayperiod = '1';

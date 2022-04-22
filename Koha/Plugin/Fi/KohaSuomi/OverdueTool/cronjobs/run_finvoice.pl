@@ -107,8 +107,8 @@ if(!@librarycodes) {
     exit;
 }
 
-my $today     = output_pref( { dt => dt_from_string, dateonly => 1, dateformat => 'iso' } ) ;
-my $notices = Koha::Notice::Messages->search({letter_code => 'FINVOICE', status => 'pending', from_address => {'=' => [@librarycodes]}});
+my $today     = Koha::DateUtils::dt_from_string()->ymd;
+my $notices = Koha::Notice::Messages->search({letter_code => 'ODUECLAIM', message_transport_type => 'finvoice', status => 'pending', from_address => {'=' => [@librarycodes]}});
 exit unless $notices;
 
 my $tmppath = $output_directory ."/tmp/";

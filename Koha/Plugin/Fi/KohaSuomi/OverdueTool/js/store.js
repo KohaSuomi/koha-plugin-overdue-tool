@@ -293,44 +293,42 @@ const store = new Vuex.Store({
       commit('showLoader', true);
       commit('removeErrors');
       commit('setCreated', false);
-      setTimeout(async() => {
-        return axios
-          .post('/api/v1/invoices/' + payload.borrowernumber, payload.params)
-          .then((response) => {
-            if (
-              payload.all &&
-              payload.params.letter_code == 'ODUECLAIM' &&
-              !payload.params.message_transport_type
-            ) {
-              commit('setNotices', response.data.notice);
-              commit('setMessageId', response.data.message_id);
-            } else if (payload.all) {
-              commit('setNotice', response.data.notice);
-              commit('setMessageId', response.data.message_id);
-            } else {
-              commit('setNotice', response.data.notice);
-              commit('setMessageId', response.data.message_id);
-              commit('setCreated', true);
-            }
-            if (
-              !payload.params.preview &&
-              payload.params.letter_code == 'ODUECLAIM' &&
-              !payload.params.message_transport_type
-            ) {
-              dispatch('editNotice', 'sent');
-            }
-            commit('showLoader', false);
-          })
-          .catch((error) => {
-            let err = error.message;
-            if (error.response.data.error) {
-              err += ': ' + error.response.data.error;
-            } else {
-              err += ', check the logs';
-            }
-            commit('addError', err);
-          });
-      }, 1000);
+      return axios
+        .post('/api/v1/invoices/' + payload.borrowernumber, payload.params)
+        .then((response) => {
+          if (
+            payload.all &&
+            payload.params.letter_code == 'ODUECLAIM' &&
+            !payload.params.message_transport_type
+          ) {
+            commit('setNotices', response.data.notice);
+            commit('setMessageId', response.data.message_id);
+          } else if (payload.all) {
+            commit('setNotice', response.data.notice);
+            commit('setMessageId', response.data.message_id);
+          } else {
+            commit('setNotice', response.data.notice);
+            commit('setMessageId', response.data.message_id);
+            commit('setCreated', true);
+          }
+          if (
+            !payload.params.preview &&
+            payload.params.letter_code == 'ODUECLAIM' &&
+            !payload.params.message_transport_type
+          ) {
+            dispatch('editNotice', 'sent');
+          }
+          commit('showLoader', false);
+        })
+        .catch((error) => {
+          let err = error.message;
+          if (error.response.data.error) {
+            err += ': ' + error.response.data.error;
+          } else {
+            err += ', check the logs';
+          }
+          commit('addError', err);
+        });
     },
     changePage({ commit, state }, payload) {
       let selectedPage = payload;

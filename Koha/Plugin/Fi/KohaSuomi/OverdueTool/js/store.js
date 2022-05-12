@@ -44,6 +44,7 @@ const store = new Vuex.Store({
     groupCity: '',
     groupZipcode: '',
     groupPhone: '',
+    invoiceNumber: 0,
   },
   mutations: {
     addError(state, value) {
@@ -198,6 +199,9 @@ const store = new Vuex.Store({
     addGroupPhone(state, value) {
       state.groupPhone = value;
     },
+    addInvoiceNumber(state, value) {
+      state.invoiceNumber = value;
+    }
   },
   actions: {
     fetchOverdues({ dispatch, commit, state }) {

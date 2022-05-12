@@ -48,6 +48,7 @@ new Vue({
     store.commit('addGroupCity', jsondata.groupcity);
     store.commit('addGroupZipcode', jsondata.groupzipcode);
     store.commit('addGroupPhone', jsondata.groupphone);
+    store.commit('addInvoiceNumber', jsondata.invoicenumber);
     store.dispatch('setDates', jsondata.overduerules);
     this.selectCategory = jsondata.overduerules.categorycodes;
     this.fetch();

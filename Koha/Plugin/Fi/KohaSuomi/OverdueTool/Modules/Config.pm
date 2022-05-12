@@ -120,6 +120,7 @@ sub getConfig() {
         overduerules => $self->checkOverdueRules($branch, $delaymonths) || [],
         groupsettings => $self->getPlugin()->retrieve_data('groupsettings') || '[]',
         pluginversion => $self->getPlugin()->{metadata}->{version},
+        invoicenumber => $self->getPlugin()->retrieve_data('invoicenumber') || 1,
     };
     
     $config->{groupsettings} = JSON::from_json($config->{groupsettings}) if $config->{groupsettings};

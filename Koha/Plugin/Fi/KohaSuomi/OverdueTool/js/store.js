@@ -44,6 +44,7 @@ const store = new Vuex.Store({
     groupCity: '',
     groupZipcode: '',
     groupPhone: '',
+    invoiceNumber: 0,
   },
   mutations: {
     addError(state, value) {
@@ -198,6 +199,9 @@ const store = new Vuex.Store({
     addGroupPhone(state, value) {
       state.groupPhone = value;
     },
+    addInvoiceNumber(state, value) {
+      state.invoiceNumber = value;
+    },
   },
   actions: {
     setSettings({ dispatch, commit, state }, payload) {
@@ -205,6 +209,7 @@ const store = new Vuex.Store({
       commit('addMaxYears', payload.maxyears);
       commit('addUserLibrary', payload.userlibrary);
       commit('addNotForLoanStatus', payload.invoicenotforloan);
+      commit('addInvoiceNumber', payload.invoicenumber);
       payload.groupsettings.forEach((group) => {
         group.grouplibraries.forEach((lib) => {
           if (lib.branchcode == state.userLibrary) {

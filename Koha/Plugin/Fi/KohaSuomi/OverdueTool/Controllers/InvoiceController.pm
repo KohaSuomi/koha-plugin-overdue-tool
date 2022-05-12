@@ -123,13 +123,9 @@ sub set {
         $totalfines = sprintf("%.2f", $totalfines);
         $totalfines =~ tr/./,/;
 
-        my $invoicenumber;
-        if (!$preview) {
-            $invoicenumber = _invoice_number();
-        }
         my $reference;
         if ($body->{addreferencenumber} && !$preview) {
-            $reference =_reference_number($body->{librarygroup}, $invoicenumber, $body->{increment});
+            $reference =_reference_number($body->{librarygroup}, $body->{increment});
         }
 
         $params{"substitute"} = {
@@ -140,7 +136,6 @@ sub set {
             lastitemissuedate => $lastissuedate,
             totalfines => $totalfines,
             referencenumber => $reference,
-            invoicenumber => $invoicenumber,
             invoicefine => $body->{invoicefine}, 
             accountnumber => $body->{accountnumber},
             biccode => $body->{biccode},
@@ -159,6 +154,11 @@ sub set {
             my $guarantee = Koha::Patrons->find($body->{guarantee});
             $params{"substitute"}{"issueborname"} = $guarantee->firstname.' '.$guarantee->surname;
             $params{"substitute"}{"issueborbarcode"} = $guarantee->cardnumber;
+        }
+
+        if (!$preview) {
+            $params{"substitute"}{"invoicenumber"} = $body->{invoicenumber};
+            _update_invoice_number($params{"substitute"}{"invoicenumber"});
         }
 
         my $notice = C4::Letters::GetPreparedLetter(%params);
@@ -242,7 +242,7 @@ sub _escape_string {
 }
 
 sub _reference_number {
-    my ($librarygroup, $invoicenumber, $increment) = @_;
+    my ($librarygroup, $increment) = @_;
     my $dbh = C4::Context->dbh;
 
     my $sth_refnumber=$dbh->prepare('SELECT plugin_value FROM plugin_data WHERE plugin_class = "Koha::Plugin::Fi::KohaSuomi::OverdueTool" AND plugin_key = "REFNO_'.$librarygroup.'";');
@@ -277,11 +277,14 @@ sub _invoice_number {
     my $sth_invoicenumber=$dbh->prepare('SELECT plugin_value FROM plugin_data WHERE plugin_class = "Koha::Plugin::Fi::KohaSuomi::OverdueTool" AND plugin_key = "invoicenumber";');
 
     $sth_invoicenumber->execute() or return 0;
-    my @invoiceno=$sth_invoicenumber->fetchrow_array();
+    my $invoiceno=$sth_invoicenumber->fetchrow();
+    return $invoiceno;
+}
 
-    $dbh->do('UPDATE plugin_data SET plugin_value = plugin_value + 1 WHERE plugin_class ="Koha::Plugin::Fi::KohaSuomi::OverdueTool" AND plugin_key = "invoicenumber";');
-
-    return $invoiceno[0];
+sub _update_invoice_number {
+    my ($invoicenumber) = @_;
+    my $dbh = C4::Context->dbh;
+    my $sth_update = $dbh->do('UPDATE plugin_data SET plugin_value = '.$invoicenumber.' WHERE plugin_class ="Koha::Plugin::Fi::KohaSuomi::OverdueTool" AND plugin_key = "invoicenumber" AND plugin_value < '.$invoicenumber.';');
 }
 
 

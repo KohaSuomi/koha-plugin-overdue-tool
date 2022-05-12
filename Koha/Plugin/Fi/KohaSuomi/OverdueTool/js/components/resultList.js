@@ -111,12 +111,18 @@ const resultList = Vue.component('result-list', {
     invoiced() {
       return this.$store.state.invoiced;
     },
+    invoicenumber() {
+      return parseInt(this.$store.state.invoiceNumber);
+    },
   },
   methods: {
     activate: function () {
       this.isActive = !this.isActive;
     },
     createInvoice: function (preview, all) {
+      if (!preview) {
+        this.$store.commit('addInvoiceNumber', this.invoicenumber+1);
+      }
       this.newcheckouts = [];
       this.newcheckouts = this.result.checkouts.slice(0);
       this.removecheckouts.forEach((element) => {
@@ -148,6 +154,7 @@ const resultList = Vue.component('result-list', {
         surname: this.result.surname,
         firstname: this.result.firstname,
         cardnumber: this.result.cardnumber,
+        invoicenumber: this.$store.state.invoiceNumber,
         letter_code: 'ODUECLAIM',
         grouplibrary: this.$store.state.groupLibrary,
         groupaddress: this.$store.state.groupAddress,

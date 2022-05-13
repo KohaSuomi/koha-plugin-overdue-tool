@@ -96,7 +96,6 @@ new Vue({
       axios
         .get('/api/v1/contrib/kohasuomi/overdues/config')
         .then((response) => {
-          console.log(response.data);
           store.dispatch('setSettings', response.data);
           this.selectCategory = response.data.overduerules.categorycodes;
           const sumFilter = localStorage.getItem('sumFilter');
@@ -123,6 +122,16 @@ new Vue({
       store.dispatch('fetchOverdues');
       this.activate();
     },
+    async refreshInvoiceNumber() {
+      return axios
+        .get('/api/v1/contrib/kohasuomi/overdues/config')
+        .then((response) => {
+          store.commit('addInvoiceNumber', response.data.invoicenumber);
+        })
+        .catch((error) => {
+          store.commit('addErrors', error.response.data.error);
+        });
+    },
     previewPDF(preview, all) {
       if (!all) {
         store.commit('setNotice', '');
@@ -132,8 +141,10 @@ new Vue({
     },
     async allFinvoices() {
       if (this.$refs.resultComponentRef) {
+        await this.refreshInvoiceNumber();
         this.finvoiceBtn = true;
         store.commit('setCreated', false);
+        this.refreshInvoiceNumber();
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
             await element.createInvoice(false, true);
@@ -146,6 +157,7 @@ new Vue({
     },
     async allPDFs(preview) {
       if (this.$refs.resultComponentRef) {
+        await this.refreshInvoiceNumber();
         store.commit('setNotice', '');
         if (preview) {
           this.previewBtn = true;
@@ -170,6 +182,7 @@ new Vue({
     },
     async allEinvoices() {
       if (this.$refs.resultComponentRef) {
+        await this.refreshInvoiceNumber();
         this.einvoiceBtn = true;
         store.commit('setCreated', false, true);
         await Promise.all(

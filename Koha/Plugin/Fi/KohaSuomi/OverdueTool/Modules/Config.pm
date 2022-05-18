@@ -81,6 +81,10 @@ sub getInvoiceNotForLoan {
     return shift->{_params}->{invoicenotforloan};
 }
 
+sub getAllowedPatrons {
+    return shift->{_params}->{allowedpatrons};
+}
+
 sub getGroupSettings {
     return shift->{_params}->{groupsettings};
 }
@@ -96,6 +100,7 @@ sub setConfig() {
         {
             delaymonths           => $self->getDelayMonths(),
             maxyears              => $self->getMaxYears(),
+            allowedpatrons        => $self->getAllowedPatrons(),
             invoicelibrary        => $self->getInvoiceLibrary(),
             invoicenotforloan     => $self->getInvoiceNotForLoan(),
             groupsettings         => $self->getGroupSettings(),
@@ -115,6 +120,7 @@ sub getConfig() {
         libraries => Koha::Libraries->search( {}, { columns => ["branchcode", "branchname"], order_by => ['branchname'] } )->unblessed,
         delaymonths => $self->getPlugin()->retrieve_data('delaymonths') || 1,
         maxyears => $self->getPlugin()->retrieve_data('maxyears') || 1,
+        allowedpatrons => $self->getPlugin()->retrieve_data('allowedpatrons') || '',
         invoicelibrary => $self->getPlugin()->retrieve_data('invoicelibrary') || 'issuebranch',
         invoicenotforloan => $self->getPlugin()->retrieve_data('invoicenotforloan') || 6,
         overduerules => $self->checkOverdueRules($branch, $delaymonths) || [],

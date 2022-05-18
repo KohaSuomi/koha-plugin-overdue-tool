@@ -17,6 +17,7 @@ new Vue({
       invoicelibrary: '',
       delaymonths: 0,
       maxyears: 1,
+      allowedpatrons: '',
       invoicenotforloan: null,
       groupsettings: [],
       group: {},
@@ -42,11 +43,11 @@ new Vue({
       axios
         .get('/api/v1/contrib/kohasuomi/overdues/config')
         .then((response) => {
-          console.log(response.data);
           this.groupLibraries = response.data.libraries;
           this.invoicelibrary = response.data.invoicelibrary;
           this.delaymonths = response.data.delaymonths;
           this.maxyears = response.data.maxyears;
+          this.allowedpatrons = response.data.allowedpatrons;
           this.invoicenotforloan = response.data.invoicenotforloan;
           this.groupsettings = response.data.groupsettings;
         })
@@ -71,6 +72,7 @@ new Vue({
           invoicelibrary: this.invoicelibrary,
           delaymonths: this.delaymonths,
           maxyears: this.maxyears,
+          allowedpatrons: this.allowedpatrons,
           invoicenotforloan: this.invoicenotforloan,
           debarment: this.debarment,
           addreplacementprice: this.addreplacementprice,

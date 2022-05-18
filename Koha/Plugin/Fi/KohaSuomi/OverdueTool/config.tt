@@ -85,6 +85,10 @@
                                                     <label for="invoicenotforloan">Laskutetun niteen "ei lainata"-tila: </label>
                                                     <input type="text" class="form-control" name="invoicenotforloan" v-model="invoicenotforloan"/>
                                                 </div>
+                                                <div class="form-group">
+                                                    <label for="allowedpatrons">Sallitut käyttäjät (borrowernumberit pilkulla eroteltuina): </label>
+                                                    <input type="text" class="form-control" name="allowedpatrons" v-model="allowedpatrons"/>
+                                                </div>
                                             </form>
                                         </div>
                                         <div class="tab-pane" id="groups">

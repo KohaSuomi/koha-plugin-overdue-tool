@@ -644,7 +644,7 @@
       ],
       "x-koha-authorization": {
         "permissions": {
-          "messages": "create_message"
+          "borrowers": "edit_borrowers"
         }
       },
       "parameters": [

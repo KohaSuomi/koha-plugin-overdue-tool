@@ -19,7 +19,7 @@ our $metadata = {
     name            => 'Laskutustyökalu',
     author          => 'Johanna Räisä',
     date_authored   => '2020-12-28',
-    date_updated    => "2022-02-10",
+    date_updated    => "2022-05-18",
     minimum_version => '21.11.00.000',
     maximum_version => undef,
     version         => $VERSION,
@@ -53,10 +53,25 @@ sub tool {
     my ( $self, $args ) = @_;
     my $cgi = $self->{'cgi'};
 
-    my $template = $self->get_template({ file => 'tool.tt' });
+    my $user = C4::Context->userenv;
+    my @patrons = split(',', $self->retrieve_data('allowedpatrons'));
+    my $allow = $user->{'flags'} == 1 ? 1 : 0;
 
-    print $cgi->header(-charset    => 'utf-8');
-    print $template->output();
+    foreach my $borrowernumber (@patrons) {
+        if ($borrowernumber eq $user->{'number'}) {
+            $allow = 1;
+            last;
+        }
+    }
+
+    if ($allow) {
+        my $template = $self->get_template({ file => 'tool.tt' });
+        print $cgi->header(-charset    => 'utf-8');
+        print $template->output();
+    } else {
+        print $cgi->header(-type => 'text/plain', -status => '403 Forbidden');
+    }
+    
 }
 
 sub configure {

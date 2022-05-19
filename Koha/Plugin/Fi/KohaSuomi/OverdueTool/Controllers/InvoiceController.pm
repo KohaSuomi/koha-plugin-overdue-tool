@@ -64,8 +64,8 @@ sub set {
             my ($iy, $im, $id) = $repeat->{issuedate} =~ /^(\d\d\d\d)-(\d\d)-(\d\d)/;
             my $finvoice_date = $y.$m.$d;
             if ($finvoice_date > $lastdatedue || !$lastdatedue) {
-                $lastdatedue = $body->{letter_code} eq 'FINVOICE' ? $finvoice_date : $d.'.'.$m.'.'.$y;
-                $lastissuedate = $body->{letter_code} eq 'FINVOICE' ? $iy.$im.$id : $id.'.'.$im.'.'.$iy;
+                $lastdatedue = $body->{message_transport_type} eq 'finvoice' ? $finvoice_date : $d.'.'.$m.'.'.$y;
+                $lastissuedate = $body->{message_transport_type} eq 'finvoice' ? $iy.$im.$id : $id.'.'.$im.'.'.$iy;
             }
             $repeat->{replacementprice} =~ tr/,/./;
             if ($body->{addreplacementprice} && !$preview) {

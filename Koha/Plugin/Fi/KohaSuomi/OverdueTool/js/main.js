@@ -157,11 +157,11 @@ new Vue({
     },
     async allPDFs(preview) {
       if (this.$refs.resultComponentRef) {
-        await this.refreshInvoiceNumber();
         store.commit('setNotice', '');
         if (preview) {
           this.previewBtn = true;
         } else {
+          await this.refreshInvoiceNumber();
           this.pdfBtn = true;
         }
         store.commit('setCreated', false);

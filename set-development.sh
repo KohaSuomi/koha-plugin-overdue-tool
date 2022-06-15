@@ -8,8 +8,8 @@ rm $kohaplugindir/Koha/Plugin/Fi/KohaSuomi/OverdueTool.pm
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-ln -s "$SCRIPT_DIR/koha-plugin-overdue-tool/Koha/Plugin/Fi/KohaSuomi/OverdueTool" $kohaplugindir/Koha/Plugin/Fi/KohaSuomi/OverdueTool
-ln -s "$SCRIPT_DIR/koha-plugin-overdue-tool/Koha/Plugin/Fi/KohaSuomi/OverdueTool.pm" $kohaplugindir/Koha/Plugin/Fi/KohaSuomi/OverdueTool.pm
+ln -s "$SCRIPT_DIR/Koha/Plugin/Fi/KohaSuomi/OverdueTool" $kohaplugindir/Koha/Plugin/Fi/KohaSuomi/OverdueTool
+ln -s "$SCRIPT_DIR/Koha/Plugin/Fi/KohaSuomi/OverdueTool.pm" $kohaplugindir/Koha/Plugin/Fi/KohaSuomi/OverdueTool.pm
 
 perl $kohadir/misc/devel/install_plugins.pl
 

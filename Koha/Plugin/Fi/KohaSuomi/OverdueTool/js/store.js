@@ -344,7 +344,7 @@ const store = new Vuex.Store({
           payload.params
         )
         .then((response) => {
-          if (payload.all && !payload.params.message_transport_type == 'pdf') {
+          if (payload.all && payload.params.message_transport_type == 'pdf') {
             commit('setNotices', response.data.notice);
             commit('setMessageId', response.data.message_id);
           } else if (payload.all) {

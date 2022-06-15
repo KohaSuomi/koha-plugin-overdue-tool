@@ -163,7 +163,7 @@ sub set {
 
         my $notice = C4::Letters::GetPreparedLetter(%params);
 
-        $notice->{content} =~ s/\s+/ /gs if $body->{letter_code} eq "FINVOICE";
+        $notice->{content} =~ s/\s+/ /gs if $body->{message_transport_type} eq "finvoice";
 
         my $message_id;
 
@@ -244,7 +244,6 @@ sub _escape_string {
 sub _reference_number {
     my ($librarygroup, $increment) = @_;
     my $dbh = C4::Context->dbh;
-
     my $sth_refnumber=$dbh->prepare('SELECT plugin_value FROM plugin_data WHERE plugin_class = "Koha::Plugin::Fi::KohaSuomi::OverdueTool" AND plugin_key = "REFNO_'.$librarygroup.'";');
 
     $sth_refnumber->execute() or return 0;
@@ -269,6 +268,7 @@ sub _ref_checksum {
 
     my $nextTen=$checkSum+9;
     $nextTen=$nextTen-($nextTen%10);
+    warn Data::Dumper::Dumper $nextTen;
     return $nextTen-$checkSum;
 }
 

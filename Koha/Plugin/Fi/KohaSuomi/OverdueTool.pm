@@ -12,7 +12,7 @@ use utf8;
 use JSON;
 
 ## Here we set our plugin version
-our $VERSION = "2.0.0";
+our $VERSION = "2.0.1";
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {

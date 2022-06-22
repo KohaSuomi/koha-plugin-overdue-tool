@@ -422,7 +422,7 @@ const store = new Vuex.Store({
       commit('showLoader', true);
       commit('removeErrors');
       axios
-        .put('/api/v1/notices/' + state.messageId, { status: status })
+        .put('/api/v1/contrib/kohasuomi/notices/' + state.messageId + '/invoice', { status: status })
         .then(() => {
           commit('showLoader', false);
         })

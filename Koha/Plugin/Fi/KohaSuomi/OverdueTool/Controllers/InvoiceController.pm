@@ -230,6 +230,31 @@ sub set {
     };
 }
 
+sub update {
+    my $c = shift->openapi->valid_input or return;
+
+    my $notice;
+    return try {
+        my $notice_id = $c->validation->param('notice_id');
+        $notice = Koha::Notice::Messages->find($notice_id);
+        my $body = $c->req->json;
+
+        $notice->set($body);
+        return $c->render( status => 204, openapi => {}) unless $notice->is_changed;
+        $notice->store;
+        return $c->render( status => 200, openapi => $notice);
+    }
+    catch {
+        unless ($notice) {
+            return $c->render( status  => 404,
+                               openapi => { error => "Notice not found" } );
+        } else {
+            return $c->render( status  => 500,
+                               openapi => { error => "Something went wront, check the logs!" } );
+        }
+    };
+}
+
 sub _escape_string {
     my ($string) = @_;
 

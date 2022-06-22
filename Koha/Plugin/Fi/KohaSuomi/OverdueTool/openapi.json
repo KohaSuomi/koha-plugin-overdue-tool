@@ -886,5 +886,66 @@
         }
       }
     }
+  },
+  "/notices/{notice_id}/invoice": {
+    "put": {
+      "x-mojo-to": "Fi::KohaSuomi::OverdueTool::Controllers::InvoiceController#update",
+      "operationId": "updateInvoiceNotice",
+      "tags": [
+        "Notices"
+      ],
+      "parameters": [
+        {
+          "name": "notice_id",
+          "in": "path",
+          "description": "Identifier",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "name": "body",
+          "in": "body",
+          "description": "A JSON object containing updated fields",
+          "required": true,
+          "schema": {
+            "type": "object"
+          }
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "Notice",
+          "schema": {
+            "type": "object"
+          }
+        },
+        "404": {
+          "description": "An error occured",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "description": "Labels not found",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Internal error",
+          "schema": {
+            "type": "object"
+          }
+        }
+      },
+      "x-koha-authorization": {
+        "permissions": {
+          "borrowers": "edit_borrowers"
+        }
+      }
+    }
   }
 }

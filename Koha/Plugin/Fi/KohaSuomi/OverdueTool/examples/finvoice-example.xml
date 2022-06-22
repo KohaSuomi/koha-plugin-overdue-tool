@@ -7,7 +7,7 @@
       <FromIntermediator><<biccode>></FromIntermediator>
     </MessageSenderDetails>
     <MessageReceiverDetails>
-      <ToIdentifier SchemeID="0037"><<borrowers.cardnumber>> </ToIdentifier>
+      <ToIdentifier SchemeID="0037"><<borrowers.borrowernumber>></ToIdentifier>
       <ToIntermediator><<borrowers.borrowernumber>></ToIntermediator>
     </MessageReceiverDetails>
     <MessageDetails>

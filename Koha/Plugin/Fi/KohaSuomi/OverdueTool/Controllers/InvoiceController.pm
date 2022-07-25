@@ -274,7 +274,8 @@ sub _reference_number {
     $sth_refnumber->execute() or return 0;
     my @refno=$sth_refnumber->fetchrow_array();
     
-    $dbh->do('UPDATE plugin_data SET plugin_value = plugin_value + ' . $increment . ' WHERE plugin_class = "Koha::Plugin::Fi::KohaSuomi::OverdueTool" AND plugin_key = "REFNO_'.$librarygroup.'";');
+    my $sth_update = $dbh->prepare('UPDATE plugin_data SET plugin_value = ? WHERE plugin_class = "Koha::Plugin::Fi::KohaSuomi::OverdueTool" AND plugin_key = "REFNO_'.$librarygroup.'";');
+    $sth_update->execute($refno[0]+$increment);
 
     return $refno[0] . _ref_checksum($refno[0]);
 }

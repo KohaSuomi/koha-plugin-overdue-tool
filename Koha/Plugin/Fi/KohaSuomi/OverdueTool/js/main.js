@@ -113,7 +113,7 @@ new Vue({
           this.fetch();
         })
         .catch((error) => {
-          console.log(error);
+          //console.log(error);
           store.commit('addErrors', error.response.data.error);
         });
     },

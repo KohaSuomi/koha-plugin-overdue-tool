@@ -32,8 +32,7 @@ sub process_xml {
     if ($fetchSSN) {
         require Koha::Plugin::Fi::KohaSuomi::SsnProvider::Modules::Database;
         my $ssndb = Koha::Plugin::Fi::KohaSuomi::SsnProvider::Modules::Database->new();
-        my $ssnkey = $ssndb->getSSNByBorrowerNumber( $notice->{borrowernumber} );
-        my $ssn = $ssndb->getSSN($ssnkey);
+        my $ssn = $ssndb->getSSNByBorrowerNumber( $notice->{borrowernumber} );
         $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerPartyIdentifier")->[0]->appendTextNode($ssn) if $ssn;
     }
 

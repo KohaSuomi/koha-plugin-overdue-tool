@@ -45,6 +45,7 @@ const store = new Vuex.Store({
     groupZipcode: '',
     groupPhone: '',
     invoiceNumber: 0,
+    cancelToken: null
   },
   mutations: {
     addError(state, value) {
@@ -202,6 +203,9 @@ const store = new Vuex.Store({
     addInvoiceNumber(state, value) {
       state.invoiceNumber = value;
     },
+    addCancelToken(state, value) {
+      state.cancelToken = value;
+    }
   },
   actions: {
     setSettings({ dispatch, commit, state }, payload) {
@@ -250,6 +254,10 @@ const store = new Vuex.Store({
       dispatch('setDates', payload.overduerules);
     },
     fetchOverdues({ dispatch, commit, state }) {
+      if (state.cancelToken) {
+        state.cancelToken.cancel(); 
+      }
+      commit("addCancelToken", axios.CancelToken.source());
       commit('addResults', []);
       commit('addOffset', 0);
       commit('removeErrors');
@@ -269,6 +277,7 @@ const store = new Vuex.Store({
 
       axios
         .get('/api/v1/contrib/kohasuomi/overdues', {
+          cancelToken: state.cancelToken.token,
           params: searchParams,
         })
         .then((response) => {
@@ -309,6 +318,7 @@ const store = new Vuex.Store({
         promises.push(
           axios
             .get('/api/v1/contrib/kohasuomi/overdues', {
+              cancelToken: state.cancelToken.token,
               params: searchParams,
             })
             .then((response) => {

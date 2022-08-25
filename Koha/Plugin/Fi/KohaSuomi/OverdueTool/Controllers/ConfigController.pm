@@ -35,7 +35,7 @@ sub get {
         return $c->render(status => 200, openapi => $response);
     } catch {
         my $error = $_;
-        return $c->render(status => 400, openapi => {message => $error->message});
+        return $c->render(status => 400, openapi => {error => $error->message});
     }
 }
 
@@ -49,7 +49,7 @@ sub set {
         return $c->render(status => 200, openapi => {message => "Success"});
     } catch {
         my $error = $_;
-        return $c->render(status => 400, openapi => {message => $error->message});
+        return $c->render(status => 400, openapi => {error => $error->message});
     }
 }
 

@@ -883,6 +883,18 @@
           "schema": {
             "type": "object"
           }
+        },
+        "400": {
+          "description": "An error occured",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "description": "Bad request",
+                "type": "string"
+              }
+            }
+          }
         }
       }
     }

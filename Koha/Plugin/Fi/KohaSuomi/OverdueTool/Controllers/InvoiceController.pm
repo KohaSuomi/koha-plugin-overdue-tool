@@ -33,6 +33,7 @@ use Koha::Patron;
 use C4::Context;
 
 use Try::Tiny;
+use XML::LibXML;
 
 sub set {
     my $c = shift->openapi->valid_input or return;
@@ -162,8 +163,14 @@ sub set {
         }
 
         my $notice = C4::Letters::GetPreparedLetter(%params);
-
-        $notice->{content} =~ s/\s+/ /gs if $body->{message_transport_type} eq "finvoice";
+        if ($body->{message_transport_type} eq "finvoice") {
+            my $content = eval { XML::LibXML->new()->parse_string($notice->{content}); };
+            if ($@) {
+                return $c->render(status => 400, openapi => {error => 'Finvoice is not valid XML'});
+            }
+            $content =~ s/>\s+</></g;
+            $notice->{content} = $content;
+        }
 
         my $message_id;
 
@@ -226,7 +233,7 @@ sub set {
     }
     catch {
         warn Data::Dumper::Dumper $_;
-        return $c->render(status => 500, openapi => {message => 'Something went wrong!'});
+        return $c->render(status => 500, openapi => {error => 'Something went wrong, check the logs!'});
     };
 }
 

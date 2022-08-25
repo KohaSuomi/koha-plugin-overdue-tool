@@ -56,19 +56,23 @@ Usage: $0 OUTPUT_DIRECTORY
   -c --config       Config name. See example file config.yaml.example. (Mandatory)
   -v --validate     Validate the Finvoice messages.
   --xsd             XSD file path for validation.
+  --zip             Create zip from xml files
+  --pretty          Create human readable xml files
 
 USAGE
     exit $_[0];
 }
 
-my ( $help, $config, $path, $validate, $xsd);
+my ( $help, $config, $path, $validate, $xsd, $zip, $pretty);
 
 GetOptions(
     'h|help'     => \$help,
     'p|path=s'   => \$path,
     'c|config=s' => \$config,
     'v|validate' => \$validate,
-    'xsd=s'        => \$xsd
+    'xsd=s'      => \$xsd,
+    'zip'        => \$zip,
+    'pretty'     => \$pretty
 ) || usage(1);
 
 usage(0) if ($help);
@@ -127,43 +131,58 @@ foreach my $notice (@{$notices->unblessed}) {
         my $xmlFile = $notice->{from_address}.'_'.$notice->{message_id}."_".$today. ".xml";
         #Write xml to file
         open(my $fh, '>', $tmppath.$xmlFile);
-        print $fh $doc->toString();
+        print $fh $doc->toString($pretty);
         close $fh;
         push @message_ids, $notice->{message_id};
     }
 
 }
 if (@message_ids) {
-    my $zip = Archive::Zip->new();
-    my $zipFile = $config."-kirjasto-finvoice-".$today. ".zip";
 
     chdir $tmppath;
     my @files = <*.xml>;
-
-    foreach my $file (@files) {
-        $zip->addFile( $file );
-    }
-
-    unless ( $zip->writeToFileNamed($tmppath . $zipFile) == AZ_OK ) {
-        die 'error creating zip-file';
-    }
-
-    foreach my $file (@files) {
-        unlink $file;
-    }
-
-    my @zipfiles = <*.zip>;
     my $archivepath = $output_directory.'/archived/';
-    foreach my $file (@zipfiles) {
+    if ($zip) {
+        my $zipwrite = Archive::Zip->new();
+        my $zipFile = $config."-kirjasto-finvoice-".$today. ".zip";
+        foreach my $file (@files) {
+            $zip->addFile( $file );
+        }
 
-        system ("sshpass -p $finvoiceconfig->{password} sftp $finvoiceconfig->{username}\@$finvoiceconfig->{host} > /dev/null 2>&1 << EOF
-        cd $finvoiceconfig->{filepath}
-        put $tmppath$file
-        bye
-        EOF") == 0 or die "system failed: $!";
+        unless ( $zipwrite->writeToFileNamed($tmppath . $zipFile) == AZ_OK ) {
+            die 'error creating zip-file';
+        }
 
-        move ("$tmppath$file", "$archivepath$file") or die "The move operation failed: $!";
+        foreach my $file (@files) {
+            unlink $file;
+        }
 
+        my @zipfiles = <*.zip>;
+
+        foreach my $file (@zipfiles) {
+
+            system ("sshpass -p $finvoiceconfig->{password} sftp $finvoiceconfig->{username}\@$finvoiceconfig->{host} > /dev/null 2>&1 << EOF
+            cd $finvoiceconfig->{filepath}
+            put $tmppath$file
+            bye
+            EOF") == 0 or die "system failed: $!";
+
+            move ("$tmppath$file", "$archivepath$file") or die "The move operation failed: $!";
+
+        }
+    } else {
+
+        foreach my $file (@files) {
+
+            system ("sshpass -p $finvoiceconfig->{password} sftp $finvoiceconfig->{username}\@$finvoiceconfig->{host} > /dev/null 2>&1 << EOF
+            cd $finvoiceconfig->{filepath}
+            put $tmppath$file
+            bye
+            EOF") == 0 or die "system failed: $!";
+
+            move ("$tmppath$file", "$archivepath$file") or die "The move operation failed: $!";
+
+        }
     }
 
     foreach my $message_id (@message_ids) {

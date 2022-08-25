@@ -163,14 +163,8 @@ sub set {
         }
 
         my $notice = C4::Letters::GetPreparedLetter(%params);
-        if ($body->{message_transport_type} eq "finvoice") {
-            my $content = eval { XML::LibXML->new()->parse_string($notice->{content}); };
-            if ($@) {
-                return $c->render(status => 400, openapi => {error => 'Finvoice is not valid XML'});
-            }
-            $content =~ s/>\s+</></g;
-            $notice->{content} = $content;
-        }
+
+        $notice->{content} =~ s/>\s+</></g; if $body->{message_transport_type} eq "finvoice"
 
         my $message_id;
 

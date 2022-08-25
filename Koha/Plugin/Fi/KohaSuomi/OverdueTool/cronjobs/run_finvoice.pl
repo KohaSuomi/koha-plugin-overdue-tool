@@ -146,7 +146,7 @@ if (@message_ids) {
         my $zipwrite = Archive::Zip->new();
         my $zipFile = $config."-kirjasto-finvoice-".$today. ".zip";
         foreach my $file (@files) {
-            $zip->addFile( $file );
+            $zipwrite->addFile( $file );
         }
 
         unless ( $zipwrite->writeToFileNamed($tmppath . $zipFile) == AZ_OK ) {

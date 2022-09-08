@@ -160,28 +160,12 @@ if (@message_ids) {
         my @zipfiles = <*.zip>;
 
         foreach my $file (@zipfiles) {
-
-            system ("sshpass -p $finvoiceconfig->{password} sftp $finvoiceconfig->{username}\@$finvoiceconfig->{host} > /dev/null 2>&1 << EOF
-            cd $finvoiceconfig->{filepath}
-            put $tmppath$file
-            bye
-            EOF") == 0 or die "system failed: $!";
-
-            move ("$tmppath$file", "$archivepath$file") or die "The move operation failed: $!";
-
+            sftp_transfer($tmppath.$file, $archivepath.$file);
         }
     } else {
 
         foreach my $file (@files) {
-
-            system ("sshpass -p $finvoiceconfig->{password} sftp $finvoiceconfig->{username}\@$finvoiceconfig->{host} > /dev/null 2>&1 << EOF
-            cd $finvoiceconfig->{filepath}
-            put $tmppath$file
-            bye
-            EOF") == 0 or die "system failed: $!";
-
-            move ("$tmppath$file", "$archivepath$file") or die "The move operation failed: $!";
-
+            sftp_transfer($tmppath.$file, $archivepath.$file);
         }
     }
 
@@ -191,4 +175,17 @@ if (@message_ids) {
     }
 } else {
     print "Not any notices processed\n";
+}
+
+sub sftp_transfer {
+    my ($filepath, $archivepath) = @_;
+
+    system ("sshpass -p $finvoiceconfig->{password} sftp $finvoiceconfig->{username}\@$finvoiceconfig->{host} > /dev/null 2>&1 << EOF
+    cd $finvoiceconfig->{filepath}
+    put $filepath
+    bye
+    EOF") == 0 or die "system failed: $!";
+
+    move ("$filepath", "$archivepath") or die "The move operation failed: $!";
+
 }

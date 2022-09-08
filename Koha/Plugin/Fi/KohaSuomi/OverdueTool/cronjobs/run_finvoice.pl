@@ -42,6 +42,7 @@ use Encode qw(decode encode);
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 use File::Copy;
 use YAML::XS;
+use Net::SFTP::Foreign;
 use Koha::Plugins;
 use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Finvoice;
 
@@ -160,12 +161,12 @@ if (@message_ids) {
         my @zipfiles = <*.zip>;
 
         foreach my $file (@zipfiles) {
-            sftp_transfer($tmppath.$file, $archivepath.$file);
+            sftp_transfer($file, $archivepath.$file);
         }
     } else {
 
         foreach my $file (@files) {
-            sftp_transfer($tmppath.$file, $archivepath.$file);
+            sftp_transfer($file, $archivepath.$file);
         }
     }
 
@@ -178,14 +179,27 @@ if (@message_ids) {
 }
 
 sub sftp_transfer {
-    my ($filepath, $archivepath) = @_;
+    my ($file, $archivepath) = @_;
 
-    system ("sshpass -p $finvoiceconfig->{password} sftp $finvoiceconfig->{username}\@$finvoiceconfig->{host} > /dev/null 2>&1 << EOF
-    cd $finvoiceconfig->{filepath}
-    put $filepath
-    bye
-    EOF") == 0 or die "system failed: $!";
+    # Connect and send with SFTP
+    my $sftp = Net::SFTP::Foreign->new('host' => $finvoiceconfig->{host}, 
+                                       'port' => $finvoiceconfig->{port} || '22', 
+                                       'user' => $finvoiceconfig->{username},
+                                       'password' => $finvoiceconfig->{password});
 
-    move ("$filepath", "$archivepath") or die "The move operation failed: $!";
+    if ( $sftp->error ) {
+        die "Logging in to SFTP server failed with: ".$sftp->error."\n";
+    }
+
+    unless ( $sftp->put($tmppath.$file, $finvoiceconfig->{filepath}.$file.'.part')) {
+        die "Transferring file to SFTP server failed with: ".$sftp->error."\n";
+    }
+
+    unless ( $sftp->rename($finvoiceconfig->{filepath}.$file.'.part', $finvoiceconfig->{filepath}.$file)) {
+        die "Renaming a file on SFTP server failed with: ".$sftp->error."\n";
+    }
+
+
+    move ("$tmppath$file", "$archivepath") or die "The move operation failed: $!";
 
 }

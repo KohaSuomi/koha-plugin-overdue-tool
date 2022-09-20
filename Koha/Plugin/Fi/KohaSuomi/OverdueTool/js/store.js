@@ -263,17 +263,17 @@ const store = new Vuex.Store({
       commit('removeErrors');
       commit('showLoader', true);
       var searchParams = new URLSearchParams();
-      searchParams.append('startdate', state.startDate);
-      searchParams.append('enddate', state.endDate);
-      searchParams.append('invoicelibrary', state.invoiceLibrary);
-      searchParams.append('lastdate', state.lastDate);
-      searchParams.append('categorycodes', state.categorycodes);
-      searchParams.append('invoicedstatus', state.notforloanStatus);
-      searchParams.append('invoiced', state.invoiced);
-      searchParams.append('libraries', state.libraries);
-      searchParams.append('offset', state.offset);
-      searchParams.append('sort', 'borrowernumber');
-      searchParams.append('limit', 1);
+      searchParams.set('startdate', state.startDate);
+      searchParams.set('enddate', state.endDate);
+      searchParams.set('invoicelibrary', state.invoiceLibrary);
+      searchParams.set('lastdate', state.lastDate);
+      searchParams.set('categorycodes', state.categorycodes);
+      searchParams.set('invoicedstatus', state.notforloanStatus);
+      searchParams.set('invoiced', state.invoiced);
+      searchParams.set('libraries', state.libraries);
+      searchParams.set('offset', state.offset);
+      searchParams.set('sort', 'borrowernumber');
+      searchParams.set('limit', 1);
 
       axios
         .get('/api/v1/contrib/kohasuomi/overdues', {
@@ -297,20 +297,20 @@ const store = new Vuex.Store({
     },
     async fetchAllOverdues({ commit, state }) {
       var searchParams = new URLSearchParams();
-      searchParams.append('startdate', state.startDate);
-      searchParams.append('enddate', state.endDate);
-      searchParams.append('invoicelibrary', state.invoiceLibrary);
-      searchParams.append('lastdate', state.lastDate);
-      searchParams.append('categorycodes', state.categorycodes);
-      searchParams.append('invoicedstatus', state.notforloanStatus);
-      searchParams.append('invoiced', state.invoiced);
-      searchParams.append('libraries', state.libraries);
-      searchParams.append('sort', 'borrowernumber');
-      searchParams.append('limit', 5);
+      searchParams.set('startdate', state.startDate);
+      searchParams.set('enddate', state.endDate);
+      searchParams.set('invoicelibrary', state.invoiceLibrary);
+      searchParams.set('lastdate', state.lastDate);
+      searchParams.set('categorycodes', state.categorycodes);
+      searchParams.set('invoicedstatus', state.notforloanStatus);
+      searchParams.set('invoiced', state.invoiced);
+      searchParams.set('libraries', state.libraries);
+      searchParams.set('sort', 'borrowernumber');
+      searchParams.set('limit', 5);
       const promises = [];
       let offset = 0;
       for (let i = 0; i < state.pages; i++) {
-        searchParams.append('offset', offset);
+        searchParams.set('offset', offset);
         offset = offset + 5;
         if (offset == state.offset) {
           continue;

@@ -45,7 +45,8 @@ const store = new Vuex.Store({
     groupZipcode: '',
     groupPhone: '',
     invoiceNumber: 0,
-    cancelToken: null
+    cancelToken: null,
+    blockedGuarantors: []
   },
   mutations: {
     addError(state, value) {
@@ -205,6 +206,9 @@ const store = new Vuex.Store({
     },
     addCancelToken(state, value) {
       state.cancelToken = value;
+    },
+    addBlockedGuarantors(state, value) {
+      state.blockedGuarantors = value;
     }
   },
   actions: {
@@ -247,6 +251,8 @@ const store = new Vuex.Store({
             commit('addGroupZipcode', group.groupzipcode);
             commit('addGroupCity', group.groupcity);
             commit('addGroupPhone', group.groupphone);
+            let blockedArr = group.guarantorblock.split(',');
+            commit('addBlockedGuarantors', blockedArr);
           }
         });
       });

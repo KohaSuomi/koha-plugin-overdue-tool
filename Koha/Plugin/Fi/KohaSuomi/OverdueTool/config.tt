@@ -199,6 +199,10 @@
                                                             <label for="guaranteemessage">Viesti huollettavalle</label>
                                                             <input type="text" class="form-control" name="guaranteemessage"  v-model="group.guaranteemessage"/>
                                                         </li>
+                                                        <li class="list-group-item">
+                                                            <label for="guarantorblock">Estä takaajakäsittely (asiakastyypit pilkulla erotettuna)</label>
+                                                            <input type="text" class="form-control" name="guarantorblock"  v-model="group.guarantorblock"/>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                             </form>

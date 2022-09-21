@@ -171,13 +171,14 @@ const resultList = Vue.component('result-list', {
         params.message_transport_type = 'pdf';
       }
 
-      if (this.result.guarantorid) {
+      if (this.result.guarantorid && !this.$store.state.blockedGuarantors.some(data => data === this.result.categorycode)) {
         params.guarantee = this.result.borrowernumber;
       }
+
       if (preview) {
         params.preview = true;
       }
-      let patronid = this.result.guarantorid
+      let patronid = this.result.guarantorid && !this.$store.state.blockedGuarantors.some(data => data === this.result.categorycode)
         ? this.result.guarantorid
         : this.result.borrowernumber;
       if (this.newcheckouts.length) {

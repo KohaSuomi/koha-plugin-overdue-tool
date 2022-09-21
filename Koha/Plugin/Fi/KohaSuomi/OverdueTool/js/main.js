@@ -233,5 +233,8 @@ new Vue({
       $('.page-link').removeClass('bg-primary text-white');
       $('[data-current=' + this.page + ']').addClass('bg-primary text-white');
     },
+    dismissCreated() {
+      store.commit("setCreated", false);
+    }
   },
 });

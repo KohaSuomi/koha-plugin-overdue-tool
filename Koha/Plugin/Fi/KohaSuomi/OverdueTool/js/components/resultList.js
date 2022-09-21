@@ -173,6 +173,8 @@ const resultList = Vue.component('result-list', {
 
       if (this.result.guarantorid && !this.$store.state.blockedGuarantors.some(data => data === this.result.categorycode)) {
         params.guarantee = this.result.borrowernumber;
+      } else if (this.result.guarantorid && this.$store.state.blockedGuarantors.some(data => data === this.result.categorycode)) {
+        params.guarantor = this.result.guarantorid;
       }
 
       if (preview) {

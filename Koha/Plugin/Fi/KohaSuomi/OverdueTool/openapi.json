@@ -742,6 +742,13 @@
                 "description": "Patron's dependant",
                 "type": "number"
               },
+              "guarantor": {
+                "description": "Patron's guarantor",
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
               "preview": {
                 "description": "Get only preview of notice",
                 "type": "boolean"

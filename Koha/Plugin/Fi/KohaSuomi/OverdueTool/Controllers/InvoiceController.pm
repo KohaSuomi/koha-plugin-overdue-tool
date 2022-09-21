@@ -157,6 +157,16 @@ sub set {
             $params{"substitute"}{"issueborbarcode"} = $guarantee->cardnumber;
         }
 
+        if ($body->{guarantor}) {
+            my $guarantor = Koha::Patrons->find($body->{guarantor});
+            $params{"substitute"}{"guarantorfirstname"} = $guarantor->firstname;
+            $params{"substitute"}{"guarantorsurname"} = $guarantor->surname;
+            $params{"substitute"}{"guarantoraddress"} = $guarantor->address;
+            $params{"substitute"}{"guarantorcity"} = $guarantor->city;
+            $params{"substitute"}{"guarantorzipcode"} = $guarantor->zipcode;
+
+        }
+
         if (!$preview) {
             $params{"substitute"}{"invoicenumber"} = $body->{invoicenumber};
             _update_invoice_number($params{"substitute"}{"invoicenumber"});

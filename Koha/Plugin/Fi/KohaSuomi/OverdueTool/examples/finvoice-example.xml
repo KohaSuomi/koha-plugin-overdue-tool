@@ -83,7 +83,7 @@
     <UnitPriceAmount AmountCurrencyIdentifier="EUR"><<items.replacementprice>></UnitPriceAmount>
     <UnitPriceNetAmount AmountCurrencyIdentifier="EUR"><<items.replacementprice>></UnitPriceNetAmount>
     <RowPositionIdentifier><<items.count>></RowPositionIdentifier>
-    <RowFreeText>Free text here!!!</RowFreeText>
+    <RowFreeText>Vapaa sana!!</RowFreeText>
   </InvoiceRow></item>
   <EpiDetails>
     <EpiIdentificationDetails>

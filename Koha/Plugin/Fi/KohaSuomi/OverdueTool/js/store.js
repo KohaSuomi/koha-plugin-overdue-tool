@@ -251,8 +251,10 @@ const store = new Vuex.Store({
             commit('addGroupZipcode', group.groupzipcode);
             commit('addGroupCity', group.groupcity);
             commit('addGroupPhone', group.groupphone);
-            let blockedArr = group.guarantorblock.split(',');
-            commit('addBlockedGuarantors', blockedArr);
+            if (group.guarantorblock) {
+              let blockedArr = group.guarantorblock.split(',');
+              commit('addBlockedGuarantors', blockedArr);
+            }
           }
         });
       });

@@ -191,7 +191,7 @@ sub sftp_transfer {
         die "Logging in to SFTP server failed with: ".$sftp->error."\n";
     }
 
-    unless ( $sftp->put($tmppath.$file, $finvoiceconfig->{filepath}.$file.'.part')) {
+    unless ( $sftp->put($tmppath.$file, $finvoiceconfig->{filepath}.$file.'.part', copy_perms => 0, copy_time => 0)) {
         die "Transferring file to SFTP server failed with: ".$sftp->error."\n";
     }
 

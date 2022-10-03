@@ -216,7 +216,7 @@ sub set {
                     comment        => "Lainauskielto laskutetusta aineistosta",
                 });
             }
-            
+
             if ($body->{guarantordebarment} && ($body->{guarantee} || $body->{guarantor})) {
                 Koha::Patron::Debarments::AddUniqueDebarment({
                     borrowernumber => $body->{guarantor} ? $body->{guarantor} : $patron_id,
@@ -239,7 +239,7 @@ sub set {
             if ($body->{guaranteemessage}) {
                 Koha::Patron::Message->new(
                     {
-                        borrowernumber => $body->{guarantee},
+                        borrowernumber => $body->{guarantor} ? $body->{guarantor} : $body->{guarantee},
                         branchcode     => $body->{branchcode},
                         message_type   => 'L',
                         message        => $body->{guaranteemessage},

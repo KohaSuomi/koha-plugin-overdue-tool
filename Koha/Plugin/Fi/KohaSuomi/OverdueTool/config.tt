@@ -203,7 +203,7 @@
                                                             <input type="text" class="form-control" name="patronmessage"  v-model="group.patronmessage"/>
                                                         </li>
                                                         <li class="list-group-item">
-                                                            <label for="guaranteemessage">Viesti huollettavalle</label>
+                                                            <label for="guaranteemessage">Viesti huollettavalle tai virhaholhoojalle</label>
                                                             <input type="text" class="form-control" name="guaranteemessage"  v-model="group.guaranteemessage"/>
                                                         </li>
                                                         <li class="list-group-item">

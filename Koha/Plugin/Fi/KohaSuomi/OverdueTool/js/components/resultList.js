@@ -161,6 +161,7 @@ const resultList = Vue.component('result-list', {
         groupcity: this.$store.state.groupCity,
         groupzipcode: this.$store.state.groupZipcode,
         groupphone: this.$store.state.groupPhone,
+        guarantordebarment: this.$store.state.guarantorDebarment
       };
 
       if (this.invoiceType == 'FINVOICE' && !preview) {

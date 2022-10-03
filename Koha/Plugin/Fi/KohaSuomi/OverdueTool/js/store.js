@@ -46,7 +46,8 @@ const store = new Vuex.Store({
     groupPhone: '',
     invoiceNumber: 0,
     cancelToken: null,
-    blockedGuarantors: []
+    blockedGuarantors: [],
+    guarantorDebarment: false
   },
   mutations: {
     addError(state, value) {
@@ -209,6 +210,9 @@ const store = new Vuex.Store({
     },
     addBlockedGuarantors(state, value) {
       state.blockedGuarantors = value;
+    },
+    addGuarantorDebarment(state, value) {
+      state.guarantorDebarment = value;
     }
   },
   actions: {
@@ -254,6 +258,9 @@ const store = new Vuex.Store({
             if (group.guarantorblock) {
               let blockedArr = group.guarantorblock.split(',');
               commit('addBlockedGuarantors', blockedArr);
+            }
+            if (group.guarantordebarment) {
+              commit('addGuarantorDebarment', group.guarantordebarment);
             }
           }
         });

@@ -716,6 +716,10 @@
                 "description": "Add debarment for patron",
                 "type": "boolean"
               },
+              "guarantordebarment": {
+                "description": "Add debarment for patron",
+                "type": "boolean"
+              },
               "addreplacementprice": {
                 "description": "Add item's replacement price to accountlines",
                 "type": "boolean"

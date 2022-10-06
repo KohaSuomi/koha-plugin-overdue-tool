@@ -5,8 +5,14 @@ use Exporter;
 use XML::LibXML;
 use Encode qw(decode encode);
 use POSIX qw(strftime);
-use C4::KohaSuomi::SSN::Access;
 use Text::Unaccent;
+
+my $fetchSSN = 1;
+eval "use Koha::Plugin::Fi::KohaSuomi::SsnProvider::Modules::Database";
+if ( $@ ) {
+     $fetchSSN = 0;
+}
+
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(process_xml);
@@ -24,9 +30,12 @@ sub process_xml {
     $doc->findnodes("Finvoice/MessageTransmissionDetails/MessageDetails/MessageIdentifier")->[0]->appendTextNode($notice->{message_id});
     $doc->findnodes("Finvoice/MessageTransmissionDetails/MessageDetails/MessageTimeStamp")->[0]->appendTextNode($timestamp);
 
-    my $ssn = GetSSNByBorrowerNumber ( $notice->{borrowernumber} );
-
-    $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerPartyIdentifier")->[0]->appendTextNode($ssn);
+    if ($fetchSSN) {
+        require Koha::Plugin::Fi::KohaSuomi::SsnProvider::Modules::Database;
+        my $ssndb = Koha::Plugin::Fi::KohaSuomi::SsnProvider::Modules::Database->new();
+        my $ssn = $ssndb->getSSNByBorrowerNumber( $notice->{borrowernumber} );
+        $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerPartyIdentifier")->[0]->appendTextNode($ssn) if $ssn;
+    }
 
     # my $name = $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerOrganisationName")->[0];
     # my $newname = _escape_string($name->textContent);
@@ -61,11 +70,6 @@ sub _escape_string {
         }
         $newstring .= $char;
     }
-
-    #$newstring =~ s/&/&amp;/sg;
-    $newstring =~ s/</&lt;/sg;
-    $newstring =~ s/>/&gt;/sg;
-    $newstring =~ s/"/&quot;/sg;
-
+    
     return $newstring;
 }

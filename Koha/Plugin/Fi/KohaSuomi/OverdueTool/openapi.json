@@ -1,0 +1,974 @@
+{
+  "/items/{itemnumber}": {
+    "patch": {
+      "x-mojo-to": "Fi::KohaSuomi::OverdueTool::Controllers::ItemController#patch",
+      "operationId": "patchItem",
+      "x-koha-authorization": {
+        "permissions": {
+          "editcatalogue": "edit_items"
+        }
+      },
+      "tags": [
+        "items"
+      ],
+      "parameters": [
+        {
+          "name": "body",
+          "in": "body",
+          "description": "A JSON object containing updated fields",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "properties": {
+              "itemnumber": {
+                "type": "integer",
+                "description": "internally assigned item identifier"
+              },
+              "biblionumber": {
+                "type": "integer",
+                "description": "internally assigned biblio identifier"
+              },
+              "biblioitemnumber": {
+                "type": "integer",
+                "description": "internally assigned biblio item identifier"
+              },
+              "barcode": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "item barcode"
+              },
+              "dateaccessioned": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "date the item was acquired or added to Koha",
+                "format": "date"
+              },
+              "booksellerid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "where the item was purchased"
+              },
+              "homebranch": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "library that owns this item"
+              },
+              "price": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "purchase price"
+              },
+              "replacementprice": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "cost the library charges to replace the item if it has been marked lost"
+              },
+              "replacementpricedate": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "the date the price is effective from",
+                "format": "date"
+              },
+              "datelastborrowed": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "the date the item was last checked out/issued",
+                "format": "date"
+              },
+              "datelastseen": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "the date the item was last see (usually the last time the barcode was scanned or inventory was done)",
+                "format": "date"
+              },
+              "stack": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "?"
+              },
+              "notforloan": {
+                "type": "integer",
+                "description": "authorized value defining why this item is not for loan"
+              },
+              "damaged": {
+                "type": "integer",
+                "description": "authorized value defining this item as damaged"
+              },
+              "itemlost": {
+                "type": "integer",
+                "description": "authorized value defining this item as lost"
+              },
+              "itemlost_on": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "the date and time an item was last marked as lost, NULL if not lost",
+                "format": "date-time"
+              },
+              "withdrawn": {
+                "type": "integer",
+                "description": "authorized value defining this item as withdrawn"
+              },
+              "withdrawn_on": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "the date and time an item was last marked as withdrawn, NULL if not withdrawn",
+                "format": "date-time"
+              },
+              "itemcallnumber": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "call number for this item"
+              },
+              "coded_location_qualifier": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "coded location qualifier"
+              },
+              "issues": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "number of times this item has been checked out/issued"
+              },
+              "renewals": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "number of times this item has been renewed"
+              },
+              "reserves": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "number of times this item has been placed on hold/reserved"
+              },
+              "restricted": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "authorized value defining use restrictions for this item"
+              },
+              "itemnotes": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "public notes on this item"
+              },
+              "itemnotes_nonpublic": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "non-public notes on this item"
+              },
+              "holdingbranch": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "library that is currently in possession item"
+              },
+              "paidfor": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "?"
+              },
+              "timestamp": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "date and time this item was last altered",
+                "format": "date-time"
+              },
+              "location": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "authorized value for the shelving location for this item"
+              },
+              "permanent_location": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "linked to the CART and PROC temporary locations feature, stores the permanent shelving location"
+              },
+              "onloan": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "defines if item is checked out (NULL for not checked out, and checkout date for checked out)",
+                "format": "date"
+              },
+              "cn_source": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "classification source used on this item"
+              },
+              "cn_sort": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "?"
+              },
+              "ccode": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "authorized value for the collection code associated with this item"
+              },
+              "materials": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "materials specified"
+              },
+              "uri": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "URL for the item"
+              },
+              "itype": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "itemtype defining the type for this item"
+              },
+              "more_subfields_xml": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "additional 952 subfields in XML format"
+              },
+              "enumchron": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "serial enumeration/chronology for the item"
+              },
+              "copynumber": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "copy number"
+              },
+              "stocknumber": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "inventory number"
+              },
+              "new_status": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "'new' value, whatever free-text information."
+              },
+              "datereceived": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "When this Item was received.",
+                "format": "date-time"
+              },
+              "genre": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "GENRE (MARC21 952$G)"
+              },
+              "sub_location": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "SUBLOC (MARC21 952$S)"
+              },
+              "holding_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "internally assigned holding identifier"
+              }
+            }
+          }
+        },
+        {
+          "name": "itemnumber",
+          "in": "path",
+          "description": "Internal item identifier",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "An item",
+          "schema": {
+            "type": "object"
+          }
+        },
+        "404": {
+          "description": "Item not found",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "description": "Error message",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/overdues": {
+    "get": {
+      "x-mojo-to": "Fi::KohaSuomi::OverdueTool::Controllers::OverdueController#get",
+      "operationId": "listOverdues",
+      "tags": [
+        "patrons",
+        "checkouts"
+      ],
+      "parameters": [
+        {
+          "name": "startdate",
+          "in": "query",
+          "description": "Start date",
+          "type": "string"
+        },
+        {
+          "name": "enddate",
+          "in": "query",
+          "description": "End date",
+          "type": "string"
+        },
+        {
+          "name": "lastdate",
+          "in": "query",
+          "description": "Last date",
+          "type": "string"
+        },
+        {
+          "name": "libraries",
+          "in": "query",
+          "description": "Libraries array",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "collectionFormat": "multi"
+        },
+        {
+          "name": "categorycodes",
+          "in": "query",
+          "description": "Categorycodes array",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "collectionFormat": "multi"
+        },
+        {
+          "name": "invoicelibrary",
+          "in": "query",
+          "description": "Invoice library type",
+          "type": "string"
+        },
+        {
+          "name": "invoiced",
+          "in": "query",
+          "description": "Get invoiced overdues",
+          "type": "boolean"
+        },
+        {
+          "name": "invoicedstatus",
+          "in": "query",
+          "description": "Invoiced item status",
+          "type": "string"
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "description": "Sort by column name. E.g. 'date_due'",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "name": "order",
+          "in": "query",
+          "description": "Ascending (asc) or descending (desc) order. Default ascending. E.g. 'desc'",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "name": "offset",
+          "in": "query",
+          "description": "Offset. Default 0.",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "description": "Limit results. By default, returns all results.",
+          "required": false,
+          "type": "integer"
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "A list of checkouts",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "description": "Total number of checkouts, excluding all limitations made by limit and offset query parameters. Please note that because of this, the number may not be equal to the array elements returned in 'records' array."
+              },
+              "records": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "borrowernumber": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "description": "internally assigned user identifier"
+                    },
+                    "cardnumber": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Patron's cardnumber"
+                    },
+                    "firstname": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Patron's firstname"
+                    },
+                    "surname": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Patron's surname"
+                    },
+                    "address": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Patron's address"
+                    },
+                    "city": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Patron's city"
+                    },
+                    "zipcode": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Patron's zipcode"
+                    },
+                    "guarantorid": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "description": "Patron's guarantor identifier"
+                    },
+                    "checkouts": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "description": "Array of checkouts"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "x-koha-authorization": {
+        "permissions": {
+          "updatecharges": "1"
+        }
+      }
+    }
+  },
+  "/overdues/config/": {
+    "get": {
+      "x-mojo-to": "Fi::KohaSuomi::OverdueTool::Controllers::ConfigController#get",
+      "operationId": "GetOverdueConfig",
+      "tags": [
+        "overdues"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "Overdue tool config",
+          "schema": {
+            "type": "object"
+          }
+        },
+        "400": {
+          "description": "An error occured",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "description": "Bad request",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "put": {
+      "x-mojo-to": "Fi::KohaSuomi::OverdueTool::Controllers::ConfigController#set",
+      "operationId": "SetOverdueConfig",
+      "tags": [
+        "overdues"
+      ],
+      "parameters": [
+        {
+          "name": "body",
+          "in": "body",
+          "description": "Config object",
+          "required": true,
+          "schema": {
+            "type": "object"
+          }
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "Success message",
+          "schema": {
+            "type": "object"
+          }
+        }
+      },
+      "x-koha-authorization": {
+        "permissions": {
+          "plugins": "configure"
+        }
+      }
+    }
+  },
+  "/invoices/{patron_id}": {
+    "post": {
+      "x-mojo-to": "Fi::KohaSuomi::OverdueTool::Controllers::InvoiceController#set",
+      "operationId": "setInvoice",
+      "tags": [
+        "notices"
+      ],
+      "x-koha-authorization": {
+        "permissions": {
+          "borrowers": "edit_borrowers"
+        }
+      },
+      "parameters": [
+        {
+          "name": "patron_id",
+          "in": "path",
+          "type": "number",
+          "description": "Patron's id",
+          "required": true
+        },
+        {
+          "name": "body",
+          "in": "body",
+          "description": "A JSON object containing informations about the new invoice",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "properties": {
+              "module": {
+                "description": "",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "letter_code": {
+                "description": "",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "message_transport_type": {
+                "description": "Transport method. Values accepted by default are 'email', 'sms', 'phone' and 'print'",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "branchcode": {
+                "description": "Notice branch",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "repeat_type": {
+                "description": "Repeat type eg. item",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "repeat": {
+                "description": "Repeat items",
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "notforloan_status": {
+                "description": "Not for loan status for invoiced items",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "debarment": {
+                "description": "Add debarment for patron",
+                "type": "boolean"
+              },
+              "guarantordebarment": {
+                "description": "Add debarment for patron",
+                "type": "boolean"
+              },
+              "addreplacementprice": {
+                "description": "Add item's replacement price to accountlines",
+                "type": "boolean"
+              },
+              "addreferencenumber": {
+                "description": "Add reference number to invoice",
+                "type": "boolean"
+              },
+              "increment": {
+                "description": "Add reference number increment",
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "lang": {
+                "description": "Patron's language",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "guarantee": {
+                "description": "Patron's dependant",
+                "type": "number"
+              },
+              "guarantor": {
+                "description": "Patron's guarantor",
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "preview": {
+                "description": "Get only preview of notice",
+                "type": "boolean"
+              },
+              "librarygroup": {
+                "description": "Set library group",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "overduefines": {
+                "description": "Set overdue fines to invoice",
+                "type": "boolean"
+              },
+              "invoicefine": {
+                "description": "Set invoice fine",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "accountnumber": {
+                "description": "Set library group accountnumber",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "biccode": {
+                "description": "Set library group bic code",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "businessid": {
+                "description": "Set library group business id",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "patronmessage": {
+                "description": "Set message to patron",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "guaranteemessage": {
+                "description": "Set message to dependant",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "surname": {
+                "description": "Set patron's surname",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "firstname": {
+                "description": "Set patron's firstname",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "cardnumber": {
+                "description": "Set patron's cardnumber",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "invoicenumber": {
+                "description": "Set invoice number",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "grouplibrary": {
+                "description": "Set library group's name",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "groupaddress": {
+                "description": "Set library group's address",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "groupcity": {
+                "description": "Set library group's city",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "groupzipcode": {
+                "description": "Set library group's zipcode",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "groupphone": {
+                "description": "Set library group's phone number",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "module",
+              "letter_code"
+            ]
+          }
+        }
+      ],
+      "consumes": [
+        "application/x-www-form-urlencoded"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "201": {
+          "description": "Added invoice",
+          "schema": {
+            "type": "object"
+          }
+        },
+        "400": {
+          "description": "An error occured",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "description": "Bad request",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/notices/{notice_id}/invoice": {
+    "put": {
+      "x-mojo-to": "Fi::KohaSuomi::OverdueTool::Controllers::InvoiceController#update",
+      "operationId": "updateInvoiceNotice",
+      "tags": [
+        "Notices"
+      ],
+      "parameters": [
+        {
+          "name": "notice_id",
+          "in": "path",
+          "description": "Identifier",
+          "required": true,
+          "type": "integer"
+        },
+        {
+          "name": "body",
+          "in": "body",
+          "description": "A JSON object containing updated fields",
+          "required": true,
+          "schema": {
+            "type": "object"
+          }
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "Notice",
+          "schema": {
+            "type": "object"
+          }
+        },
+        "404": {
+          "description": "An error occured",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "description": "Labels not found",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Internal error",
+          "schema": {
+            "type": "object"
+          }
+        }
+      },
+      "x-koha-authorization": {
+        "permissions": {
+          "borrowers": "edit_borrowers"
+        }
+      }
+    }
+  }
+}

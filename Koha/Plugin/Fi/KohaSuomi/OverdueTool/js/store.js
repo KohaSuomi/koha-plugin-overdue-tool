@@ -17,21 +17,21 @@ const store = new Vuex.Store({
     invoiceLibrary: '',
     maxYears: 1,
     lastDate: '',
-    invoiceLetters: [],
+    invoiceType: '',
     userLibrary: '',
+    libraryGroup: '',
     notforloanStatus: '',
     invoiced: false,
-    debarment: '',
-    addReplacementPrice: '',
-    addReferenceNumber: '',
-    libraryGroup: '',
+    debarment: false,
+    addReplacementPrice: false,
+    addReferenceNumber: false,
     categorycodes: [],
     resultOffset: 0,
     showLoader: false,
     notice: '',
     increment: '',
     invoicefine: '',
-    overduefines: '',
+    overduefines: false,
     accountNumber: '',
     bicCode: '',
     messageId: '',
@@ -45,6 +45,9 @@ const store = new Vuex.Store({
     groupZipcode: '',
     groupPhone: '',
     invoiceNumber: 0,
+    cancelToken: null,
+    blockedGuarantors: [],
+    guarantorDebarment: false
   },
   mutations: {
     addError(state, value) {
@@ -98,20 +101,20 @@ const store = new Vuex.Store({
     addLibraries(state, value) {
       state.libraries = value;
     },
-    addLibraryGroup(state, value) {
-      state.libraryGroup = value;
-    },
     addInvoiceLibrary(state, value) {
       state.invoiceLibrary = value;
     },
     addMaxYears(state, value) {
       state.maxYears = value;
     },
-    addInvoiceLetters(state, value) {
-      state.invoiceLetters = value;
+    addInvoiceType(state, value) {
+      state.invoiceType = value;
     },
     addUserLibrary(state, value) {
       state.userLibrary = value;
+    },
+    addLibraryGroup(state, value) {
+      state.libraryGroup = value;
     },
     addNotForLoanStatus(state, value) {
       state.notforloanStatus = value;
@@ -201,29 +204,95 @@ const store = new Vuex.Store({
     },
     addInvoiceNumber(state, value) {
       state.invoiceNumber = value;
+    },
+    addCancelToken(state, value) {
+      state.cancelToken = value;
+    },
+    addBlockedGuarantors(state, value) {
+      state.blockedGuarantors = value;
+    },
+    addGuarantorDebarment(state, value) {
+      state.guarantorDebarment = value;
     }
   },
   actions: {
+    setSettings({ dispatch, commit, state }, payload) {
+      commit('addInvoiceLibrary', payload.invoicelibrary);
+      commit('addMaxYears', payload.maxyears);
+      commit('addUserLibrary', payload.userlibrary);
+      commit('addNotForLoanStatus', payload.invoicenotforloan);
+      commit('addInvoiceNumber', payload.invoicenumber);
+      payload.groupsettings.forEach((group) => {
+        group.grouplibraries.forEach((lib) => {
+          if (lib.branchcode == state.userLibrary) {
+            let libArray = group.grouplibraries.map(function (obj) {
+              return obj.branchcode;
+            });
+            commit('addLibraries', libArray);
+            commit('addInvoiceType', group.invoicetype);
+            if (group.debarment) {
+              commit('debarment', group.debarment);
+            }
+            if (group.addreplacementprice) {
+              commit('addReplacementPrice', group.addreplacementprice);
+            }
+            if (group.addreferencenumber) {
+              commit('addReferenceNumber', group.addreferencenumber);
+            }
+            commit('addInvoiceFine', group.invoicefine);
+            if (group.overduefines) {
+              commit('addOverdueFines', group.overduefines);
+            }
+            commit('addLibraryGroup', group.groupname);
+            commit('addIncrement', group.increment);
+            commit('addAccountNumber', group.accountnumber);
+            commit('addBicCode', group.biccode);
+            commit('addBusinessId', group.businessid);
+            commit('addPatronMessage', group.patronmessage);
+            commit('addGuaranteeMessage', group.guaranteemessage);
+            commit('addGroupLibrary', group.grouplibrary);
+            commit('addGroupAddress', group.groupaddress);
+            commit('addGroupZipcode', group.groupzipcode);
+            commit('addGroupCity', group.groupcity);
+            commit('addGroupPhone', group.groupphone);
+            if (group.guarantorblock) {
+              let blockedArr = group.guarantorblock.split(',');
+              commit('addBlockedGuarantors', blockedArr);
+            }
+            if (group.guarantordebarment) {
+              commit('addGuarantorDebarment', group.guarantordebarment);
+            }
+          }
+        });
+      });
+      commit('addCategoryCodes', payload.overduerules.categorycodes);
+      dispatch('setDates', payload.overduerules);
+    },
     fetchOverdues({ dispatch, commit, state }) {
+      if (state.cancelToken) {
+        state.cancelToken.cancel(); 
+      }
+      commit("addCancelToken", axios.CancelToken.source());
       commit('addResults', []);
       commit('addOffset', 0);
       commit('removeErrors');
       commit('showLoader', true);
       var searchParams = new URLSearchParams();
-      searchParams.append('startdate', state.startDate);
-      searchParams.append('enddate', state.endDate);
-      searchParams.append('invoicelibrary', state.invoiceLibrary);
-      searchParams.append('lastdate', state.lastDate);
-      searchParams.append('categorycodes', state.categorycodes);
-      searchParams.append('invoicedstatus', state.notforloanStatus);
-      searchParams.append('invoiced', state.invoiced);
-      searchParams.append('libraries', state.libraries);
-      searchParams.append('offset', state.offset);
-      searchParams.append('sort', 'borrowernumber');
-      searchParams.append('limit', 1);
+      searchParams.set('startdate', state.startDate);
+      searchParams.set('enddate', state.endDate);
+      searchParams.set('invoicelibrary', state.invoiceLibrary);
+      searchParams.set('lastdate', state.lastDate);
+      searchParams.set('categorycodes', state.categorycodes);
+      searchParams.set('invoicedstatus', state.notforloanStatus);
+      searchParams.set('invoiced', state.invoiced);
+      searchParams.set('libraries', state.libraries);
+      searchParams.set('offset', state.offset);
+      searchParams.set('sort', 'borrowernumber');
+      searchParams.set('limit', 1);
 
       axios
-        .get('/api/v1/checkouts/overdues', {
+        .get('/api/v1/contrib/kohasuomi/overdues', {
+          cancelToken: state.cancelToken.token,
           params: searchParams,
         })
         .then((response) => {
@@ -243,27 +312,28 @@ const store = new Vuex.Store({
     },
     async fetchAllOverdues({ commit, state }) {
       var searchParams = new URLSearchParams();
-      searchParams.append('startdate', state.startDate);
-      searchParams.append('enddate', state.endDate);
-      searchParams.append('invoicelibrary', state.invoiceLibrary);
-      searchParams.append('lastdate', state.lastDate);
-      searchParams.append('categorycodes', state.categorycodes);
-      searchParams.append('invoicedstatus', state.notforloanStatus);
-      searchParams.append('invoiced', state.invoiced);
-      searchParams.append('libraries', state.libraries);
-      searchParams.append('sort', 'borrowernumber');
-      searchParams.append('limit', 5);
+      searchParams.set('startdate', state.startDate);
+      searchParams.set('enddate', state.endDate);
+      searchParams.set('invoicelibrary', state.invoiceLibrary);
+      searchParams.set('lastdate', state.lastDate);
+      searchParams.set('categorycodes', state.categorycodes);
+      searchParams.set('invoicedstatus', state.notforloanStatus);
+      searchParams.set('invoiced', state.invoiced);
+      searchParams.set('libraries', state.libraries);
+      searchParams.set('sort', 'borrowernumber');
+      searchParams.set('limit', 5);
       const promises = [];
       let offset = 0;
       for (let i = 0; i < state.pages; i++) {
-        searchParams.append('offset', offset);
+        searchParams.set('offset', offset);
         offset = offset + 5;
         if (offset == state.offset) {
           continue;
         }
         promises.push(
           axios
-            .get('/api/v1/checkouts/overdues', {
+            .get('/api/v1/contrib/kohasuomi/overdues', {
+              cancelToken: state.cancelToken.token,
               params: searchParams,
             })
             .then((response) => {
@@ -294,13 +364,12 @@ const store = new Vuex.Store({
       commit('removeErrors');
       commit('setCreated', false);
       return axios
-        .post('/api/v1/invoices/' + payload.borrowernumber, payload.params)
+        .post(
+          '/api/v1/contrib/kohasuomi/invoices/' + payload.borrowernumber,
+          payload.params
+        )
         .then((response) => {
-          if (
-            payload.all &&
-            payload.params.letter_code == 'ODUECLAIM' &&
-            !payload.params.message_transport_type
-          ) {
+          if (payload.all && payload.params.message_transport_type == 'pdf') {
             commit('setNotices', response.data.notice);
             commit('setMessageId', response.data.message_id);
           } else if (payload.all) {
@@ -313,8 +382,7 @@ const store = new Vuex.Store({
           }
           if (
             !payload.params.preview &&
-            payload.params.letter_code == 'ODUECLAIM' &&
-            !payload.params.message_transport_type
+            payload.params.message_transport_type == 'pdf'
           ) {
             dispatch('editNotice', 'sent');
           }
@@ -379,7 +447,7 @@ const store = new Vuex.Store({
       commit('showLoader', true);
       commit('removeErrors');
       axios
-        .put('/api/v1/notices/' + state.messageId, { status: status })
+        .put('/api/v1/contrib/kohasuomi/notices/' + state.messageId + '/invoice', { status: status })
         .then(() => {
           commit('showLoader', false);
         })
@@ -396,7 +464,7 @@ const store = new Vuex.Store({
     updateReplacementPrice({ commit }, payload) {
       commit('removeErrors');
       axios
-        .patch('/api/v1/items/' + payload.itemnumber, {
+        .patch('/api/v1/contrib/kohasuomi/items/' + payload.itemnumber, {
           replacementprice: payload.replacementprice,
         })
         .then(() => {})

@@ -10,15 +10,15 @@
 		<!-- Bootstrap core CSS -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+		<link rel="stylesheet" type="text/css" href="[% PLUGIN_PATH %]/css/assets/print.min.css">
 		<!-- Custom styles for this template-->
-		<script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
-		<script src="https://unpkg.com/vuex@3.6.2/dist/vuex.min.js"></script>
-		<script src="https://unpkg.com/vuejs-datepicker"></script>
-		<script src="https://unpkg.com/vuejs-datepicker/dist/locale/translations/fi.js"></script>
-		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
-		<script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="https://printjs-4de6.kxcdn.com/print.min.css">
+		<script src="[% PLUGIN_PATH %]/js/assets/vue.min.js"></script>
+		<script src="[% PLUGIN_PATH %]/js/assets/vuex.min.js"></script>
+		<script src="[% PLUGIN_PATH %]/js/assets/vuejs-datepicker.min.js"></script>
+		<script src="[% PLUGIN_PATH %]/js/assets/vuejs-datepicker-fi.js"></script>
+		<script src="[% PLUGIN_PATH %]/js/assets/axios.min.js"></script>
+		<script src="[% PLUGIN_PATH %]/js/assets/moment-with-locales.min.js"></script>
+		<script src="[% PLUGIN_PATH %]/js/assets/print.min.js"></script>
 	</head>
 	<body>
 
@@ -41,8 +41,11 @@
 							<li v-for="error in errors">{{ error }}</li>
 						</ul>
 					</div>
-					<div class="alert alert-success" role="alert" v-if="created">
+					<div class="alert alert-success fixed-top" role="alert" v-if="created">
 						<b>Luonti onnistui!</b>
+						<button type="button" class="close" @click="dismissCreated" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
 					</div>
 					<div v-if="showPDF">
 						<ul class="nav nav-pills mb-3 mt-3 justify-content-center">
@@ -102,12 +105,10 @@
 								</li>
 								<li v-if="results.length" :class="{'d-none': showLoader }" class="nav-item pl-2">
 									<div class="form-group row">
-										<div v-if="!invoiced" v-for="letter in invoiceLetters" class="mr-2">
-											<button v-if="letter == 'FINVOICE'"class="btn btn-info" v-on:click="allFinvoices" :disabled='finvoiceBtn'><i v-if="finvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo Finvoice:t</span></button>
-											<button v-if="letter == 'EINVOICE'"class="btn btn-info" v-on:click="allEinvoices" :disabled='einvoiceBtn'><i v-if="einvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo e-laskut</span></button>
-											<button v-if="letter == 'ODUECLAIM'"class="btn btn-info" :disabled='pdfBtn' v-on:click="allPDFs(false)"><i v-if="pdfBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo PDF:t</span></button>
-										</div>
-										<button class="btn btn-info" :disabled='previewBtn' v-on:click="allPDFs(true)"><i v-if="previewBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Jäljennökset</span></button>
+										<button v-if="!invoiced && invoiceType == 'FINVOICE'"class="btn btn-info" v-on:click="allFinvoices" :disabled='finvoiceBtn'><i v-if="finvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo Finvoice:t</span></button>
+										<button v-if="!invoiced && invoiceType == 'EINVOICE'"class="btn btn-info" v-on:click="allEinvoices" :disabled='einvoiceBtn'><i v-if="einvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo e-laskut</span></button>
+										<button v-if="!invoiced && invoiceType == 'ODUECLAIM'"class="btn btn-info" :disabled='pdfBtn' v-on:click="allPDFs(false)"><i v-if="pdfBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo PDF:t</span></button>
+										<button class="btn btn-info ml-1" :disabled='previewBtn' v-on:click="allPDFs(true)"><i v-if="previewBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Jäljennökset</span></button>
 									</div>
 								</li>
 							</ul>
@@ -177,10 +178,10 @@
 						</li>
 						<li class="list-inline-item d-table-cell">
 							<button class="btn btn-info" v-on:click="activate"><i class='fas fa-angle-down' :class="{'fa-angle-up': isActive}" style='font-size:24px'></i></button>
-							<span v-if="!invoiced" v-for="letter in letterFilter">
-								<button v-if="letter != 'ODUECLAIM' && letter != 'EINVOICE'" class="btn btn-success" v-on:click="createInvoice(letter)">Luo {{letter | lowercase}}</button>
-								<button v-if="letter == 'EINVOICE'" class="btn btn-success" v-on:click="createInvoice(letter)">Luo e-lasku</button>
-								<button v-if="letter == 'ODUECLAIM'" class="btn btn-success" v-on:click="previewPDF(false, false)">Luo pdf-lasku</button>
+							<span v-if="!invoiced">
+								<button v-if="invoiceType == 'FINVOICE'" class="btn btn-success" v-on:click="createInvoice(false)">Luo Finvoice</button>
+								<button v-if="invoiceType == 'EINVOICE'" class="btn btn-success" v-on:click="createInvoice(false)">Luo e-lasku</button>
+								<button v-if="invoiceType == 'ODUECLAIM'" class="btn btn-success" v-on:click="previewPDF(false, false)">Luo pdf-lasku</button>
 							</span>
 							<button class="btn btn-success" v-on:click="previewPDF(true, true)">Jäljennös</button>
 						</li>
@@ -223,10 +224,9 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 		<!-- Icons -->
-		<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 		<script>
 			feather.replace();
-			var jsondata = JSON.parse('[% data %]');
 		</script>
 		<script type="module" src="[% PLUGIN_PATH %]/js/main.js"></script>
 		<link rel="stylesheet" href="[% PLUGIN_PATH %]/css/pdf.css">

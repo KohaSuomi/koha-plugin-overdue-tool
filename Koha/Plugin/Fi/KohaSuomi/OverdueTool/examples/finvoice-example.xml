@@ -7,7 +7,7 @@
       <FromIntermediator><<biccode>></FromIntermediator>
     </MessageSenderDetails>
     <MessageReceiverDetails>
-      <ToIdentifier SchemeID="0037"><<borrowers.cardnumber>> </ToIdentifier>
+      <ToIdentifier SchemeID="0037"><<borrowers.borrowernumber>></ToIdentifier>
       <ToIntermediator><<borrowers.borrowernumber>></ToIntermediator>
     </MessageReceiverDetails>
     <MessageDetails>
@@ -33,6 +33,19 @@
       <SellerBic IdentificationSchemeName="BIC"><<biccode>></SellerBic>
     </SellerAccountDetails>
   </SellerInformationDetails>
+  <!-- Jos pitää lisätä huoltajan tiedot erikseen
+[% IF guarantorsurname %]
+  <InvoiceRecipientPartyDetails>                            
+    <InvoiceRecipientOrganisationName><<guarantorsurname>> <<guarantorfirstname>></InvoiceRecipientOrganisationName>
+    <InvoiceRecipientPostalAddressDetails>
+      <InvoiceRecipientStreetName><<guarantoraddress>></InvoiceRecipientStreetName>
+      <InvoiceRecipientTownName><<guarantorcity>></InvoiceRecipientTownName>
+      <InvoiceRecipientPostCodeIdentifier><<guarantorzipcode>></InvoiceRecipientPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Suomi</CountryName>
+    </InvoiceRecipientPostalAddressDetails>
+  </InvoiceRecipientPartyDetails> 
+[% END %]-->
   <BuyerPartyDetails>
     <BuyerPartyIdentifier></BuyerPartyIdentifier>                             
     <BuyerOrganisationName><<borrowers.firstname>> <<borrowers.surname>></BuyerOrganisationName>
@@ -70,6 +83,7 @@
     <UnitPriceAmount AmountCurrencyIdentifier="EUR"><<items.replacementprice>></UnitPriceAmount>
     <UnitPriceNetAmount AmountCurrencyIdentifier="EUR"><<items.replacementprice>></UnitPriceNetAmount>
     <RowPositionIdentifier><<items.count>></RowPositionIdentifier>
+    <RowFreeText>Vapaasana!!</RowFreeText>
   </InvoiceRow></item>
   <EpiDetails>
     <EpiIdentificationDetails>

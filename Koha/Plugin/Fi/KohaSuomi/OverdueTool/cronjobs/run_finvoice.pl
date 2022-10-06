@@ -42,6 +42,7 @@ use Encode qw(decode encode);
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 use File::Copy;
 use YAML::XS;
+use Net::SFTP::Foreign;
 use Koha::Plugins;
 use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Finvoice;
 
@@ -56,19 +57,23 @@ Usage: $0 OUTPUT_DIRECTORY
   -c --config       Config name. See example file config.yaml.example. (Mandatory)
   -v --validate     Validate the Finvoice messages.
   --xsd             XSD file path for validation.
+  --zip             Create zip from xml files
+  --pretty          Create human readable xml files
 
 USAGE
     exit $_[0];
 }
 
-my ( $help, $config, $path, $validate, $xsd);
+my ( $help, $config, $path, $validate, $xsd, $zip, $pretty);
 
 GetOptions(
     'h|help'     => \$help,
     'p|path=s'   => \$path,
     'c|config=s' => \$config,
     'v|validate' => \$validate,
-    'xsd=s'        => \$xsd
+    'xsd=s'      => \$xsd,
+    'zip'        => \$zip,
+    'pretty'     => \$pretty
 ) || usage(1);
 
 usage(0) if ($help);
@@ -107,8 +112,8 @@ if(!@librarycodes) {
     exit;
 }
 
-my $today     = output_pref( { dt => dt_from_string, dateonly => 1, dateformat => 'iso' } ) ;
-my $notices = Koha::Notice::Messages->search({letter_code => 'FINVOICE', status => 'pending', from_address => {'=' => [@librarycodes]}});
+my $today     = Koha::DateUtils::dt_from_string()->ymd;
+my $notices = Koha::Notice::Messages->search({letter_code => 'ODUECLAIM', message_transport_type => 'finvoice', status => 'pending', from_address => {'=' => [@librarycodes]}});
 exit unless $notices;
 
 my $tmppath = $output_directory ."/tmp/";
@@ -127,43 +132,42 @@ foreach my $notice (@{$notices->unblessed}) {
         my $xmlFile = $notice->{from_address}.'_'.$notice->{message_id}."_".$today. ".xml";
         #Write xml to file
         open(my $fh, '>', $tmppath.$xmlFile);
-        print $fh $doc->toString();
+        print $fh $doc->toString($pretty);
         close $fh;
         push @message_ids, $notice->{message_id};
     }
 
 }
 if (@message_ids) {
-    my $zip = Archive::Zip->new();
-    my $zipFile = $config."-kirjasto-finvoice-".$today. ".zip";
 
     chdir $tmppath;
     my @files = <*.xml>;
-
-    foreach my $file (@files) {
-        $zip->addFile( $file );
-    }
-
-    unless ( $zip->writeToFileNamed($tmppath . $zipFile) == AZ_OK ) {
-        die 'error creating zip-file';
-    }
-
-    foreach my $file (@files) {
-        unlink $file;
-    }
-
-    my @zipfiles = <*.zip>;
     my $archivepath = $output_directory.'/archived/';
-    foreach my $file (@zipfiles) {
+    if ($zip) {
+        my $zipwrite = Archive::Zip->new();
+        my $zipFile = $config."-kirjasto-finvoice-".$today. ".zip";
+        foreach my $file (@files) {
+            $zipwrite->addFile( $file );
+        }
 
-        system ("sshpass -p $finvoiceconfig->{password} sftp $finvoiceconfig->{username}\@$finvoiceconfig->{host} > /dev/null 2>&1 << EOF
-        cd $finvoiceconfig->{filepath}
-        put $tmppath$file
-        bye
-        EOF") == 0 or die "system failed: $!";
+        unless ( $zipwrite->writeToFileNamed($tmppath . $zipFile) == AZ_OK ) {
+            die 'error creating zip-file';
+        }
 
-        move ("$tmppath$file", "$archivepath$file") or die "The move operation failed: $!";
+        foreach my $file (@files) {
+            unlink $file;
+        }
 
+        my @zipfiles = <*.zip>;
+
+        foreach my $file (@zipfiles) {
+            sftp_transfer($file, $archivepath.$file);
+        }
+    } else {
+
+        foreach my $file (@files) {
+            sftp_transfer($file, $archivepath.$file);
+        }
     }
 
     foreach my $message_id (@message_ids) {
@@ -172,4 +176,30 @@ if (@message_ids) {
     }
 } else {
     print "Not any notices processed\n";
+}
+
+sub sftp_transfer {
+    my ($file, $archivepath) = @_;
+
+    # Connect and send with SFTP
+    my $sftp = Net::SFTP::Foreign->new('host' => $finvoiceconfig->{host}, 
+                                       'port' => $finvoiceconfig->{port} || '22', 
+                                       'user' => $finvoiceconfig->{username},
+                                       'password' => $finvoiceconfig->{password});
+
+    if ( $sftp->error ) {
+        die "Logging in to SFTP server failed with: ".$sftp->error."\n";
+    }
+
+    unless ( $sftp->put($tmppath.$file, $finvoiceconfig->{filepath}.$file.'.part', copy_perms => 0, copy_time => 0)) {
+        die "Transferring file to SFTP server failed with: ".$sftp->error."\n";
+    }
+
+    unless ( $sftp->rename($finvoiceconfig->{filepath}.$file.'.part', $finvoiceconfig->{filepath}.$file)) {
+        die "Renaming a file on SFTP server failed with: ".$sftp->error."\n";
+    }
+
+
+    move ("$tmppath$file", "$archivepath") or die "The move operation failed: $!";
+
 }

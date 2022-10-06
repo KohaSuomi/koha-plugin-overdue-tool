@@ -11,18 +11,16 @@ use C4::Context;
 use utf8;
 use JSON;
 
-use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Config;
-
 ## Here we set our plugin version
-our $VERSION = "1.7.3";
+our $VERSION = "2.0.3";
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {
     name            => 'Laskutustyökalu',
     author          => 'Johanna Räisä',
     date_authored   => '2020-12-28',
-    date_updated    => "2022-05-12",
-    minimum_version => '17.05.00.000',
+    date_updated    => "2022-09-03",
+    minimum_version => '21.11.00.000',
     maximum_version => undef,
     version         => $VERSION,
     description     => 'Laskutustyökalu laskujen lähetykseen',
@@ -55,27 +53,25 @@ sub tool {
     my ( $self, $args ) = @_;
     my $cgi = $self->{'cgi'};
 
-    $self->tool_view();
-}
+    my $user = C4::Context->userenv;
+    my @patrons = split(',', $self->retrieve_data('allowedpatrons'));
+    my $allow = $user->{'flags'} == 1 ? 1 : 0;
 
-sub api {
-    my ( $self, $args ) = @_;
-    my $cgi = $self->{'cgi'};
-    my $data = JSON::decode_json($cgi->param('POSTDATA'));
-    $self->store_data(
-        {
-            delaymonths           => $data->{'params'}->{'delaymonths'},
-            maxyears              => $data->{'params'}->{'maxyears'},
-            invoicelibrary        => $data->{'params'}->{'invoicelibrary'},
-            invoicenotforloan     => $data->{'params'}->{'invoicenotforloan'},
-            groupsettings         => $data->{'params'}->{'groupsettings'},
-
+    foreach my $borrowernumber (@patrons) {
+        if ($borrowernumber eq $user->{'number'}) {
+            $allow = 1;
+            last;
         }
-    );
+    }
 
-    print $cgi->header( -type => 'text/json', -charset => 'UTF-8' );
-    print JSON::to_json({message => 'success'});
-    exit 0;
+    if ($allow) {
+        my $template = $self->get_template({ file => 'tool.tt' });
+        print $cgi->header(-charset    => 'utf-8');
+        print $template->output();
+    } else {
+        print $cgi->header(-type => 'text/plain', -status => '403 Forbidden');
+    }
+    
 }
 
 sub configure {
@@ -83,20 +79,6 @@ sub configure {
     my $cgi = $self->{'cgi'};
 
     my $template = $self->get_template({ file => 'config.tt' });
-    my $settings = $self->retrieve_data('groupsettings') ? JSON::from_json($self->retrieve_data('groupsettings')) : [];
-    my $groupsettings = set_group_settings($settings);
-
-    my $json = {
-        delaymonths => $self->retrieve_data('delaymonths'),
-        maxyears => $self->retrieve_data('maxyears'),
-        invoicelibrary => $self->retrieve_data('invoicelibrary'),
-        invoicenotforloan => $self->retrieve_data('invoicenotforloan'),
-        groupsettings => $groupsettings
-    };
-    $template->param(
-        data => JSON::to_json($json),
-    );
-
     print $cgi->header(-charset    => 'utf-8');
     print $template->output();
 
@@ -109,7 +91,8 @@ sub configure {
 sub install() {
     my ( $self, $args ) = @_;
 
-    return 1;
+    $self->table_inserts();
+    
 }
 
 ## This is the 'upgrade' method. It will be triggered when a newer version of a
@@ -126,60 +109,39 @@ sub upgrade {
 sub uninstall() {
     my ( $self, $args ) = @_;
 
-    return 1;
+    $self->table_deletes();
 }
 
-sub tool_view {
+sub api_routes {
     my ( $self, $args ) = @_;
-    my $cgi = $self->{'cgi'};
-    my $template = $self->get_template({ file => 'tool.tt' });
 
-    my $branch = C4::Context->userenv->{'branch'};
-    my $branchsettings = get_branch_settings($branch);
-    my $groupsettings = $self->retrieve_data('groupsettings') || '[]';
-    my $overduerules = check_overdue_rules($branch, $self->retrieve_data("delaymonths"));
-    my $newsettings = get_group_settings(JSON::from_json($groupsettings), $branchsettings->{librarygroup});
+    my $spec_str = $self->mbf_read('openapi.json');
+    my $spec     = decode_json($spec_str);
+
+    return $spec;
+}
+
+sub api_namespace {
+    my ( $self ) = @_;
+    
+    return 'kohasuomi';
+}
+
+sub table_inserts {
+    my ( $self ) = @_;
 
     my $dbh = C4::Context->dbh;
-    my $sth_invoicenumber=$dbh->prepare('SELECT invoicenumber FROM sequences;');
-    $sth_invoicenumber->execute();
-    my $invoiceno=$sth_invoicenumber->fetchrow();
-    
-    my $json = {
-        userlibrary => $branch,
-        maxyears => $self->retrieve_data('maxyears'),
-        libraries => $branchsettings->{libraries},
-        librarygroup => $branchsettings->{librarygroup},
-        invoiceletters => $branchsettings->{invoiceletters},
-        overduerules => $overduerules,
-        invoicelibrary => $self->retrieve_data('invoicelibrary'),
-        invoicenotforloan => $self->retrieve_data('invoicenotforloan'),
-        debarment => $newsettings->{debarment},
-        addreplacementprice   => $newsettings->{addreplacementprice},
-        addreferencenumber  => $newsettings->{addreferencenumber},
-        increment   => $newsettings->{increment},
-        overduefines => $newsettings->{overduefines},
-        invoicefine => $newsettings->{invoicefine},
-        accountnumber => $newsettings->{accountnumber},
-        biccode => $newsettings->{biccode},
-        businessid => $newsettings->{businessid},
-        patronmessage => $newsettings->{patronmessage}, 
-        guaranteemessage => $newsettings->{guaranteemessage},
-        grouplibrary => $newsettings->{grouplibrary},
-        groupaddress => $newsettings->{groupaddress},
-        groupzipcode => $newsettings->{groupzipcode}, 
-        groupcity => $newsettings->{groupcity},
-        groupphone => $newsettings->{groupphone},
-        pluginversion => $VERSION,
-        invoicenumber => $invoiceno,
+    $dbh->do("INSERT INTO message_transport_types (message_transport_type) VALUES ('finvoice');");
+    $dbh->do("INSERT INTO message_transport_types (message_transport_type) VALUES ('pdf');");
+    $dbh->do("INSERT INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','invoicenumber','1');");
+}
 
-    };
-    $template->param(
-        data => JSON::to_json($json)
-    );
+sub table_deletes {
+    my ( $self ) = @_;
 
-    print $cgi->header(-charset    => 'utf-8');
-    print $template->output();
+    my $dbh = C4::Context->dbh;
+    $dbh->do("DELETE FROM message_transport_types where message_transport_type = 'finvoice';");
+    $dbh->do("DELETE FROM message_transport_types where message_transport_type = 'pdf';");
 }
 
 1;

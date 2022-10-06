@@ -1,6 +1,6 @@
 const patronData = Vue.component('patrondata', {
   template:
-    '<div><i v-if="loader" class="fas fa-circle-notch fa-spin"></i><span v-else><span class="d-block">{{patron.surname}}, {{patron.firstname}} ({{guarantorssnkey}})</span><span class="d-block">{{patron.address}}, {{patron.zipcode}} {{patron.city}}</span></div>',
+    '<div><i v-if="loader" class="fas fa-circle-notch fa-spin"></i><span v-else><span class="d-block">{{patron.surname}}, {{patron.firstname}} ({{guarantorssnkey}})</span><span class="d-block">{{patron.address}}, {{patron.zipcode}} {{patron.city}}</span></span></div>',
   props: ['borrowernumber', 'guarantorssnkey'],
   data() {
     return {
@@ -105,11 +105,8 @@ const resultList = Vue.component('result-list', {
     }
   },
   computed: {
-    invoiceLetters() {
-      return this.$store.state.invoiceLetters;
-    },
-    letterFilter() {
-      return this.$store.getters.filterLetters;
+    invoiceType() {
+      return this.$store.state.invoiceType;
     },
     invoiced() {
       return this.$store.state.invoiced;
@@ -122,7 +119,7 @@ const resultList = Vue.component('result-list', {
     activate: function () {
       this.isActive = !this.isActive;
     },
-    createInvoice: function (letter_code, preview, all) {
+    createInvoice: function (preview, all) {
       if (!preview) {
         this.$store.commit('addInvoiceNumber', this.invoicenumber+1);
       }
@@ -158,26 +155,33 @@ const resultList = Vue.component('result-list', {
         firstname: this.result.firstname,
         cardnumber: this.result.cardnumber,
         invoicenumber: this.$store.state.invoiceNumber,
-        letter_code: letter_code,
+        letter_code: 'ODUECLAIM',
         grouplibrary: this.$store.state.groupLibrary,
         groupaddress: this.$store.state.groupAddress,
         groupcity: this.$store.state.groupCity,
         groupzipcode: this.$store.state.groupZipcode,
         groupphone: this.$store.state.groupPhone,
+        guarantordebarment: this.$store.state.guarantorDebarment
       };
-      
-      if (letter_code == 'EINVOICE') {
-        params.letter_code = 'ODUECLAIM';
+
+      if (this.invoiceType == 'FINVOICE' && !preview) {
+        params.message_transport_type = 'finvoice';
+      } else if (this.invoiceType == 'EINVOICE' && !preview) {
         params.message_transport_type = 'print';
+      } else {
+        params.message_transport_type = 'pdf';
       }
 
-      if (this.result.guarantorid) {
+      if (this.result.guarantorid && !this.$store.state.blockedGuarantors.some(data => data === this.result.categorycode)) {
         params.guarantee = this.result.borrowernumber;
+      } else if (this.result.guarantorid && this.$store.state.blockedGuarantors.some(data => data === this.result.categorycode)) {
+        params.guarantor = this.result.guarantorid;
       }
+
       if (preview) {
         params.preview = true;
       }
-      let patronid = this.result.guarantorid
+      let patronid = this.result.guarantorid && !this.$store.state.blockedGuarantors.some(data => data === this.result.categorycode)
         ? this.result.guarantorid
         : this.result.borrowernumber;
       if (this.newcheckouts.length) {
@@ -189,17 +193,8 @@ const resultList = Vue.component('result-list', {
       }
     },
     previewPDF: function (preview, all) {
-      this.createInvoice('ODUECLAIM', preview, all);
+      this.createInvoice(preview, all);
       this.$parent.previewPDF(preview);
-    },
-    onlyPreview: function () {
-      let retval = false;
-      this.$store.state.invoiceLetters.forEach((element) => {
-        if (element == 'FINVOICE' || element == 'EINVOICE') {
-          retval = true;
-        }
-      });
-      return retval;
     },
     newPrice(val, index) {
       var intvalue = Math.floor(val);

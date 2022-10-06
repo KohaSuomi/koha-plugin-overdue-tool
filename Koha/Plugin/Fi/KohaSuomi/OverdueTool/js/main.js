@@ -24,43 +24,7 @@ new Vue({
     };
   },
   mounted() {
-    store.commit('addInvoiceLibrary', jsondata.invoicelibrary);
-    store.commit('addMaxYears', jsondata.maxyears);
-    store.commit('addLibraries', jsondata.libraries);
-    store.commit('addInvoiceLetters', jsondata.invoiceletters);
-    store.commit('addUserLibrary', jsondata.userlibrary);
-    store.commit('addNotForLoanStatus', jsondata.invoicenotforloan);
-    store.commit('debarment', jsondata.debarment);
-    store.commit('addReplacementPrice', jsondata.addreplacementprice);
-    store.commit('addReferenceNumber', jsondata.addreferencenumber);
-    store.commit('addInvoiceFine', jsondata.invoicefine);
-    store.commit('addOverdueFines', jsondata.overduefines);
-    store.commit('addIncrement', jsondata.increment);
-    store.commit('addLibraryGroup', jsondata.librarygroup);
-    store.commit('addAccountNumber', jsondata.accountnumber);
-    store.commit('addBicCode', jsondata.biccode);
-    store.commit('addBusinessId', jsondata.businessid);
-    store.commit('addPatronMessage', jsondata.patronmessage);
-    store.commit('addGuaranteeMessage', jsondata.guaranteemessage);
-    store.commit('addCategoryCodes', jsondata.overduerules.categorycodes);
-    store.commit('addGroupLibrary', jsondata.grouplibrary);
-    store.commit('addGroupAddress', jsondata.groupaddress);
-    store.commit('addGroupCity', jsondata.groupcity);
-    store.commit('addGroupZipcode', jsondata.groupzipcode);
-    store.commit('addGroupPhone', jsondata.groupphone);
-    store.commit('addInvoiceNumber', jsondata.invoicenumber);
-    store.dispatch('setDates', jsondata.overduerules);
-    this.selectCategory = jsondata.overduerules.categorycodes;
-    this.fetch();
-    const sumFilter = localStorage.getItem('sumFilter');
-    if (sumFilter) {
-      this.sumFilter = sumFilter;
-    }
-    const pluginVersion = localStorage.getItem('invoicePluginVersion');
-    if (pluginVersion != jsondata.pluginversion) {
-      $('#reloadModal').modal('show');
-      localStorage.setItem('invoicePluginVersion', jsondata.pluginversion);
-    }
+    this.getConfig();
   },
   computed: {
     results() {
@@ -120,18 +84,53 @@ new Vue({
     notice() {
       return store.state.notice;
     },
-    invoiceLetters() {
-      return store.state.invoiceLetters;
+    invoiceType() {
+      return store.state.invoiceType;
     },
     created() {
       return store.state.created;
     },
   },
   methods: {
+    getConfig() {
+      axios
+        .get('/api/v1/contrib/kohasuomi/overdues/config')
+        .then((response) => {
+          store.dispatch('setSettings', response.data);
+          this.selectCategory = response.data.overduerules.categorycodes;
+          const sumFilter = localStorage.getItem('sumFilter');
+          if (sumFilter) {
+            this.sumFilter = sumFilter;
+          }
+          const pluginVersion = localStorage.getItem('invoicePluginVersion');
+          if (pluginVersion != response.data.pluginversion) {
+            $('#reloadModal').modal('show');
+            localStorage.setItem(
+              'invoicePluginVersion',
+              response.data.pluginversion
+            );
+          }
+          this.fetch();
+        })
+        .catch((error) => {
+          //console.log(error);
+          store.commit('addErrors', error.response.data.error);
+        });
+    },
     fetch() {
       store.commit('setCreated', false);
       store.dispatch('fetchOverdues');
       this.activate();
+    },
+    async refreshInvoiceNumber() {
+      return axios
+        .get('/api/v1/contrib/kohasuomi/overdues/config')
+        .then((response) => {
+          store.commit('addInvoiceNumber', response.data.invoicenumber);
+        })
+        .catch((error) => {
+          store.commit('addErrors', error.response.data.error);
+        });
     },
     previewPDF(preview, all) {
       if (!all) {
@@ -142,11 +141,13 @@ new Vue({
     },
     async allFinvoices() {
       if (this.$refs.resultComponentRef) {
+        await this.refreshInvoiceNumber();
         this.finvoiceBtn = true;
         store.commit('setCreated', false);
+        this.refreshInvoiceNumber();
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
-            await element.createInvoice('FINVOICE', false, true);
+            await element.createInvoice(false, true);
           })
         ).then(() => {
           this.finvoiceBtn = false;
@@ -160,12 +161,13 @@ new Vue({
         if (preview) {
           this.previewBtn = true;
         } else {
+          await this.refreshInvoiceNumber();
           this.pdfBtn = true;
         }
         store.commit('setCreated', false);
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
-            await element.createInvoice('ODUECLAIM', preview, true);
+            await element.createInvoice(preview, true);
           })
         ).then(() => {
           this.previewPDF(preview, true);
@@ -180,11 +182,12 @@ new Vue({
     },
     async allEinvoices() {
       if (this.$refs.resultComponentRef) {
+        await this.refreshInvoiceNumber();
         this.einvoiceBtn = true;
         store.commit('setCreated', false, true);
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
-            await element.createInvoice('EINVOICE', false);
+            await element.createInvoice(false, false);
           })
         ).then(() => {
           this.einvoiceBtn = false;
@@ -230,5 +233,8 @@ new Vue({
       $('.page-link').removeClass('bg-primary text-white');
       $('[data-current=' + this.page + ']').addClass('bg-primary text-white');
     },
+    dismissCreated() {
+      store.commit("setCreated", false);
+    }
   },
 });

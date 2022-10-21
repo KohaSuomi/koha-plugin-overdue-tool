@@ -100,9 +100,22 @@ sub set {
                 $item->{overduefine} = $overdueline ? $overdueline->amountoutstanding : 0;
                 $totalfines = $totalfines + $item->{overduefine};
             }
+
+            # if author + title combination is over 100 chars, remove extra characters from title
+            # for this, trim values before passing them forward
+            my $author = _escape_string($repeat->{author});
+            my $title = _escape_string($repeat->{title});
+            my $auth_title = $author." - ".$title;
+            my $max_length = 100;
+            my $title;
+            if(length($auth_title) > $max_length){
+                my $diff = $max_length - length($auth_title);
+                $title = substr($repeat->{title}, 0, $diff);
+            }
+
             my $biblio = {
-                title => _escape_string($repeat->{title}),
-                author => _escape_string($repeat->{author}),
+                title => $title,
+                author => $author,
             };
             
             push @items, {"items" => $item, "biblio" => $biblio, "biblioitems" => $repeat->{biblionumber}};
@@ -288,6 +301,7 @@ sub _escape_string {
     $string =~ s/</&lt;/sg;
     $string =~ s/>/&gt;/sg;
     $string =~ s/"/&quot;/sg;
+    chop($string); #also remove extra characters from the end of string
     
     return $string;
 }

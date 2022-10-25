@@ -107,7 +107,6 @@ sub set {
             my $title = _escape_string($repeat->{title});
             my $auth_title = $author." - ".$title;
             my $max_length = 100;
-            my $title;
             if(length($auth_title) > $max_length){
                 my $diff = $max_length - length($auth_title);
                 $title = substr($repeat->{title}, 0, $diff);

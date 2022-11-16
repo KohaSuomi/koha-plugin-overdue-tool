@@ -487,6 +487,14 @@
                 "type": "integer",
                 "description": "Total number of checkouts, excluding all limitations made by limit and offset query parameters. Please note that because of this, the number may not be equal to the array elements returned in 'records' array."
               },
+              "totalItems": {
+                "type": "integer",
+                "description": "Total number of items charged"
+              },
+              "totalSum": {
+                "type": "string",
+                "description": "How much has been charged"
+              },
               "records": {
                 "type": "array",
                 "items": {

@@ -32,7 +32,9 @@ sub get {
     my $c = shift->openapi->valid_input or return;
 
     my $startdate = $c->validation->param('startdate');
+    $startdate = "$startdate 00:00:00";
     my $enddate = $c->validation->param('enddate');
+    $enddate = "$enddate 23:59:59";
     my @libraries = split(',', $c->validation->param('libraries'));
     my @categorycodes = split(',', $c->validation->param('categorycodes'));
     my $invoicelibrary = $c->validation->param('invoicelibrary');

@@ -87,7 +87,7 @@ sub get {
         my $borcheckouts = Koha::Checkouts->search(
             {
                 borrowernumber => $checkout->{borrowernumber},
-                date_due => { '>=' => $lastdate, '<=' => $enddate  },
+                date_due => { '>=' => $startdate, '<=' => $enddate  },
                 'item.notforloan' => $notforloan,
                 $librarytable => \@libraries,
             }, 

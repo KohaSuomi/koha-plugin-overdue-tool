@@ -78,8 +78,6 @@ sub get {
     );
 
     my $results = [];
-    my $totalItems = 0;
-    my $totalSum = 0;
 
     foreach my $checkout (@{$checkouts->unblessed}){
         my $items = [];
@@ -97,11 +95,6 @@ sub get {
                 '+as' => ['barcode', 'enumchron', 'itemcallnumber', 'itype', 'replacementprice', 'biblionumber', 'dateaccessioned', 'title', 'author'],
             }
         )->unblessed;
-
-        $totalItems += scalar @$borcheckouts;
-        foreach my $borcheckout (@$borcheckouts){
-            $totalSum += $borcheckout->{replacementprice} if $borcheckout->{replacementprice};
-        }
 
         my $borrowercheckouts;
         my $patron = Koha::Patrons->find($checkout->{borrowernumber})->unblessed;
@@ -130,13 +123,8 @@ sub get {
         push @{$results}, $borrowercheckouts
     }
 
-    $totalSum = sprintf("%.2f", $totalSum);
-    $totalSum =~ tr/./,/;
-
     return $c->render( status => 200, openapi => {
         total => $checkouts_count,
-        totalItems => $totalItems,
-        totalSum => $totalSum,
         records => $results
     });
 }

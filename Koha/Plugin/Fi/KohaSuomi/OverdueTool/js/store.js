@@ -10,8 +10,6 @@ const store = new Vuex.Store({
     endPage: 11,
     lastPage: 0,
     totalResults: 0,
-    totalItems: 0,
-    totalSum: 0,
     startDate: '',
     endDate: '',
     disableDate: '',
@@ -66,12 +64,6 @@ const store = new Vuex.Store({
     },
     addTotalResults(state, value) {
       state.totalResults = value;
-    },
-    addTotalItems(state, value) {
-      state.totalItems = value;
-    },
-    addTotalSum(state, value) {
-      state.totalSum = value;
     },
     addResultOffset(state, value) {
       state.resultOffset = value;
@@ -347,8 +339,6 @@ const store = new Vuex.Store({
             .then((response) => {
               response.data.records.forEach((element) => {
                 if (offset == state.offset) {
-                  commit('addTotalItems', response.data.totalItems);
-                  commit('addTotalSum', response.data.totalSum);
                   commit('pushResults', element);
                 }
               });
@@ -490,6 +480,27 @@ const store = new Vuex.Store({
     },
   },
   getters: {
+    addTotalItems: (state) => () => {
+      let total = 0;
+      state.results.forEach((patron) => {
+        patron.checkouts.forEach((checkout) => {
+          total++;
+        });
+      });
+      return total;
+    },
+    addTotalSum: (state) => () => {
+      let total = 0;
+      state.results.forEach((patron) => {
+        patron.checkouts.forEach((checkout) => {
+          if(checkout.replacementprice == null){
+            checkout.replacementprice = 0;
+          }
+          total += parseFloat(checkout.replacementprice);
+        });
+      });
+      return total.toFixed(2).replace(".", ",");
+    },
     disabledEndDates: (state) => {
       return { from: new Date(state.disableDate) };
     },

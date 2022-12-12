@@ -37,10 +37,10 @@ new Vue({
       return store.state.totalResults;
     },
     totalItems() {
-      return store.state.totalItems;
+      return store.getters.addTotalItems();
     },
     totalSum() {
-      return store.state.totalSum;
+      return store.getters.addTotalSum();
     },
     resultOffset() {
       return store.state.resultOffset;

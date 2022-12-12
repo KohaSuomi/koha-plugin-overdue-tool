@@ -122,7 +122,7 @@
 							<ul style="list-style: none;">
 								<li><b> Tuloksia: {{totalResults}} </b></li>
 								<li v-if="invoiced">Laskutettuja niteitä yhteensä: {{totalItems}} </li>
-								<li v-if="invoiced">Laskutettujen niteiden yhteissumma: {{totalSum}} </li>
+								<li v-if="invoiced">Laskutettujen niteiden yhteissumma: {{totalSum}} euroa</li>
 							</ul>
 							</div>
 							<div class="row d-table w-100 p-3 border-bottom" style="table-layout:fixed;">

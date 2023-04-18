@@ -44,7 +44,7 @@ sub get {
     my $other_params = {
             'columns' => [ qw/borrowernumber/ ],
             'group_by' => [ qw/borrowernumber/ ],
-            join => { 'item' => '', 'patron'},
+            join => { 'item' => '', 'patron' => ''},
         };
     my %attributes;
     my $notforloan = $invoiced ? { '=' => $invoicedstatus} : { '!=' => $invoicedstatus};

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<?xml-stylesheet href="Finvoice.xsl" type="text/xsl"?>
+<Finvoice Version="3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Finvoice3.0.xsd">
+  <MessageTransmissionDetails>
+    <MessageSenderDetails>
+      <FromIdentifier SchemeID="0037"><<accountnumber>></FromIdentifier>
+      <FromIntermediator><<biccode>></FromIntermediator>
+    </MessageSenderDetails>
+    <MessageReceiverDetails>
+      <ToIdentifier SchemeID="0037"><<borrowers.borrowernumber>></ToIdentifier>
+      <ToIntermediator><<borrowers.borrowernumber>></ToIntermediator>
+    </MessageReceiverDetails>
+    <MessageDetails>
+      <MessageIdentifier></MessageIdentifier>
+      <MessageTimeStamp></MessageTimeStamp>
+      <SpecificationIdentifier>EN16931</SpecificationIdentifier>
+    </MessageDetails>
+  </MessageTransmissionDetails>
+  <SellerPartyDetails>
+    <SellerPartyIdentifier><<businessid>></SellerPartyIdentifier>
+    <SellerOrganisationName><<grouplibrary>></SellerOrganisationName>
+    <SellerPostalAddressDetails>  
+      <SellerStreetName><<groupaddress>></SellerStreetName>
+      <SellerTownName><<groupzipcode>></SellerTownName>
+      <SellerPostCodeIdentifier><<groupcity>></SellerPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Suomi</CountryName>
+    </SellerPostalAddressDetails>
+  </SellerPartyDetails>
+  <SellerInformationDetails> 
+          <SellerAccountDetails>
+      <SellerAccountID IdentificationSchemeName="IBAN"><<accountnumber>></SellerAccountID>
+      <SellerBic IdentificationSchemeName="BIC"><<biccode>></SellerBic>
+    </SellerAccountDetails>
+  </SellerInformationDetails>
+[% IF guarantorsurname %]
+  <InvoiceRecipientPartyDetails>                            
+    <InvoiceRecipientOrganisationName><<guarantorsurname>> <<guarantorfirstname>></InvoiceRecipientOrganisationName>
+    <InvoiceRecipientPostalAddressDetails>
+      <InvoiceRecipientStreetName><<guarantoraddress>></InvoiceRecipientStreetName>
+      <InvoiceRecipientTownName><<guarantorcity>></InvoiceRecipientTownName>
+      <InvoiceRecipientPostCodeIdentifier><<guarantorzipcode>></InvoiceRecipientPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Suomi</CountryName>
+    </InvoiceRecipientPostalAddressDetails>
+  </InvoiceRecipientPartyDetails>
+[% END %]
+  <BuyerPartyDetails>
+    <BuyerPartyIdentifier></BuyerPartyIdentifier>                             
+    <BuyerOrganisationName><<borrowers.surname>> <<borrowers.firstname>></BuyerOrganisationName>
+    <BuyerPostalAddressDetails>
+      <BuyerStreetName><<borrowers.address>></BuyerStreetName>
+      <BuyerTownName><<borrowers.city>></BuyerTownName>
+      <BuyerPostCodeIdentifier><<borrowers.zipcode>></BuyerPostCodeIdentifier>
+      <CountryCode>FI</CountryCode>
+      <CountryName>Suomi</CountryName>
+    </BuyerPostalAddressDetails>
+  </BuyerPartyDetails>
+  <DeliveryDetails>
+    <DeliveryDate Format="CCYYMMDD"><<finvoice_today>></DeliveryDate>
+  </DeliveryDetails>
+  <InvoiceDetails>
+     <InvoiceTypeCode>INV01</InvoiceTypeCode>
+    <InvoiceTypeCodeUN>380</InvoiceTypeCodeUN>
+    <InvoiceTypeText>Lasku</InvoiceTypeText>  
+    <OriginCode>Original</OriginCode>
+    <InvoiceNumber><<invoicenumber>></InvoiceNumber>
+    <InvoiceDate Format="CCYYMMDD"><<finvoice_today>></InvoiceDate>
+    <RowsTotalVatExcludedAmount AmountCurrencyIdentifier="EUR"><<totalfines>></RowsTotalVatExcludedAmount>
+    <InvoiceTotalVatExcludedAmount AmountCurrencyIdentifier="EUR"><<totalfines>></InvoiceTotalVatExcludedAmount>
+    <InvoiceTotalVatAmount AmountCurrencyIdentifier="EUR">0,00</InvoiceTotalVatAmount>
+    <InvoiceTotalVatIncludedAmount AmountCurrencyIdentifier="EUR"><<totalfines>></InvoiceTotalVatIncludedAmount>
+   <InvoiceFreeText>PALAUTTAMATON AINEISTO.</InvoiceFreeText> 
+   <InvoiceFreeText>LASKUA EI TARVITSE MAKSAA, JOS AINEISTO  PALAUTETAAN.</InvoiceFreeText>
+   <InvoiceFreeText>Veroton vahingonkorvaus</InvoiceFreeText>
+    <PaymentTermsDetails>
+      <PaymentTermsFreeText>14 päivää netto</PaymentTermsFreeText>
+      <InvoiceDueDate Format="CCYYMMDD"><<finvoice_duedate>></InvoiceDueDate>
+    </PaymentTermsDetails>
+  </InvoiceDetails><item>
+  <InvoiceRow>
+    <ArticleName><<biblio.author>> - <<biblio.title>></ArticleName>
+ <ArticleDescription></ArticleDescription> 
+    <InvoicedQuantity QuantityUnitCode="kpl" QuantityUnitCodeUN="C62">1</InvoicedQuantity>
+    <UnitPriceAmount AmountCurrencyIdentifier="EUR"><<items.replacementprice>></UnitPriceAmount>
+    <UnitPriceNetAmount AmountCurrencyIdentifier="EUR"><<items.replacementprice>></UnitPriceNetAmount>
+    <RowPositionIdentifier><<items.count>></RowPositionIdentifier>
+    <RowFreeText>Lainaaja: <<issueborname>> <<issueborbarcode>></RowFreeText>
+    <RowFreeText>Lainan eräpäivä: <<items.date_due>></RowFreeText> 
+    <RowFreeText><<items.barcode>>, <<biblioitems.itemtype>></RowFreeText>
+  </InvoiceRow></item>
+  <EpiDetails>
+    <EpiIdentificationDetails>
+      <EpiDate Format="CCYYMMDD"><<finvoice_today>></EpiDate>
+      <EpiReference />
+    </EpiIdentificationDetails>
+    <EpiPartyDetails>
+      <EpiBfiPartyDetails>
+        <EpiBfiIdentifier IdentificationSchemeName="BIC"><<biccode>></EpiBfiIdentifier>
+      </EpiBfiPartyDetails>
+      <EpiBeneficiaryPartyDetails>
+        <EpiNameAddressDetails>Kirjasto</EpiNameAddressDetails>
+        <EpiAccountID IdentificationSchemeName="IBAN"><<accountnumber>></EpiAccountID>
+      </EpiBeneficiaryPartyDetails>
+    </EpiPartyDetails>
+    <EpiPaymentInstructionDetails>
+      <EpiRemittanceInfoIdentifier IdentificationSchemeName="SPY">000000</EpiRemittanceInfoIdentifier>
+      <EpiInstructedAmount AmountCurrencyIdentifier="EUR"><<totalfines>></EpiInstructedAmount>
+      <EpiCharge ChargeOption="SLEV"/>
+      <EpiDateOptionDate Format="CCYYMMDD"><<finvoice_duedate>></EpiDateOptionDate>
+      <EpiPaymentMeansCode>58</EpiPaymentMeansCode>
+    </EpiPaymentInstructionDetails>
+  </EpiDetails>
+</Finvoice>

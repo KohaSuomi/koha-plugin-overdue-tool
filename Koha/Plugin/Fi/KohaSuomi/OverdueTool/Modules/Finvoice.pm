@@ -18,7 +18,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(process_xml);
 
 sub process_xml {
-    my ( $notice ) = @_;
+    my ( $notice, $noescape ) = @_;
 
     my $parser = XML::LibXML->new(recover => 1);
     my $data = Encode::encode( "iso-8859-15", $notice->{content});
@@ -43,7 +43,7 @@ sub process_xml {
 
     for my $invoicerow ($doc->findnodes("Finvoice/InvoiceRow")) {
         my ($row) = $invoicerow->findnodes('ArticleName');
-        my $newvalue = _escape_string($row->textContent);
+        my $newvalue = !$noescape ? _escape_string($row->textContent) : $row->textContent;
         $row->removeChildNodes;
         $row->appendText($newvalue); 
     }

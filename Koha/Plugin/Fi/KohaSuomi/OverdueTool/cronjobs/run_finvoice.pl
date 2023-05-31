@@ -59,12 +59,13 @@ Usage: $0 OUTPUT_DIRECTORY
   --xsd             XSD file path for validation.
   --zip             Create zip from xml files
   --pretty          Create human readable xml files
+  --noescape        Do not use method _escape_string with field ArticleName.
 
 USAGE
     exit $_[0];
 }
 
-my ( $help, $config, $path, $validate, $xsd, $zip, $pretty);
+my ( $help, $config, $path, $validate, $xsd, $zip, $pretty, $noescape);
 
 GetOptions(
     'h|help'     => \$help,
@@ -73,7 +74,8 @@ GetOptions(
     'v|validate' => \$validate,
     'xsd=s'      => \$xsd,
     'zip'        => \$zip,
-    'pretty'     => \$pretty
+    'pretty'     => \$pretty,
+    'noescape'   => \$noescape
 ) || usage(1);
 
 usage(0) if ($help);
@@ -121,7 +123,7 @@ my $tmppath = $output_directory ."/tmp/";
 my @message_ids;
 foreach my $notice (@{$notices->unblessed}) {
     my $patron = Koha::Patrons->find($notice->{borrowernumber});
-    my $doc = process_xml($notice);
+    my $doc = process_xml($notice, $noescape);
     my $xmlschema = XML::LibXML::Schema->new(location => $xsd);
 	eval {$xmlschema->validate($doc);};
     if ($@ && $validate) {

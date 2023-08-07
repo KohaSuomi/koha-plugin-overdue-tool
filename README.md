@@ -46,4 +46,4 @@ From the release page you can download the latest \*.kpz file
 
 ## Ohjeet pääkäyttäjille
 
-Ohjeet pääkäyttäjille löytyy [repostitorion wikistä](https://github.com/KohaSuomi/koha-plugin-overdue-tool/wiki/Laskutusty%C3%B6kalun-k%C3%A4ytt%C3%B6%C3%B6notto%E2%80%90ohjeet)https://github.com/KohaSuomi/koha-plugin-overdue-tool/wiki/Laskutusty%C3%B6kalun-k%C3%A4ytt%C3%B6%C3%B6notto%E2%80%90ohjeet.
+Ohjeet pääkäyttäjille löytyy [repostitorion wikistä](https://github.com/KohaSuomi/koha-plugin-overdue-tool/wiki/Laskutusty%C3%B6kalun-k%C3%A4ytt%C3%B6%C3%B6notto%E2%80%90ohjeet)

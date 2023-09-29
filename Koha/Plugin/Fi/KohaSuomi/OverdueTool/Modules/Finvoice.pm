@@ -1,5 +1,6 @@
 package Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Finvoice;
 
+use utf8;
 use Modern::Perl;
 use Exporter;
 use XML::LibXML;

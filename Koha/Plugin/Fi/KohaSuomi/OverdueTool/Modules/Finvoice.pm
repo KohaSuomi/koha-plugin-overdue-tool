@@ -45,6 +45,12 @@ sub process_xml {
     for my $invoicerow ($doc->findnodes("Finvoice/InvoiceRow")) {
         my ($row) = $invoicerow->findnodes('ArticleName');
         my $newvalue = !$noescape ? _escape_string($row->textContent) : $row->textContent;
+        my $max_length = 99;
+        if(length($newvalue) > $max_length){
+            # if the string is longer than the max length, truncate it
+            my $diff = $max_length - length($newvalue);
+            $newvalue = substr($newvalue, 0, $diff);
+        }
         $row->removeChildNodes;
         $row->appendText($newvalue); 
     }

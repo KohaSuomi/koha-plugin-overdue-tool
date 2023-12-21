@@ -101,16 +101,8 @@ sub set {
                 $totalfines = $totalfines + $item->{overduefine};
             }
 
-            # if author + title combination is over 100 chars, remove extra characters from title
-            # for this, trim values before passing them forward
             my $author = _escape_string($repeat->{author});
             my $title = _escape_string($repeat->{title});
-            my $auth_title = $author." - ".$title;
-            my $max_length = 99;
-            if(length($auth_title) > $max_length){
-                my $diff = $max_length - length($auth_title);
-                $title = substr($repeat->{title}, 0, $diff);
-            }
 
             my $biblio = {
                 title => $title,

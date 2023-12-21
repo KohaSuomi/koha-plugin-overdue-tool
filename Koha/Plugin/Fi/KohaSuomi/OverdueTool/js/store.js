@@ -480,6 +480,27 @@ const store = new Vuex.Store({
     },
   },
   getters: {
+    addTotalItems: (state) => () => {
+      let total = 0;
+      state.results.forEach((patron) => {
+        patron.checkouts.forEach((checkout) => {
+          total++;
+        });
+      });
+      return total;
+    },
+    addTotalSum: (state) => () => {
+      let total = 0;
+      state.results.forEach((patron) => {
+        patron.checkouts.forEach((checkout) => {
+          if(checkout.replacementprice == null){
+            checkout.replacementprice = 0;
+          }
+          total += parseFloat(checkout.replacementprice);
+        });
+      });
+      return total.toFixed(2).replace(".", ",");
+    },
     disabledEndDates: (state) => {
       return { from: new Date(state.disableDate) };
     },

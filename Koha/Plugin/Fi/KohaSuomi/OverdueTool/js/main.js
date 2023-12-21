@@ -36,6 +36,12 @@ new Vue({
     totalResults() {
       return store.state.totalResults;
     },
+    totalItems() {
+      return store.getters.addTotalItems();
+    },
+    totalSum() {
+      return store.getters.addTotalSum();
+    },
     resultOffset() {
       return store.state.resultOffset;
     },

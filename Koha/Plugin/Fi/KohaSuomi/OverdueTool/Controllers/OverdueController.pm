@@ -32,7 +32,9 @@ sub get {
     my $c = shift->openapi->valid_input or return;
 
     my $startdate = $c->validation->param('startdate');
+    $startdate = "$startdate 00:00:00";
     my $enddate = $c->validation->param('enddate');
+    $enddate = "$enddate 23:59:59";
     my @libraries = split(',', $c->validation->param('libraries'));
     my @categorycodes = split(',', $c->validation->param('categorycodes'));
     my $invoicelibrary = $c->validation->param('invoicelibrary');
@@ -42,7 +44,7 @@ sub get {
     my $other_params = {
             'columns' => [ qw/borrowernumber/ ],
             'group_by' => [ qw/borrowernumber/ ],
-            join => { 'item' => '', 'patron'},
+            join => { 'item' => '', 'patron' => ''},
         };
     my %attributes;
     my $notforloan = $invoiced ? { '=' => $invoicedstatus} : { '!=' => $invoicedstatus};
@@ -76,13 +78,14 @@ sub get {
     );
 
     my $results = [];
+
     foreach my $checkout (@{$checkouts->unblessed}){
         my $items = [];
         my $librarytable = $invoicelibrary eq "itembranch" ? 'item.homebranch' : 'me.branchcode';
         my $borcheckouts = Koha::Checkouts->search(
             {
                 borrowernumber => $checkout->{borrowernumber},
-                date_due => { '>=' => $lastdate, '<=' => $enddate  },
+                date_due => { '>=' => $startdate, '<=' => $enddate  },
                 'item.notforloan' => $notforloan,
                 $librarytable => \@libraries,
             }, 
@@ -92,6 +95,7 @@ sub get {
                 '+as' => ['barcode', 'enumchron', 'itemcallnumber', 'itype', 'replacementprice', 'biblionumber', 'dateaccessioned', 'title', 'author'],
             }
         )->unblessed;
+
         my $borrowercheckouts;
         my $patron = Koha::Patrons->find($checkout->{borrowernumber})->unblessed;
         my $patronssnkey = Koha::Patron::Attributes->search({borrowernumber => $checkout->{borrowernumber}, code => 'SSN'})->next;

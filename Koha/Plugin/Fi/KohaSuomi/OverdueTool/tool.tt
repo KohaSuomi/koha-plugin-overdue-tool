@@ -26,7 +26,7 @@
         <nav aria-label="breadcrumb" class="main-breadcrumb">
             <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/cgi-bin/koha/mainpage.pl">Etusivu</a></li>
-            <li class="breadcrumb-item"><a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugit</a></li>
+            <li class="breadcrumb-item"><a href="/cgi-bin/koha/plugins/plugins-home.pl">Liitännäiset</a></li>
             <li class="breadcrumb-item active" aria-current="page">Laskutustyökalu</li>
             </ol>
         </nav>
@@ -119,7 +119,11 @@
 						</div>
 						<div v-else>
 							<div>
-								<b> Tuloksia: {{totalResults}} </b>
+							<ul style="list-style: none;">
+								<li><b> Tuloksia: {{totalResults}} </b></li>
+								<li v-if="invoiced">Laskutettuja niteitä yhteensä: {{totalItems}} </li>
+								<li v-if="invoiced">Laskutettujen niteiden yhteissumma: {{totalSum}} euroa</li>
+							</ul>
 							</div>
 							<div class="row d-table w-100 p-3 border-bottom" style="table-layout:fixed;">
 								<ul class="list-inline d-table-row font-weight-bold">

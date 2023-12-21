@@ -46,7 +46,7 @@ const priceData = Vue.component('pricedata', {
   filters: {
     currency: function (price) {
       if (price) {
-        return price.replace(/\./g, ',');
+        return price.toString().replace(/\./g, ',');
       }
     },
   },

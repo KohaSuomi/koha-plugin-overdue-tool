@@ -100,9 +100,13 @@ sub set {
                 $item->{overduefine} = $overdueline ? $overdueline->amountoutstanding : 0;
                 $totalfines = $totalfines + $item->{overduefine};
             }
+
+            my $author = _escape_string($repeat->{author});
+            my $title = _escape_string($repeat->{title});
+
             my $biblio = {
-                title => _escape_string($repeat->{title}),
-                author => _escape_string($repeat->{author}),
+                title => $title,
+                author => $author,
             };
             
             push @items, {"items" => $item, "biblio" => $biblio, "biblioitems" => $repeat->{biblionumber}};
@@ -288,6 +292,7 @@ sub _escape_string {
     $string =~ s/</&lt;/sg;
     $string =~ s/>/&gt;/sg;
     $string =~ s/"/&quot;/sg;
+    chop($string); #also remove extra characters from the end of string
     
     return $string;
 }

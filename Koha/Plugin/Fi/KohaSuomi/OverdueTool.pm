@@ -131,9 +131,9 @@ sub table_inserts {
     my ( $self ) = @_;
 
     my $dbh = C4::Context->dbh;
-    $dbh->do("INSERT INTO message_transport_types (message_transport_type) VALUES ('finvoice');");
-    $dbh->do("INSERT INTO message_transport_types (message_transport_type) VALUES ('pdf');");
-    $dbh->do("INSERT INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','invoicenumber','1');");
+    $dbh->do("INSERT IGNORE INTO message_transport_types (message_transport_type) VALUES ('finvoice');");
+    $dbh->do("INSERT IGNORE INTO message_transport_types (message_transport_type) VALUES ('pdf');");
+    $dbh->do("INSERT IGNORE INTO plugin_data (plugin_class,plugin_key,plugin_value) VALUES ('Koha::Plugin::Fi::KohaSuomi::OverdueTool','invoicenumber','1');");
 }
 
 sub table_deletes {

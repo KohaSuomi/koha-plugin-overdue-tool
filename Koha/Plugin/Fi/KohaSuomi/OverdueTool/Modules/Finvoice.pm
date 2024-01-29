@@ -52,6 +52,7 @@ sub process_xml {
             $newvalue = substr($newvalue, 0, $diff);
         }
         $row->removeChildNodes;
+        $newvalue =~ s/"/&quot;/sg;
         $row->appendText($newvalue); 
     }
 

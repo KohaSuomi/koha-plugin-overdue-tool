@@ -291,7 +291,7 @@ sub _escape_string {
     $string =~ s/&/&amp;/sg;
     $string =~ s/</&lt;/sg;
     $string =~ s/>/&gt;/sg;
-    $string =~ s/"/&quot;/sg;
+    #$string =~ s/"/&quot;/sg;
     chop($string); #also remove extra characters from the end of string
     
     return $string;

@@ -78,7 +78,7 @@
   </InvoiceDetails><item>
   <InvoiceRow>
     <ArticleIdentifier><<items.itemnumber>></ArticleIdentifier>
-    <ArticleName><<biblio.author>> - <<biblio.title>></ArticleName>
+    <ArticleName><<biblio.author>> - <<biblio.title>> <<items.enumchron>></ArticleName>
     <InvoicedQuantity QuantityUnitCode="kpl" QuantityUnitCodeUN="C62">1</InvoicedQuantity>
     <UnitPriceAmount AmountCurrencyIdentifier="EUR"><<items.replacementprice>></UnitPriceAmount>
     <UnitPriceNetAmount AmountCurrencyIdentifier="EUR"><<items.replacementprice>></UnitPriceNetAmount>

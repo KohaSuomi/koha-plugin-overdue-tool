@@ -165,16 +165,18 @@ if (@message_ids) {
         foreach my $file (@zipfiles) {
             sftp_transfer($file, $archivepath.$file);
         }
+
+        foreach my $message_id (@message_ids) {
+        C4::Letters::_set_message_status(
+            { message_id => $message_id, status => 'sent'} );
+        }
     } else {
 
         foreach my $file (@files) {
             sftp_transfer($file, $archivepath.$file);
+            my ($library, $message_id) = split(/(\d+)/, $file);
+            C4::Letters::_set_message_status({ message_id => $message_id, status => 'sent'} );
         }
-    }
-
-    foreach my $message_id (@message_ids) {
-        C4::Letters::_set_message_status(
-            { message_id => $message_id, status => 'sent'} );
     }
 } else {
     print "Not any notices processed\n";

@@ -97,6 +97,7 @@ const resultList = Vue.component('result-list', {
       isActive: false,
       newcheckouts: [],
       removecheckouts: [],
+      disableInvoiceButton: false,
     };
   },
   mounted() {
@@ -120,6 +121,7 @@ const resultList = Vue.component('result-list', {
       this.isActive = !this.isActive;
     },
     createInvoice: function (preview, all) {
+      this.disableInvoiceButton = true;
       if (!preview) {
         this.$store.commit('addInvoiceNumber', this.invoicenumber+1);
       }

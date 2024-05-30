@@ -152,6 +152,7 @@ sub set {
             groupzipcode => $body->{groupzipcode}, 
             groupcity => $body->{groupcity},
             groupphone => $body->{groupphone},
+            borrowerlang => _convert_language($body->{lang})
         };
 
 
@@ -291,8 +292,6 @@ sub _escape_string {
     $string =~ s/&/&amp;/sg;
     $string =~ s/</&lt;/sg;
     $string =~ s/>/&gt;/sg;
-    $string =~ s/"/&quot;/sg;
-    chop($string); #also remove extra characters from the end of string
     
     return $string;
 }
@@ -342,6 +341,18 @@ sub _update_invoice_number {
     my ($invoicenumber) = @_;
     my $dbh = C4::Context->dbh;
     my $sth_update = $dbh->do('UPDATE plugin_data SET plugin_value = '.$invoicenumber.' WHERE plugin_class ="Koha::Plugin::Fi::KohaSuomi::OverdueTool" AND plugin_key = "invoicenumber" AND plugin_value < '.$invoicenumber.';');
+}
+
+sub _convert_language {
+    my ($lang) = @_;
+
+    if ($lang eq "default" || $lang eq "fi-FI") {
+        $lang = "fi";
+    } elsif ($lang eq "sv-SE") {
+        $lang = "sv";
+    }
+
+    return $lang;
 }
 
 

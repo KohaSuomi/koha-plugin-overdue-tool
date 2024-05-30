@@ -69,19 +69,6 @@ sub set {
                 $lastissuedate = $body->{message_transport_type} eq 'finvoice' ? $iy.$im.$id : $id.'.'.$im.'.'.$iy;
             }
             $repeat->{replacementprice} =~ tr/,/./;
-            if ($body->{addreplacementprice} && !$preview) {
-                my $accountline = Koha::Account::Lines->search({borrowernumber => $patron_id, itemnumber => $repeat->{itemnumber}, accounttype => 'B'});
-                unless (@{$accountline->unblessed}) {
-                    Koha::Account::Line->new({ 
-                        borrowernumber => $patron_id, 
-                        amountoutstanding => $repeat->{replacementprice}, 
-                        amount => $repeat->{replacementprice},
-                        note => 'Korvaushinta',
-                        accounttype => 'B',
-                        itemnumber => $repeat->{itemnumber},
-                    })->store();
-                }
-            }
             $totalfines = $totalfines + $repeat->{replacementprice};
             $repeat->{replacementprice} =~ tr/./,/;
             my $item = {
@@ -95,11 +82,6 @@ sub set {
                 itemcallnumber => $repeat->{itemcallnumber},
                 barcode => $repeat->{barcode}
             };
-            if ($body->{overduefines}) {
-                my $overdueline = Koha::Account::Lines->find({borrowernumber => $patron_id, itemnumber => $repeat->{itemnumber}, accounttype => 'FU'});
-                $item->{overduefine} = $overdueline ? $overdueline->amountoutstanding : 0;
-                $totalfines = $totalfines + $item->{overduefine};
-            }
 
             my $author = _escape_string($repeat->{author});
             my $title = _escape_string($repeat->{title});

@@ -23,7 +23,6 @@ const store = new Vuex.Store({
     notforloanStatus: '',
     invoiced: false,
     debarment: false,
-    addReplacementPrice: false,
     addReferenceNumber: false,
     categorycodes: [],
     resultOffset: 0,
@@ -31,7 +30,6 @@ const store = new Vuex.Store({
     notice: '',
     increment: '',
     invoicefine: '',
-    overduefines: false,
     accountNumber: '',
     bicCode: '',
     messageId: '',
@@ -128,17 +126,11 @@ const store = new Vuex.Store({
     addInvoiceFine(state, value) {
       state.invoicefine = value;
     },
-    addOverdueFines(state, value) {
-      state.overduefines = value;
-    },
     debarment(state, value) {
       state.debarment = value;
     },
     invoiced(state, value) {
       state.invoiced = value;
-    },
-    addReplacementPrice(state, value) {
-      state.addReplacementPrice = value;
     },
     addIncrement(state, value) {
       state.increment = value;
@@ -233,16 +225,10 @@ const store = new Vuex.Store({
             if (group.debarment) {
               commit('debarment', group.debarment);
             }
-            if (group.addreplacementprice) {
-              commit('addReplacementPrice', group.addreplacementprice);
-            }
             if (group.addreferencenumber) {
               commit('addReferenceNumber', group.addreferencenumber);
             }
             commit('addInvoiceFine', group.invoicefine);
-            if (group.overduefines) {
-              commit('addOverdueFines', group.overduefines);
-            }
             commit('addLibraryGroup', group.groupname);
             commit('addIncrement', group.increment);
             commit('addAccountNumber', group.accountnumber);

@@ -180,20 +180,6 @@
                                                             <label class="custom-control-label" :for="group.groupname + '_guarantordebarment'" ></label>
                                                             </div>
                                                         </li>
-                                                        <li class="list-group-item has-icon">
-                                                            Lisää niteen hinta asiakkaan maksuihin
-                                                            <div class="custom-control custom-control-nolabel custom-switch ml-auto">
-                                                            <input type="checkbox" class="custom-control-input" :id="group.groupname + '_price'" v-model="group.addreplacementprice">
-                                                            <label class="custom-control-label" :for="group.groupname + '_price'"></label>
-                                                            </div>
-                                                        </li>
-                                                        <li class="list-group-item has-icon">
-                                                            Lisää myöhästymismaksut laskuun
-                                                            <div class="custom-control custom-control-nolabel custom-switch ml-auto">
-                                                            <input type="checkbox" class="custom-control-input" :id="group.groupname + '_overduefines'" v-model="group.overduefines">
-                                                            <label class="custom-control-label" :for="group.groupname + '_overduefines'"></label>
-                                                            </div>
-                                                        </li>
                                                         <li class="list-group-item">
                                                             <label for="invoicefine">Laskutuslisä</label>
                                                             <input type="text" class="form-control" name="invoicefine"  v-model="group.invoicefine"/>

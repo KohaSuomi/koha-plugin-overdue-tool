@@ -75,7 +75,6 @@ new Vue({
           allowedpatrons: this.allowedpatrons,
           invoicenotforloan: this.invoicenotforloan,
           debarment: this.debarment,
-          addreplacementprice: this.addreplacementprice,
           groupsettings: JSON.stringify(this.groupsettings),
         })
         .then(() => {

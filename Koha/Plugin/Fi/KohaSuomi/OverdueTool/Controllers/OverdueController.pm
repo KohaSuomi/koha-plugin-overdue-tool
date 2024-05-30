@@ -64,6 +64,8 @@ sub get {
         );
     }
 
+    $attributes{'itemlost'} = 0;
+
     my $checkouts_count = Koha::Checkouts->search(
           \%attributes,
           $other_params
@@ -87,6 +89,7 @@ sub get {
                 borrowernumber => $checkout->{borrowernumber},
                 date_due => { '>=' => $startdate, '<=' => $enddate  },
                 'item.notforloan' => $notforloan,
+                'itemlost' => 0,
                 $librarytable => \@libraries,
             }, 
             {

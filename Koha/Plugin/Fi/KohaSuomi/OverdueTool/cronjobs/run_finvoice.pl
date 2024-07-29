@@ -129,7 +129,7 @@ foreach my $notice (@{$notices->unblessed}) {
     if ($@ && $validate) {
         print "$notice->{message_id} failed with $@\n";
         C4::Letters::_set_message_status(
-        { message_id => $notice->{message_id}, status => 'failed', delivery_note => "Finvoice template error, check the logs." } );
+        { message_id => $notice->{message_id}, status => 'failed', failure_code => "Finvoice template error, check the logs." } );
     } else {
         my $xmlFile = $notice->{from_address}.'_'.$notice->{message_id}."_".$today. ".xml";
         #Write xml to file

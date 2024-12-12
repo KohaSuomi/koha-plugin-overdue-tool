@@ -511,6 +511,10 @@ const store = new Vuex.Store({
           filteredResults.push(patron);
         }
       });
+      // Remove disabling of "Create buttons" when results are loaded again
+      filteredResults.forEach((value, index) => {
+          sessionStorage.removeItem("disableButton"+index);
+      });
       return filteredResults;
     },
     filterLetters: (state) => {

@@ -93,11 +93,13 @@ const resultList = Vue.component('result-list', {
     selectPrice,
   },
   data() {
+    // Fetch the state disabling "Create button"
+    var disabled = sessionStorage.getItem("disableButton"+this.index);
     return {
       isActive: false,
       newcheckouts: [],
       removecheckouts: [],
-      disableInvoiceButton: false,
+      disableInvoiceButton: disabled,
     };
   },
   mounted() {
@@ -122,6 +124,9 @@ const resultList = Vue.component('result-list', {
     },
     createInvoice: function (preview, all) {
       this.disableInvoiceButton = true;
+      // Save the state of disabling "Create" button
+      sessionStorage.setItem("disableButton"+this.index, true);
+
       if (!preview) {
         this.$store.commit('addInvoiceNumber', this.invoicenumber+1);
       }

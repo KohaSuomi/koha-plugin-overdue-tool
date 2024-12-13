@@ -6,7 +6,16 @@ const patronData = Vue.component('patrondata', {
     return {
       patron: {},
       loader: true,
+      borrowernumber: "",
     };
+  },
+  watch: {
+    borrowernumber: function borrowernumber(new_val, old_val) {
+      if( new_val != old_val ){
+        this.loader = true;
+        this.getPatron();
+      }
+    }
   },
   mounted() {
     this.getPatron();

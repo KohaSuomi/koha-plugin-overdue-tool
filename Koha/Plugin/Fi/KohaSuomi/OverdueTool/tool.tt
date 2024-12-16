@@ -183,9 +183,9 @@
 						<li class="list-inline-item d-table-cell">
 							<button class="btn btn-info" v-on:click="activate"><i class='fas fa-angle-down' :class="{'fa-angle-up': isActive}" style='font-size:24px'></i></button>
 							<span v-if="!invoiced">
-								<button v-if="invoiceType == 'FINVOICE'" class="btn btn-success" v-on:click="createInvoice(false)" :disabled="disableInvoiceButton">Luo Finvoice</button>
-								<button v-if="invoiceType == 'EINVOICE'" class="btn btn-success" v-on:click="createInvoice(false)" :disabled="disableInvoiceButton">Luo e-lasku</button>
-								<button v-if="invoiceType == 'ODUECLAIM'" class="btn btn-success" v-on:click="previewPDF(false, false)" :disabled="disableInvoiceButton">Luo pdf-lasku</button>
+								<button v-if="invoiceType == 'FINVOICE'" class="btn btn-success" v-on:click="createInvoice(false); disableInvoiceButton();" :disabled="disableButton">Luo Finvoice</button>
+								<button v-if="invoiceType == 'EINVOICE'" class="btn btn-success" v-on:click="createInvoice(false); disableInvoiceButton();" :disabled="disableButton">Luo e-lasku</button>
+								<button v-if="invoiceType == 'ODUECLAIM'" class="btn btn-success" v-on:click="previewPDF(false, false); disableInvoiceButton();" :disabled="disableButton">Luo pdf-lasku</button>
 							</span>
 							<button class="btn btn-success" v-on:click="previewPDF(true, true)">Jäljennös</button>
 						</li>

@@ -65,7 +65,7 @@ USAGE
     exit $_[0];
 }
 
-my ( $help, $config, $path, $validate, $xsd, $zip, $pretty, $noescape);
+my ( $help, $config, $path, $validate, $xsd, $zip, $pretty, $noescape, $testssn);
 
 GetOptions(
     'h|help'     => \$help,
@@ -75,7 +75,8 @@ GetOptions(
     'xsd=s'      => \$xsd,
     'zip'        => \$zip,
     'pretty'     => \$pretty,
-    'noescape'   => \$noescape
+    'noescape'   => \$noescape,
+    'testssn'    => \$testssn,
 ) || usage(1);
 
 usage(0) if ($help);
@@ -123,7 +124,7 @@ my $tmppath = $output_directory ."/tmp/";
 my @message_ids;
 foreach my $notice (@{$notices->unblessed}) {
     my $patron = Koha::Patrons->find($notice->{borrowernumber});
-    my $doc = process_xml($notice, $noescape);
+    my $doc = process_xml($notice, $noescape, $testssn);
     my $xmlschema = XML::LibXML::Schema->new(location => $xsd);
 	eval {$xmlschema->validate($doc);};
     if ($@ && $validate) {
@@ -138,7 +139,6 @@ foreach my $notice (@{$notices->unblessed}) {
         close $fh;
         push @message_ids, $notice->{message_id};
     }
-
 }
 if (@message_ids) {
 

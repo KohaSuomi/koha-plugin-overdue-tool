@@ -65,7 +65,7 @@ USAGE
     exit $_[0];
 }
 
-my ( $help, $config, $path, $validate, $xsd, $zip, $pretty, $noescape, $testssn);
+my ( $help, $config, $path, $validate, $xsd, $zip, $pretty, $noescape, $testssn, $new_sftp);
 
 GetOptions(
     'h|help'     => \$help,
@@ -77,6 +77,7 @@ GetOptions(
     'pretty'     => \$pretty,
     'noescape'   => \$noescape,
     'testssn'    => \$testssn,
+    'newsftp'    => \$new_sftp,
 ) || usage(1);
 
 usage(0) if ($help);
@@ -120,6 +121,7 @@ my $notices = Koha::Notice::Messages->search({letter_code => 'ODUECLAIM', messag
 exit unless $notices;
 
 my $tmppath = $output_directory ."/tmp/";
+my $archivepath = $output_directory.'/archived/';
 
 my @message_ids;
 foreach my $notice (@{$notices->unblessed}) {
@@ -144,7 +146,7 @@ if (@message_ids) {
 
     chdir $tmppath;
     my @files = <*.xml>;
-    my $archivepath = $output_directory.'/archived/';
+
     if ($zip) {
         my $zipwrite = Archive::Zip->new();
         my $zipFile = $config."-kirjasto-finvoice-".$today. ".zip";
@@ -171,11 +173,14 @@ if (@message_ids) {
             { message_id => $message_id, status => 'sent'} );
         }
     } else {
-
-        foreach my $file (@files) {
-            sftp_transfer($file, $archivepath.$file);
-            my ($library, $message_id) = split(/(\d+)/, $file);
-            C4::Letters::_set_message_status({ message_id => $message_id, status => 'sent'} );
+        if($new_sftp){
+            new_sftp_transfer( \@files );
+        } else {
+            foreach my $file (@files) {
+                sftp_transfer($file, $archivepath.$file);
+                my ($library, $message_id) = split(/(\d+)/, $file);
+                C4::Letters::_set_message_status({ message_id => $message_id, status => 'sent'} );
+            }
         }
     }
 } else {
@@ -206,4 +211,41 @@ sub sftp_transfer {
 
     move ("$tmppath$file", "$archivepath") or die "The move operation failed: $!";
 
+}
+
+sub new_sftp_transfer {
+    my ( $files ) = @_;
+
+    # Connect and send with SFTP
+    my $sftp = Net::SFTP::Foreign->new('host' => $finvoiceconfig->{host},
+                                       'port' => $finvoiceconfig->{port} || '22',
+                                       'user' => $finvoiceconfig->{username},
+                                       'password' => $finvoiceconfig->{password});
+
+    if ( $sftp->error ) {
+        die "Logging in to SFTP server failed with: ".$sftp->error."\n";
+    }
+
+    foreach my $file ( @$files ) {
+        my $success = 1;
+        my ($library, $message_id) = split(/(\d+)/, $file);
+
+        unless ( $sftp->put($tmppath.$file, $finvoiceconfig->{filepath}.$file.'.part', copy_perms => 0, copy_time => 0)) {
+            $success = 0;
+            print "Transferring file to SFTP server failed with: ".$sftp->error."\n";
+        }
+
+        unless ( $sftp->rename($finvoiceconfig->{filepath}.$file.'.part', $finvoiceconfig->{filepath}.$file)) {
+            $success = 0;
+            print "Renaming a file on SFTP server failed with: ".$sftp->error."\n";
+        }
+
+        move ("$tmppath$file", "$archivepath") or die "The move operation failed: $!";
+
+        if( $success ){
+            C4::Letters::_set_message_status({ message_id => $message_id, status => 'sent'} );
+        } else {
+            C4::Letters::_set_message_status({ message_id => $message_id, status => 'failed', failure_code => "Error while transfering file, check the logs." } );
+        }
+    }
 }

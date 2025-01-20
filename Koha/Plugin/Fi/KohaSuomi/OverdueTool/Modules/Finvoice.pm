@@ -19,9 +19,10 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(process_xml);
 
 sub process_xml {
-    my ( $notice, $noescape ) = @_;
+    my ( $notice, $noescape, $testssn ) = @_;
 
     my $parser = XML::LibXML->new(recover => 1);
+    $notice->{content} =~ s/&/&amp;/sg;
     my $data = Encode::encode( "iso-8859-15", $notice->{content});
     my $doc = $parser->load_xml(string => $data);
     my $timestamp = strftime "%Y-%m-%dT%H:%M:%S%z", localtime;
@@ -29,13 +30,25 @@ sub process_xml {
     $timestamp .= ':00';
     $doc->findnodes("Finvoice/MessageTransmissionDetails/MessageDetails/MessageIdentifier")->[0]->appendTextNode($notice->{message_id});
     $doc->findnodes("Finvoice/MessageTransmissionDetails/MessageDetails/MessageTimeStamp")->[0]->appendTextNode($timestamp);
+    my $ssn;
 
     if ($fetchSSN) {
         require Koha::Plugin::Fi::KohaSuomi::SsnProvider::Modules::Database;
         my $ssndb = Koha::Plugin::Fi::KohaSuomi::SsnProvider::Modules::Database->new();
-        my $ssn = $ssndb->getSSNByBorrowerNumber( $notice->{borrowernumber} );
-        $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerPartyIdentifier")->[0]->appendTextNode($ssn) if $ssn;
+        $ssn = $ssndb->getSSNByBorrowerNumber( $notice->{borrowernumber} );
     }
+
+    if (!$ssn && $testssn) {
+        require Koha::Plugin::Fi::KohaSuomi::SsnProvider::Modules::TestSSN;
+        my $testssn = eval { Koha::Plugin::Fi::KohaSuomi::SsnProvider::Modules::TestSSN->new() };
+        if ($@) {
+            die "Could not load TestSSN module: $@";
+        }
+        $ssn = $testssn->generate($notice->{borrowernumber});
+        print "Generated test SSN: $ssn for borrowernumber: $notice->{borrowernumber}\n" if $ssn;
+    }
+
+    $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerPartyIdentifier")->[0]->appendTextNode($ssn) if $ssn;
 
     # my $name = $doc->findnodes("Finvoice/BuyerPartyDetails/BuyerOrganisationName")->[0];
     # my $newname = _escape_string($name->textContent);
@@ -52,7 +65,7 @@ sub process_xml {
             $newvalue = substr($newvalue, 0, $diff);
         }
         $row->removeChildNodes;
-        $row->appendText($newvalue); 
+        $row->appendText($newvalue);
     }
 
     return $doc;
@@ -79,3 +92,5 @@ sub _escape_string {
     
     return $newstring;
 }
+
+1;

@@ -6,7 +6,16 @@ const patronData = Vue.component('patrondata', {
     return {
       patron: {},
       loader: true,
+      borrowernumber: "",
     };
+  },
+  watch: {
+    borrowernumber: function borrowernumber(new_val, old_val) {
+      if( new_val != old_val ){
+        this.loader = true;
+        this.getPatron();
+      }
+    }
   },
   mounted() {
     this.getPatron();
@@ -93,10 +102,13 @@ const resultList = Vue.component('result-list', {
     selectPrice,
   },
   data() {
+    // Fetch the state disabling "Create button"
+    var disabled = sessionStorage.getItem("disableButton"+this.index);
     return {
       isActive: false,
       newcheckouts: [],
       removecheckouts: [],
+      disableButton: disabled,
     };
   },
   mounted() {
@@ -116,6 +128,11 @@ const resultList = Vue.component('result-list', {
     },
   },
   methods: {
+    disableInvoiceButton: function () {
+      this.disableButton = true;
+      // Save the state of disabling "Create" button
+      sessionStorage.setItem("disableButton"+this.index, true);
+    },
     activate: function () {
       this.isActive = !this.isActive;
     },

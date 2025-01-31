@@ -42,6 +42,11 @@ sub set {
         my $patron_id = $c->validation->param('patron_id');
         my $body = $c->req->json;
 
+        my ($valid_patron, $validation_error) = _validate_patron($patron_id);
+        unless ($valid_patron) {
+            return $c->render(status => 400, openapi => {error => $validation_error});
+        }
+
         my $preview = $body->{preview} || 0;
 
         my %tables = ( 'borrowers' => $patron_id, 'branches' => $body->{branchcode} );
@@ -146,6 +151,10 @@ sub set {
 
         if ($body->{guarantor}) {
             my $guarantor = Koha::Patrons->find($body->{guarantor});
+            ($valid_patron, $validation_error) = _validate_patron($body->{guarantor});
+            unless ($valid_patron) {
+                return $c->render(status => 400, openapi => {error => $validation_error});
+            }
             $params{"substitute"}{"guarantorfirstname"} = $guarantor->firstname;
             $params{"substitute"}{"guarantorsurname"} = $guarantor->surname;
             $params{"substitute"}{"guarantoraddress"} = $guarantor->address;
@@ -337,5 +346,17 @@ sub _convert_language {
     return $lang;
 }
 
+sub _validate_patron {
+    my ($patron_id) = @_;
+
+    my $patron = Koha::Patrons->find($patron_id);
+    return (0, 'No patron') unless $patron;
+    my @valid_fields = qw( firstname surname address city zipcode );
+    foreach my $field (@valid_fields) {
+        return (0 , 'Missing required field: '.$field.' for '.$patron->cardnumber) unless $patron->$field;
+    }
+
+    return 1;
+}
 
 1;

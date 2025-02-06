@@ -42,12 +42,12 @@ sub set {
         my $patron_id = $c->validation->param('patron_id');
         my $body = $c->req->json;
 
+        my $preview = $body->{preview} || 0;
+
         my ($valid_patron, $validation_error) = _validate_patron($patron_id);
-        unless ($valid_patron) {
+        if (!$valid_patron && !$preview) {
             return $c->render(status => 400, openapi => {error => $validation_error});
         }
-
-        my $preview = $body->{preview} || 0;
 
         my %tables = ( 'borrowers' => $patron_id, 'branches' => $body->{branchcode} );
 
@@ -152,7 +152,7 @@ sub set {
         if ($body->{guarantor}) {
             my $guarantor = Koha::Patrons->find($body->{guarantor});
             ($valid_patron, $validation_error) = _validate_patron($body->{guarantor});
-            unless ($valid_patron) {
+            if (!$valid_patron && !$preview) {
                 return $c->render(status => 400, openapi => {error => $validation_error});
             }
             $params{"substitute"}{"guarantorfirstname"} = $guarantor->firstname;

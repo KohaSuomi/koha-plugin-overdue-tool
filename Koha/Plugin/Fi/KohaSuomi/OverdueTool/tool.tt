@@ -171,6 +171,9 @@
 		<template id="list-items">
 			<div>
 				<div class="row d-table w-100 p-3" style="table-layout:fixed;" :class="{'odd-cell': index % 2 !== 0 }">
+					<span v-if="patronErrors.length" class="text-danger">
+						Asiakastiedoissa puutteita: {{ patronErrors.join(', ') }}
+					</span>
 					<ul class="list-inline w-100 d-table-row">
 						<li class="list-inline-item d-table-cell">
 							<span class="d-block"><a :href="'/cgi-bin/koha/members/moremember.pl?borrowernumber='+result.borrowernumber" target="_blank">{{result.cardnumber}}</a></span>

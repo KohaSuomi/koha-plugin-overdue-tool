@@ -109,12 +109,14 @@ const resultList = Vue.component('result-list', {
       newcheckouts: [],
       removecheckouts: [],
       disableButton: disabled,
+      patronErrors: [],
     };
   },
   mounted() {
     if (this.index == 0) {
       this.activate();
     }
+    this.validatePatron();
   },
   computed: {
     invoiceType() {
@@ -136,7 +138,21 @@ const resultList = Vue.component('result-list', {
     activate: function () {
       this.isActive = !this.isActive;
     },
+    validatePatron: function () {
+      const fields = ['firstname', 'surname', 'address', 'zipcode', 'city'];
+      const finnishFields = ['etunimi', 'sukunimi', 'osoite', 'postinumero', 'kaupunki'];
+      this.patronErrors = [];
+      fields.forEach((field) => {
+        if (!this.result[field]) {
+          this.disableInvoiceButton();
+          this.patronErrors.push(finnishFields[fields.indexOf(field)]);
+        }
+      });
+    },
     createInvoice: function (preview, all) {
+      if (this.patronErrors.length && !preview) {
+        return "error";
+      }
       if (!preview) {
         this.$store.commit('addInvoiceNumber', this.invoicenumber+1);
       }

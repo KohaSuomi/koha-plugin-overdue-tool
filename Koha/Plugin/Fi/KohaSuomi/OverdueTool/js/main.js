@@ -93,6 +93,12 @@ new Vue({
     invoiceType() {
       return store.state.invoiceType;
     },
+    accountNumber() {
+      return store.state.accountNumber;
+    },
+    bicCode() {
+      return store.state.bicCode;
+    },
     created() {
       return store.state.created;
     },
@@ -126,6 +132,7 @@ new Vue({
       store.commit('setCreated', false);
       store.dispatch('fetchOverdues');
       this.activate();
+      this.validateSettings();
     },
     async refreshInvoiceNumber() {
       return axios
@@ -151,6 +158,10 @@ new Vue({
         store.commit('setCreated', false);
         this.refreshInvoiceNumber();
         const errors = [];
+        if (this.errors.length) {
+          this.finvoiceBtn = false;
+          return;
+        }
         await Promise.all(
           this.$refs.resultComponentRef.map(async (element) => {
             const response = await element.createInvoice(false, true);
@@ -238,6 +249,14 @@ new Vue({
       this.buttonLoader = false;
       localStorage.setItem('sumFilter', e.target.value);
       this.sumFilter = e.target.value;
+    },
+    validateSettings() {
+      if (!this.accountNumber || this.accountNumber.length < 10) {
+        store.commit('addError', 'Tilinumero on Finvoice-laskun lähettämiseen pakollinen');
+      }
+      if (!this.bicCode || this.bicCode.length < 8) {
+        store.commit('addError', 'BIC-koodi on Finvoice-laskun lähettämiseen pakollinen');
+      }
     },
     toggleFilters() {
       this.showFilters = !this.showFilters;

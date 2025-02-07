@@ -117,8 +117,14 @@ const resultList = Vue.component('result-list', {
       this.activate();
     }
     this.validatePatron();
+    if (this.errors.length) {
+      this.disableInvoiceButton();
+    }
   },
   computed: {
+    errors() {
+      return this.$store.state.errors;
+    },
     invoiceType() {
       return this.$store.state.invoiceType;
     },

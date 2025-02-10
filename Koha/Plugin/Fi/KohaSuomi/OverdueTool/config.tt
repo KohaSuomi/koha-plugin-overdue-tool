@@ -148,11 +148,11 @@
                                                             <input type="text" class="form-control" name="businessid"  v-model="group.businessid"/>
                                                         </li>
                                                         <li class="list-group-item">
-                                                            <label for="accountnumber">Tilinumero</label>
+                                                            <label for="accountnumber">Tilinumero <span class="small">(< 34 merkkiä)</span></label>
                                                             <input type="text" class="form-control" name="accountnumber"  v-model="group.accountnumber"/>
                                                         </li>
                                                         <li class="list-group-item">
-                                                            <label for="biccode">BIC-tunnus</label>
+                                                            <label for="biccode">BIC-tunnus <span class="small">(8-11 merkkiä)</span></label>
                                                             <input type="text" class="form-control" name="biccode"  v-model="group.biccode"/>
                                                         </li>
                                                         <li class="list-group-item has-icon">

@@ -105,9 +105,9 @@
 								</li>
 								<li v-if="results.length" :class="{'d-none': showLoader }" class="nav-item pl-2">
 									<div class="form-group row">
-										<button v-if="!invoiced && invoiceType == 'FINVOICE'"class="btn btn-info" v-on:click="allFinvoices" :disabled='finvoiceBtn'><i v-if="finvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo Finvoice:t</span></button>
-										<button v-if="!invoiced && invoiceType == 'EINVOICE'"class="btn btn-info" v-on:click="allEinvoices" :disabled='einvoiceBtn'><i v-if="einvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo e-laskut</span></button>
-										<button v-if="!invoiced && invoiceType == 'ODUECLAIM'"class="btn btn-info" :disabled='pdfBtn' v-on:click="allPDFs(false)"><i v-if="pdfBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo PDF:t</span></button>
+										<button v-if="!invoiced && invoiceType == 'FINVOICE' && !errors.length"class="btn btn-info" v-on:click="allFinvoices" :disabled='finvoiceBtn'><i v-if="finvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo Finvoice:t</span></button>
+										<button v-if="!invoiced && invoiceType == 'EINVOICE' && !errors.length"class="btn btn-info" v-on:click="allEinvoices" :disabled='einvoiceBtn'><i v-if="einvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo e-laskut</span></button>
+										<button v-if="!invoiced && invoiceType == 'ODUECLAIM' && !errors.length"class="btn btn-info" :disabled='pdfBtn' v-on:click="allPDFs(false)"><i v-if="pdfBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo PDF:t</span></button>
 										<button class="btn btn-info ml-1" :disabled='previewBtn' v-on:click="allPDFs(true)"><i v-if="previewBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Jäljennökset</span></button>
 									</div>
 								</li>

@@ -65,7 +65,7 @@ USAGE
     exit $_[0];
 }
 
-my ( $help, $config, $path, $validate, $xsd, $zip, $pretty, $noescape, $testssn, $new_sftp);
+my ( $help, $config, $path, $validate, $xsd, $zip, $pretty, $noescape, $testssn );
 
 GetOptions(
     'h|help'     => \$help,
@@ -77,7 +77,6 @@ GetOptions(
     'pretty'     => \$pretty,
     'noescape'   => \$noescape,
     'testssn'    => \$testssn,
-    'newsftp'    => \$new_sftp,
 ) || usage(1);
 
 usage(0) if ($help);
@@ -146,6 +145,7 @@ if (@message_ids) {
 
     chdir $tmppath;
     my @files = <*.xml>;
+    my $messages;
 
     if ($zip) {
         my $zipwrite = Archive::Zip->new();
@@ -164,57 +164,30 @@ if (@message_ids) {
 
         my @zipfiles = <*.zip>;
 
-        foreach my $file (@zipfiles) {
-            sftp_transfer($file, $archivepath.$file);
-        }
+        $messages = sftp_transfer( \@zipfiles, \@message_ids );
 
-        foreach my $message_id (@message_ids) {
-        C4::Letters::_set_message_status(
-            { message_id => $message_id, status => 'sent'} );
-        }
     } else {
-        if($new_sftp){
-            new_sftp_transfer( \@files );
+        $messages = sftp_transfer( \@files );
+    }
+
+    foreach my $message (@$messages){
+        if( $message->{success} ){
+            C4::Letters::_set_message_status({ message_id => $message->{message_id}, status => 'sent'} );
         } else {
-            foreach my $file (@files) {
-                sftp_transfer($file, $archivepath.$file);
-                my ($library, $message_id) = split(/(\d+)/, $file);
-                C4::Letters::_set_message_status({ message_id => $message_id, status => 'sent'} );
-            }
+            C4::Letters::_set_message_status({ message_id => $message->{message_id}, status => 'failed', failure_code => "Error while transfering file: ".$message->{error} } );
         }
     }
+
 } else {
     print "Not any notices processed\n";
 }
 
 sub sftp_transfer {
-    my ($file, $archivepath) = @_;
+    my ( $files, $message_ids ) = @_;
 
-    # Connect and send with SFTP
-    my $sftp = Net::SFTP::Foreign->new('host' => $finvoiceconfig->{host}, 
-                                       'port' => $finvoiceconfig->{port} || '22', 
-                                       'user' => $finvoiceconfig->{username},
-                                       'password' => $finvoiceconfig->{password});
-
-    if ( $sftp->error ) {
-        die "Logging in to SFTP server failed with: ".$sftp->error."\n";
-    }
-
-    unless ( $sftp->put($tmppath.$file, $finvoiceconfig->{filepath}.$file.'.part', copy_perms => 0, copy_time => 0)) {
-        die "Transferring file to SFTP server failed with: ".$sftp->error."\n";
-    }
-
-    unless ( $sftp->rename($finvoiceconfig->{filepath}.$file.'.part', $finvoiceconfig->{filepath}.$file)) {
-        die "Renaming a file on SFTP server failed with: ".$sftp->error."\n";
-    }
-
-
-    move ("$tmppath$file", "$archivepath") or die "The move operation failed: $!";
-
-}
-
-sub new_sftp_transfer {
-    my ( $files ) = @_;
+    my @messages_array;
+    my $success = 1;
+    my $error = "";
 
     # Connect and send with SFTP
     my $sftp = Net::SFTP::Foreign->new('host' => $finvoiceconfig->{host},
@@ -227,25 +200,43 @@ sub new_sftp_transfer {
     }
 
     foreach my $file ( @$files ) {
-        my $success = 1;
-        my ($library, $message_id) = split(/(\d+)/, $file);
+        my $file_type = substr $file, -4;
+        my ($library, $message_id) = split(/(\d+)/, $file) unless $file_type eq ".zip";
 
         unless ( $sftp->put($tmppath.$file, $finvoiceconfig->{filepath}.$file.'.part', copy_perms => 0, copy_time => 0)) {
             $success = 0;
+            $error = $sftp->error;
             print "Transferring file to SFTP server failed with: ".$sftp->error."\n";
         }
 
         unless ( $sftp->rename($finvoiceconfig->{filepath}.$file.'.part', $finvoiceconfig->{filepath}.$file)) {
             $success = 0;
+            $error = $sftp->error;
             print "Renaming a file on SFTP server failed with: ".$sftp->error."\n";
         }
 
         move ("$tmppath$file", "$archivepath") or die "The move operation failed: $!";
 
-        if( $success ){
-            C4::Letters::_set_message_status({ message_id => $message_id, status => 'sent'} );
-        } else {
-            C4::Letters::_set_message_status({ message_id => $message_id, status => 'failed', failure_code => "Error while transfering file, check the logs." } );
+        unless( $file_type eq ".zip" ){
+            my $message_hash = {
+                message_id => $message_id,
+                success => $success,
+                error => $error
+            };
+            push @messages_array, $message_hash;
         }
     }
+
+    if ( $message_ids ){
+        foreach my $message_id ( @$message_ids ){
+            my $message_hash = {
+                message_id => $message_id,
+                success => $success,
+                error => $error
+            };
+            push @messages_array, $message_hash;
+        }
+    }
+
+    return \@messages_array;
 }

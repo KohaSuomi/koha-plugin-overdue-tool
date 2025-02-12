@@ -32,6 +32,7 @@ new Vue({
         { name: 'Lainaajakirjasto', value: 'issuebranch' },
         { name: 'Omistajakirjasto', value: 'itembranch' },
       ],
+      loading: false,
     };
   },
   created() {
@@ -56,6 +57,7 @@ new Vue({
         });
     },
     setConfig() {
+      this.loading = true;
       this.saved = false;
       let index = this.groupsettings.findIndex(
         (group) => group.groupname === this.group.groupname
@@ -79,6 +81,7 @@ new Vue({
         })
         .then(() => {
           this.saved = true;
+          this.loading = false;
           this.showGroup = false;
         })
         .catch((error) => {

@@ -289,7 +289,7 @@ const store = new Vuex.Store({
         .catch((error) => {
           let err = error.message;
           if (error.response.data.error) {
-            err += ':' + error.response.data.error;
+            err += ': ' + error.response.data.error;
           } else {
             err += ', check the logs';
           }
@@ -382,6 +382,7 @@ const store = new Vuex.Store({
             err += ', check the logs';
           }
           commit('addError', err);
+          commit('showLoader', false);
         });
     },
     changePage({ commit, state }, payload) {
@@ -440,11 +441,12 @@ const store = new Vuex.Store({
         .catch((error) => {
           let err = error.message;
           if (error.response.data.error) {
-            err += ':' + error.response.data.error;
+            err += ': ' + error.response.data.error;
           } else {
             err += ', check the logs';
           }
           commit('addError', err);
+          commit('showLoader', false);
         });
     },
     updateReplacementPrice({ commit }, payload) {
@@ -457,13 +459,39 @@ const store = new Vuex.Store({
         .catch((error) => {
           let err = error.message;
           if (error.response.data.error) {
-            err += ':' + error.response.data.error;
+            err += ': ' + error.response.data.error;
           } else {
             err += ', check the logs';
           }
           commit('addError', err);
+          commit('showLoader', false);
         });
     },
+    async getInvoiceCopy({ commit, state }, payload) {
+      commit('showLoader', true);
+      commit('setNotice', '');
+      commit('removeErrors');
+      return axios
+        .get('/api/v1/contrib/kohasuomi/invoices/' + payload.patron_id + '/copy')
+        .then((response) => {
+          if (payload.multi) {
+            commit('setNotices', response.data.notice);
+          } else {
+            commit('setNotice', response.data.notice);
+          }
+          commit('showLoader', false);
+        })
+        .catch((error) => {
+          let err = error.message;
+          if (error.response.data.error) {
+            err += ': ' + error.response.data.error;
+          } else {
+            err += ', check the logs';
+          }
+          commit('addError', err);
+          commit('showLoader', false);
+        });
+    }
   },
   getters: {
     addTotalItems: (state) => () => {

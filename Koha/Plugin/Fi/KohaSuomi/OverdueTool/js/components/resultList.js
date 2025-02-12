@@ -102,17 +102,17 @@ const resultList = Vue.component('result-list', {
     selectPrice,
   },
   data() {
-    // Fetch the state disabling "Create button"
-    var disabled = sessionStorage.getItem("disableButton"+this.index);
     return {
       isActive: false,
       newcheckouts: [],
       removecheckouts: [],
-      disableButton: disabled,
+      disableButton: false,
       patronErrors: [],
     };
   },
   mounted() {
+    // Fetch the state disabling "Create button"
+    this.disableButton = sessionStorage.getItem("disableButton"+this.index);
     if (this.index == 0) {
       this.activate();
     }
@@ -155,11 +155,19 @@ const resultList = Vue.component('result-list', {
         }
       });
     },
+    create: function () {
+      if (this.invoiceType === 'FINVOICE' || this.invoiceType === 'EINVOICE') {
+        this.createInvoice(false);
+      } else {
+        this.previewPDF(false);
+      }
+    },
     createInvoice: function (preview, all) {
       if (this.patronErrors.length && !preview) {
         return "error";
       }
       if (!preview) {
+        this.disableInvoiceButton();
         this.$store.commit('addInvoiceNumber', this.invoicenumber+1);
       }
       this.newcheckouts = [];
@@ -232,6 +240,13 @@ const resultList = Vue.component('result-list', {
     previewPDF: function (preview, all) {
       this.createInvoice(preview, all);
       this.$parent.previewPDF(preview);
+    },
+    invoiceCopy: function () {
+      this.$store.dispatch('getInvoiceCopy', {patron_id: this.result.borrowernumber, multi: false});
+      this.$parent.previewPDF(true);
+    },
+    invoiceCopies: function () {
+      return this.$store.dispatch('getInvoiceCopy', {patron_id: this.result.borrowernumber, multi: true});
     },
     newPrice(val, index) {
       var intvalue = Math.floor(val);

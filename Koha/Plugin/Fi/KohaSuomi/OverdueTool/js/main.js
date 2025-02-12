@@ -19,7 +19,7 @@ new Vue({
       pdfBtn: false,
       einvoiceBtn: false,
       finvoiceBtn: false,
-      previewBtn: false,
+      copyBtn: false,
       categoryfilter: '',
     };
   },
@@ -183,7 +183,7 @@ new Vue({
       if (this.$refs.resultComponentRef) {
         store.commit('setNotice', '');
         if (preview) {
-          this.previewBtn = true;
+          this.copyBtn = true;
         } else {
           await this.refreshInvoiceNumber();
           this.pdfBtn = true;
@@ -196,7 +196,7 @@ new Vue({
         ).then(() => {
           this.previewPDF(preview, true);
           if (preview) {
-            this.previewBtn = false;
+            this.copyBtn = false;
           } else {
             this.pdfBtn = false;
           }
@@ -219,6 +219,22 @@ new Vue({
         });
       }
     },
+    async allCopies() {
+      if (this.$refs.resultComponentRef) {
+        store.commit('setNotice', '');
+        this.copyBtn = true;
+        store.commit('setCreated', false);
+        await Promise.all(
+          this.$refs.resultComponentRef.map(async (element) => {
+            await element.invoiceCopies();
+          })
+        ).then(() => {
+          this.previewPDF(false, true);
+          store.commit('setCreated', true);
+          this.copyBtn = false;
+        });
+      }
+    },
     printPDF() {
       printJS({
         printable: 'printDoc',
@@ -227,7 +243,6 @@ new Vue({
       });
     },
     back() {
-      store.commit('setCreated', false);
       this.showPDF = false;
     },
     updateStartDate(value) {
@@ -251,10 +266,10 @@ new Vue({
       this.sumFilter = e.target.value;
     },
     validateSettings() {
-      if (!this.accountNumber || this.accountNumber.length < 34) {
+      if (this.invoiceType === 'FINVOICE' && (!this.accountNumber || this.accountNumber.length > 34)) {
         store.commit('addError', 'Tilinumero (< 34 merkkiä) on Finvoice-laskun lähettämiseen pakollinen');
       }
-      if (!this.bicCode || this.bicCode.length < 8 || this.bicCode.length > 11) {
+      if (this.invoiceType === 'FINVOICE' && (!this.bicCode || this.bicCode.length < 8 || this.bicCode.length > 11)) {
         store.commit('addError', 'BIC-koodi (8-11 merkkiä) on Finvoice-laskun lähettämiseen pakollinen');
       }
     },
@@ -267,6 +282,7 @@ new Vue({
     },
     dismissCreated() {
       store.commit("setCreated", false);
+      this.fetch();
     }
   },
 });

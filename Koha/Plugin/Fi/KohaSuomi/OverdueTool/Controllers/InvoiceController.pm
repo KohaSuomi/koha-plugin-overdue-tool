@@ -29,11 +29,15 @@ use POSIX qw(strftime);
 use Koha::Items;
 use Koha::Account;
 use Koha::Patron;
+use Koha::DateUtils qw( dt_from_string );
+use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Finvoice qw( finvoice_to_html );
 
 use C4::Context;
 
 use Try::Tiny;
 use XML::LibXML;
+use XML::LibXSLT;
+use Encode;
 
 sub set {
     my $c = shift->openapi->valid_input or return;
@@ -189,7 +193,7 @@ sub set {
                                 from_address => $body->{branchcode},
                             }
                         );
-
+            
             foreach my $item (@itemnumbers) {
                 my $item_object = Koha::Items->find($item->{itemnumber});
                 $item_object->set({new_status => $message_id, notforloan => $body->{notforloan_status}});
@@ -243,8 +247,29 @@ sub set {
                 )->store;
             }
         }
-        
+
         return $c->render(status => 201, openapi => {message_id => $message_id, notice => $notice->{content}});
+    }
+    catch {
+        warn Data::Dumper::Dumper $_;
+        return $c->render(status => 500, openapi => {error => 'Something went wrong, check the logs!'});
+    };
+}
+
+sub invoice_copy {
+    my $c = shift->openapi->valid_input or return;
+
+    return try {
+        my $patron_id = $c->validation->param('patron_id');
+        my $patron = Koha::Patrons->find($patron_id);
+        my $notice = _last_patron_invoice($patron_id);
+        return $c->render(status => 404, openapi => {error => 'Invoice copy not found for '.$patron->cardnumber}) unless $notice && _find_message_id_from_items($notice->message_id);
+
+        my $html = $notice->message_transport_type eq 'finvoice' ? finvoice_to_html($notice) : $notice->content;
+
+        $html =~ s/\n/<br>/g if $notice->message_transport_type eq 'print'; # For e-invoice we need to replace newlines with <br> for proper formatting
+
+        return $c->render(status => 200, openapi => {notice => $html, message_id => $notice->message_id});
     }
     catch {
         warn Data::Dumper::Dumper $_;
@@ -357,6 +382,20 @@ sub _validate_patron {
     }
 
     return 1;
+}
+
+sub _last_patron_invoice {
+    my ($patron_id) = @_;
+
+    my $notice = Koha::Notice::Messages->search({borrowernumber => $patron_id, letter_code => 'ODUECLAIM'})->last;
+    return $notice;
+}
+
+sub _find_message_id_from_items {
+    my ($message_id) = @_;
+
+    my $item = Koha::Items->search({new_status => $message_id})->next;
+    return $item;
 }
 
 1;

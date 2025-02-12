@@ -4,9 +4,12 @@ use utf8;
 use Modern::Perl;
 use Exporter;
 use XML::LibXML;
+use XML::LibXSLT;
 use Encode qw(decode encode);
 use POSIX qw(strftime);
 use Text::Unaccent;
+use C4::Context;
+use Koha::DateUtils qw( dt_from_string );
 
 my $fetchSSN = 1;
 eval "use Koha::Plugin::Fi::KohaSuomi::SsnProvider::Modules::Database";
@@ -16,7 +19,7 @@ if ( $@ ) {
 
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(process_xml);
+our @EXPORT = qw(process_xml finvoice_to_html);
 
 sub process_xml {
     my ( $notice, $noescape, $testssn ) = @_;
@@ -71,6 +74,41 @@ sub process_xml {
     return $doc;
 }
 
+sub finvoice_to_html {
+    my ($notice) = @_;
+
+    my $xslt = XML::LibXSLT->new();
+    my $parser = XML::LibXML->new();
+
+    my $plugin_path = C4::Context->config('pluginsdir') . '/Koha/Plugin/Fi/KohaSuomi/OverdueTool/finvoice/finvoice-to-html.xsl';
+    my $style_doc = $parser->parse_file($plugin_path);
+    my $stylesheet = $xslt->parse_stylesheet($style_doc);
+    my $finvoice = $notice->content;
+    $finvoice =~ s/encoding="ISO-8859-15"/encoding="UTF-8"/;
+    my $xml_doc = $parser->parse_string($finvoice);
+    my $message_timestamp = $xml_doc->findnodes('//MessageDetails/MessageTimeStamp')->[0];
+    if ($message_timestamp) {
+        $message_timestamp->removeChildNodes();
+        $message_timestamp->appendText(dt_from_string($notice->updated_on)->strftime('%d.%m.%Y'));
+    };
+
+    my $message_invoicedate = $xml_doc->findnodes('//InvoiceDetails/PaymentTermsDetails/InvoiceDueDate')->[0];
+    if ($message_invoicedate) {
+        my $invoice_date = $message_invoicedate->textContent;
+        if ($invoice_date) {
+            $message_invoicedate->removeChildNodes();
+            $message_invoicedate->appendText(_convert_finvoice_date($invoice_date));
+        }
+    }
+
+    my $results = $stylesheet->transform($xml_doc);
+    my $html = $stylesheet->output_string($results);
+
+    # Ensure the HTML is treated as UTF-8
+    $html = Encode::decode('UTF-8', $html);
+
+    return $html;
+}
 
 sub _escape_string {
     my ($string) = @_;
@@ -91,6 +129,12 @@ sub _escape_string {
     }
     
     return $newstring;
+}
+
+sub _convert_finvoice_date {
+    my ($date) = @_;
+    my ($year, $month, $day) = $date =~ /^(\d{4})(\d{2})(\d{2})$/;
+    return "$day.$month.$year";
 }
 
 1;

@@ -251,7 +251,8 @@ new Vue({
       this.sumFilter = e.target.value;
     },
     validateSettings() {
-      if (!this.accountNumber || this.accountNumber.length < 34) {
+      store.commit('removeErrors');
+      if (!this.accountNumber || this.accountNumber.length > 34) {
         store.commit('addError', 'Tilinumero (< 34 merkkiä) on Finvoice-laskun lähettämiseen pakollinen');
       }
       if (!this.bicCode || this.bicCode.length < 8 || this.bicCode.length > 11) {

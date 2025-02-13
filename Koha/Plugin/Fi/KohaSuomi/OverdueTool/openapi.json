@@ -902,6 +902,70 @@
       }
     }
   },
+  "/invoices/{patron_id}/copy": {
+    "get": {
+      "x-mojo-to": "Fi::KohaSuomi::OverdueTool::Controllers::InvoiceController#invoice_copy",
+      "operationId": "copyInvoice",
+      "tags": [
+        "notices"
+      ],
+      "x-koha-authorization": {
+        "permissions": {
+          "borrowers": "edit_borrowers"
+        }
+      },
+      "parameters": [
+        {
+          "name": "patron_id",
+          "in": "path",
+          "type": "number",
+          "description": "Patron's id",
+          "required": true
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "Invoice copy",
+          "schema": {
+            "type": "object"
+          }
+        },
+        "400": {
+          "description": "An error occured",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "description": "Bad request",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "An error occured",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "description": "Notices not found",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Internal error",
+          "schema": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  },
   "/notices/{notice_id}/invoice": {
     "put": {
       "x-mojo-to": "Fi::KohaSuomi::OverdueTool::Controllers::InvoiceController#update",

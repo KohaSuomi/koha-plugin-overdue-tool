@@ -122,6 +122,7 @@ sub set {
         my $reference;
         if ($body->{addreferencenumber} && !$preview) {
             $reference =_reference_number($body->{librarygroup}, $body->{increment});
+            return $c->render(status => 400, openapi => {error => 'Reference number generation failed'}) unless $reference;
         }
 
         $params{"substitute"} = {

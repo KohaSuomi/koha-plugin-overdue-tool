@@ -252,10 +252,10 @@ new Vue({
     },
     validateSettings() {
       store.commit('removeErrors');
-      if (!this.accountNumber || this.accountNumber.length > 34) {
+      if (this.invoiceType === 'FINVOICE' && (!this.accountNumber || this.accountNumber.length > 34)) {
         store.commit('addError', 'Tilinumero (< 34 merkkiä) on Finvoice-laskun lähettämiseen pakollinen');
       }
-      if (!this.bicCode || this.bicCode.length < 8 || this.bicCode.length > 11) {
+      if (this.invoiceType === 'FINVOICE' && (!this.bicCode || this.bicCode.length < 8 || this.bicCode.length > 11)) {
         store.commit('addError', 'BIC-koodi (8-11 merkkiä) on Finvoice-laskun lähettämiseen pakollinen');
       }
     },

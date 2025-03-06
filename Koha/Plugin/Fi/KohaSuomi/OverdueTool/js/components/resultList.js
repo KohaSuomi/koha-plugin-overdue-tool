@@ -145,8 +145,8 @@ const resultList = Vue.component('result-list', {
       this.isActive = !this.isActive;
     },
     validatePatron: function () {
-      const fields = ['firstname', 'surname', 'address', 'zipcode', 'city'];
-      const finnishFields = ['etunimi', 'sukunimi', 'osoite', 'postinumero', 'kaupunki'];
+      const fields = ['surname', 'address', 'zipcode', 'city'];
+      const finnishFields = ['sukunimi', 'osoite', 'postinumero', 'kaupunki'];
       this.patronErrors = [];
       fields.forEach((field) => {
         if (!this.result[field]) {

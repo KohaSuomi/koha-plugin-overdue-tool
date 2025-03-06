@@ -12,14 +12,14 @@ use utf8;
 use JSON;
 
 ## Here we set our plugin version
-our $VERSION = "2.0.3";
+our $VERSION = "2.1.0";
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {
     name            => 'Laskutustyökalu',
     author          => 'Johanna Räisä',
     date_authored   => '2020-12-28',
-    date_updated    => "2022-09-03",
+    date_updated    => "2025-03-05",
     minimum_version => '21.11.00.000',
     maximum_version => undef,
     version         => $VERSION,

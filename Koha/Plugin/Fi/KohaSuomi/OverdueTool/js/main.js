@@ -51,6 +51,9 @@ new Vue({
     errors() {
       return store.state.errors;
     },
+    warnings() {
+      return store.state.warnings;
+    },
     status() {
       return store.state.status;
     },
@@ -157,7 +160,7 @@ new Vue({
         this.finvoiceBtn = true;
         store.commit('setCreated', false);
         this.refreshInvoiceNumber();
-        const errors = [];
+        const warnings = [];
         if (this.errors.length) {
           this.finvoiceBtn = false;
           return;
@@ -166,16 +169,15 @@ new Vue({
           this.$refs.resultComponentRef.map(async (element) => {
             const response = await element.createInvoice(false, true);
             if (response === 'error') {
-              errors.push(element.result.cardnumber);
+              warnings.push(element.result.cardnumber);
             }
           })
         ).then(() => {
           this.finvoiceBtn = false;
-          if (errors.length) {
-            store.commit('addError', "Korjaa asiakkastiedot: " + errors.join(', '));
-          } else {
-            store.commit('setCreated', true);
+          if (warnings.length) {
+            store.commit('addWarning', "Korjaa asiakkastiedot ja lähetä uudestaan: " + warnings.join(', '));
           }
+          store.commit('setCreated', true);
         });
       }
     },

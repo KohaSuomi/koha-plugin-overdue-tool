@@ -2,6 +2,7 @@ const store = new Vuex.Store({
   state: {
     results: [],
     errors: [],
+    warnings: [],
     offset: 0,
     page: 1,
     limit: 5,
@@ -53,6 +54,12 @@ const store = new Vuex.Store({
     },
     removeErrors(state) {
       state.errors = [];
+    },
+    addWarning(state, value) {
+      state.warnings.push(value);
+    },
+    removeWarnings(state) {
+      state.warnings = [];
     },
     addResults(state, value) {
       state.results = value;

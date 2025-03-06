@@ -41,6 +41,12 @@
 							<li v-for="error in errors">{{ error }}</li>
 						</ul>
 					</div>
+					<div class="alert alert-warning" role="alert" v-if="warnings.length">
+						<b>Huomioitavaa:</b>
+						<ul>
+							<li v-for="warning in warnings">{{ warning }}</li>
+						</ul>
+					</div>
 					<div class="alert alert-success fixed-top" role="alert" v-if="created">
 						<b>Luonti onnistui!</b>
 						<button type="button" class="close" @click="dismissCreated" aria-label="Close">

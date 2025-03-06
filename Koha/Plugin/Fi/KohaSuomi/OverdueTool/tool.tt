@@ -196,7 +196,7 @@
 									Luo {{ invoiceType == 'FINVOICE' ? 'Finvoice' : invoiceType == 'EINVOICE' ? 'e-lasku' : 'pdf-lasku' }}
 								</button>
 							</span>
-							<button v-if="!invoiced && !disableButton" class="btn btn-success" v-on:click="previewPDF(true, true)">Esikatselu</button>
+							<button v-if="(!invoiced && !disableButton) || patronErrors.length" class="btn btn-success" v-on:click="previewPDF(true, true)">Esikatselu</button>
 							<button v-else class="btn btn-success" v-on:click="invoiceCopy()">Jäljennös</button>
 						</li>
 					</ul>

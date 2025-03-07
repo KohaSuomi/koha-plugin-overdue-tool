@@ -246,6 +246,7 @@ new Vue({
     },
     onCategoryChange(e) {
       this.categoryfilter = e.target.value;
+      store.commit('removeWarnings');
     },
     filterResults(e) {
       this.buttonLoader = false;

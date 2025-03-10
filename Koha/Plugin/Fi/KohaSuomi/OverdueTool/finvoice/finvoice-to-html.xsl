@@ -37,7 +37,6 @@
 
         <div class="content">
             <p><strong>Lainaajan nimi: </strong> <xsl:value-of select="//BuyerOrganisationName"/></p>
-            <p>Pyydämme palauttamaan oheisen aineiston välittömästi. Ellei aineistoa palauteta, lähetämme laskun, joka on ulosottokelpoinen. Korvaushinta peritään vain niiden niteiden osalta, joita ei palauteta.</p>
             <table class="table">
                 <thead>
                     <tr>

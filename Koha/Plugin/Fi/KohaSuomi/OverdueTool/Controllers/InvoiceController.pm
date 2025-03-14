@@ -351,7 +351,7 @@ sub _validate_patron {
 
     my $patron = Koha::Patrons->find($patron_id);
     return (0, 'No patron') unless $patron;
-    my @valid_fields = qw( firstname surname address city zipcode );
+    my @valid_fields = qw( surname address city zipcode );
     foreach my $field (@valid_fields) {
         return (0 , 'Missing required field: '.$field.' for '.$patron->cardnumber) unless $patron->$field;
     }

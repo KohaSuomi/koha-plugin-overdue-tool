@@ -69,6 +69,9 @@ sub process_xml {
         }
         $row->removeChildNodes;
         $row->appendText($newvalue);
+        # Remove RowIdentifierDate, not sure if this is creating an error in the invoice processing
+        my ($daterow) = $invoicerow->findnodes('RowIdentifierDate');
+        $daterow->parentNode->removeChild($daterow) if $daterow;
     }
 
     return $doc;
@@ -98,6 +101,15 @@ sub finvoice_to_html {
         if ($invoice_date) {
             $message_invoicedate->removeChildNodes();
             $message_invoicedate->appendText(_convert_finvoice_date($invoice_date));
+        }
+    }
+
+    my $date_rows = $xml_doc->findnodes('//InvoiceRow/RowIdentifierDate');
+    foreach my $date_row ($date_rows->get_nodelist) {
+        my $date = $date_row->textContent;
+        if ($date) {
+            $date_row->removeChildNodes();
+            $date_row->appendText(_convert_finvoice_date($date));
         }
     }
 

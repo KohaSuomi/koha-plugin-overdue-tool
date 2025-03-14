@@ -49,7 +49,7 @@
                 <tbody>
                     <xsl:for-each select="//InvoiceRow">
                         <tr>
-                            <td><xsl:value-of select="DueDate"/></td>
+                            <td><xsl:value-of select="RowIdentifierDate"/></td>
                             <td><xsl:value-of select="ArticleName"/></td>
                             <td>
                                 <xsl:value-of select="ArticleIdentifier"/><br/>

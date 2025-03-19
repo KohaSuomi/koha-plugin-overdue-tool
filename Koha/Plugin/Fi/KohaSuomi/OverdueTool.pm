@@ -23,7 +23,7 @@ our $metadata = {
     minimum_version => '21.11.00.000',
     maximum_version => undef,
     version         => $VERSION,
-    description     => 'Laskutustyökalu laskujen lähetykseen',
+    description     => 'Laskutustyökalu laskujen lähetykseen. (Paikalliskannat)',
 };
 
 ## This is the minimum code required for a plugin's 'new' method

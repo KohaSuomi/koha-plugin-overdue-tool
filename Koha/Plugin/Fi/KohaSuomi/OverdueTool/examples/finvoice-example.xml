@@ -83,6 +83,7 @@
     <UnitPriceAmount AmountCurrencyIdentifier="EUR"><<items.replacementprice>></UnitPriceAmount>
     <UnitPriceNetAmount AmountCurrencyIdentifier="EUR"><<items.replacementprice>></UnitPriceNetAmount>
     <RowPositionIdentifier><<items.count>></RowPositionIdentifier>
+    <RowIdentifierDate Format="CCYYMMDD"><<items.finvoice_date>></RowIdentifierDate> <!-- Niteen eräpäivä, voidaan käyttää jäljennöksessä. -->
     <RowFreeText>Vapaasana!!</RowFreeText>
   </InvoiceRow></item>
   <EpiDetails>

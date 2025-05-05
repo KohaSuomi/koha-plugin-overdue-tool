@@ -19,7 +19,7 @@ new Vue({
       pdfBtn: false,
       einvoiceBtn: false,
       finvoiceBtn: false,
-      previewBtn: false,
+      copyBtn: false,
       categoryfilter: '',
     };
   },
@@ -185,7 +185,7 @@ new Vue({
       if (this.$refs.resultComponentRef) {
         store.commit('setNotice', '');
         if (preview) {
-          this.previewBtn = true;
+          this.copyBtn = true;
         } else {
           await this.refreshInvoiceNumber();
           this.pdfBtn = true;
@@ -198,7 +198,7 @@ new Vue({
         ).then(() => {
           this.previewPDF(preview, true);
           if (preview) {
-            this.previewBtn = false;
+            this.copyBtn = false;
           } else {
             this.pdfBtn = false;
           }
@@ -221,6 +221,22 @@ new Vue({
         });
       }
     },
+    async allCopies() {
+      if (this.$refs.resultComponentRef) {
+        store.commit('setNotice', '');
+        this.copyBtn = true;
+        store.commit('setCreated', false);
+        await Promise.all(
+          this.$refs.resultComponentRef.map(async (element) => {
+            await element.invoiceCopies();
+          })
+        ).then(() => {
+          this.previewPDF(false, true);
+          store.commit('setCreated', true);
+          this.copyBtn = false;
+        });
+      }
+    },
     printPDF() {
       printJS({
         printable: 'printDoc',
@@ -229,7 +245,6 @@ new Vue({
       });
     },
     back() {
-      store.commit('setCreated', false);
       this.showPDF = false;
     },
     updateStartDate(value) {
@@ -271,6 +286,7 @@ new Vue({
     },
     dismissCreated() {
       store.commit("setCreated", false);
+      this.fetch();
     }
   },
 });

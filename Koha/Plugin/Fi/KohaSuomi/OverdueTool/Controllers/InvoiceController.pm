@@ -264,18 +264,21 @@ sub invoice_copy {
         my $patron_id = $c->validation->param('patron_id');
         my $guarantor_id = $c->validation->param('guarantor_id');
         my $patron = Koha::Patrons->find($patron_id);
-        my $notices = $guarantor_id ? _last_patron_invoice($guarantor_id) : _last_patron_invoice($patron_id);
+        my $notices = $guarantor_id ? _patron_invoices($guarantor_id) : _patron_invoices($patron_id);
         my $html_pages = [];
         for my $notice (@$notices) {
-        
-            my $html = $notice->{message_transport_type} eq 'finvoice' ? finvoice_to_html($notice, $patron) : $notice->{content};
+            if (_find_actual_borrower($notice->{message_id}) == $patron_id) {
+                    
+                my $html = $notice->{message_transport_type} eq 'finvoice' ? finvoice_to_html($notice, $patron) : $notice->{content};
 
-            $html =~ s/\n/<br>/g if $notice->{message_transport_type} eq 'print'; # For e-invoice we need to replace newlines with <br> for proper formatting
-            push @$html_pages, {
-                message_id => $notice->{message_id},
-                notice => $html,
-            };
+                $html =~ s/\n/<br>/g if $notice->{message_transport_type} eq 'print'; # For e-invoice we need to replace newlines with <br> for proper formatting
+                push @$html_pages, {
+                    message_id => $notice->{message_id},
+                    notice => $html,
+                };
+            }
         }
+        return $c->render(status => 404, openapi => {error => 'Invoice copy is not linked to any item'}) unless @$html_pages;
         return $c->render(status => 200, openapi => $html_pages);
     }
     catch {
@@ -391,27 +394,22 @@ sub _validate_patron {
     return 1;
 }
 
-sub _last_patron_invoice {
-    my ($patron_id, $guarantor_id) = @_;
+sub _patron_invoices {
+    my ($patron_id) = @_;
 
-    my $notices = Koha::Notice::Messages->search({borrowernumber => $patron_id, letter_code => 'ODUECLAIM'});
-    my $last_notice = $notices->last;
-    my $last_date = $last_notice ? dt_from_string($last_notice->time_queued)->ymd : undef;
-    $notices = $notices->unblessed;
-    my @new_notices = ();
-    foreach my $notice (@$notices) {
-        if ($last_date && dt_from_string($notice->{time_queued})->ymd eq $last_date) {
-            push @new_notices, $notice;
-        }
-    }
-    return \@new_notices;
+    my $notices = Koha::Notice::Messages->search({borrowernumber => $patron_id, letter_code => 'ODUECLAIM'})->unblessed;
+    return $notices;
 }
 
-sub _find_message_id_from_items {
+sub _find_actual_borrower {
     my ($message_id) = @_;
 
     my $item = Koha::Items->search({new_status => $message_id})->next;
-    return $item;
+    if ($item) {
+        my $issue = Koha::Checkouts->search({itemnumber => $item->itemnumber})->next;
+        return $issue->borrowernumber;
+    }
+    return undef;
 }
 
 1;

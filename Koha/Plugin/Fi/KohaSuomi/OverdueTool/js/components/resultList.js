@@ -242,7 +242,7 @@ const resultList = Vue.component('result-list', {
       this.$parent.previewPDF(preview);
     },
     invoiceCopy: function () {
-      this.$store.dispatch('getInvoiceCopy', {patron_id: this.result.borrowernumber, guarantor_id: this.result.guarantor_id, multi: false});
+      this.$store.dispatch('getInvoiceCopy', {patron_id: this.result.borrowernumber, guarantor_id: this.result.guarantorid, multi: false});
       this.$parent.previewPDF(true);
     },
     invoiceCopies: function () {

@@ -276,6 +276,7 @@ sub invoice_copy {
                     message_id => $notice->{message_id},
                     notice => $html,
                 };
+                last;
             }
         }
         return $c->render(status => 404, openapi => {error => 'Invoice copy is not linked to any item'}) unless @$html_pages;
@@ -397,7 +398,7 @@ sub _validate_patron {
 sub _patron_invoices {
     my ($patron_id) = @_;
 
-    my $notices = Koha::Notice::Messages->search({borrowernumber => $patron_id, letter_code => 'ODUECLAIM'})->unblessed;
+    my $notices = Koha::Notice::Messages->search({borrowernumber => $patron_id, letter_code => 'ODUECLAIM'}, { order_by => {-desc => 'message_id'} })->unblessed;
     return $notices;
 }
 

@@ -478,9 +478,9 @@ const store = new Vuex.Store({
       commit('showLoader', true);
       commit('setNotice', '');
       commit('removeErrors');
-      const path = '/api/v1/contrib/kohasuomi/invoices/' + payload.patron_id +'/copy';
-      if (payload.guarontor_id) {
-        path += '?guarantor_id=' + payload.guarontor_id;
+      let path = '/api/v1/contrib/kohasuomi/invoices/' + payload.patron_id + '/copy';
+      if (payload.guarantor_id ){
+        path += '?guarantor_id=' + payload.guarantor_id;
       }
       return axios
         .get(path)

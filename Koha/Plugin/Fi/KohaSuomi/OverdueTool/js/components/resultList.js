@@ -242,13 +242,11 @@ const resultList = Vue.component('result-list', {
       this.$parent.previewPDF(preview);
     },
     invoiceCopy: function () {
-      const borrowernumber = this.result.guarantorid && !this.$store.state.blockedGuarantors.some(data => data === this.result.categorycode) ? this.result.guarantorid : this.result.borrowernumber;
-      this.$store.dispatch('getInvoiceCopy', {patron_id: borrowernumber, multi: false});
+      this.$store.dispatch('getInvoiceCopy', {patron_id: this.result.borrowernumber, guarantor_id: this.result.guarantor_id, multi: false});
       this.$parent.previewPDF(true);
     },
     invoiceCopies: function () {
-      const borrowernumber = this.result.guarantorid && !this.$store.state.blockedGuarantors.some(data => data === this.result.categorycode) ? this.result.guarantorid : this.result.borrowernumber;
-      return this.$store.dispatch('getInvoiceCopy', {patron_id: borrowernumber, multi: true});
+      return this.$store.dispatch('getInvoiceCopy', {patron_id: this.result.borrowernumber, guarantor_id: this.result.guarantorid, multi: true});
     },
     newPrice(val, index) {
       var intvalue = Math.floor(val);

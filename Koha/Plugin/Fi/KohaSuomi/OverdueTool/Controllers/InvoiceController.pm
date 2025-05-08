@@ -262,15 +262,21 @@ sub invoice_copy {
 
     return try {
         my $patron_id = $c->validation->param('patron_id');
+        my $guarantor_id = $c->validation->param('guarantor_id');
         my $patron = Koha::Patrons->find($patron_id);
-        my $notice = _last_patron_invoice($patron_id);
-        return $c->render(status => 404, openapi => {error => 'Invoice copy not found for '.$patron->cardnumber}) unless $notice && _find_message_id_from_items($notice->message_id);
+        my $notices = $guarantor_id ? _last_patron_invoice($guarantor_id) : _last_patron_invoice($patron_id);
+        my $html_pages = [];
+        for my $notice (@$notices) {
+        
+            my $html = $notice->{message_transport_type} eq 'finvoice' ? finvoice_to_html($notice, $patron) : $notice->{content};
 
-        my $html = $notice->message_transport_type eq 'finvoice' ? finvoice_to_html($notice) : $notice->content;
-
-        $html =~ s/\n/<br>/g if $notice->message_transport_type eq 'print'; # For e-invoice we need to replace newlines with <br> for proper formatting
-
-        return $c->render(status => 200, openapi => {notice => $html, message_id => $notice->message_id});
+            $html =~ s/\n/<br>/g if $notice->{message_transport_type} eq 'print'; # For e-invoice we need to replace newlines with <br> for proper formatting
+            push @$html_pages, {
+                message_id => $notice->{message_id},
+                notice => $html,
+            };
+        }
+        return $c->render(status => 200, openapi => $html_pages);
     }
     catch {
         warn Data::Dumper::Dumper $_;
@@ -386,10 +392,19 @@ sub _validate_patron {
 }
 
 sub _last_patron_invoice {
-    my ($patron_id) = @_;
+    my ($patron_id, $guarantor_id) = @_;
 
-    my $notice = Koha::Notice::Messages->search({borrowernumber => $patron_id, letter_code => 'ODUECLAIM'})->last;
-    return $notice;
+    my $notices = Koha::Notice::Messages->search({borrowernumber => $patron_id, letter_code => 'ODUECLAIM'});
+    my $last_notice = $notices->last;
+    my $last_date = $last_notice ? dt_from_string($last_notice->time_queued)->ymd : undef;
+    $notices = $notices->unblessed;
+    my @new_notices = ();
+    foreach my $notice (@$notices) {
+        if ($last_date && dt_from_string($notice->{time_queued})->ymd eq $last_date) {
+            push @new_notices, $notice;
+        }
+    }
+    return \@new_notices;
 }
 
 sub _find_message_id_from_items {

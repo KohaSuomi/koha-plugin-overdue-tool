@@ -478,14 +478,16 @@ const store = new Vuex.Store({
       commit('showLoader', true);
       commit('setNotice', '');
       commit('removeErrors');
+      const path = '/api/v1/contrib/kohasuomi/invoices/' + payload.patron_id +'/copy';
+      if (payload.guarontor_id) {
+        path += '?guarantor_id=' + payload.guarontor_id;
+      }
       return axios
-        .get('/api/v1/contrib/kohasuomi/invoices/' + payload.patron_id + '/copy')
+        .get(path)
         .then((response) => {
-          if (payload.multi) {
-            commit('setNotices', response.data.notice);
-          } else {
-            commit('setNotice', response.data.notice);
-          }
+          response.data.forEach(element => {
+            commit('setNotices', element.notice);
+          });
           commit('showLoader', false);
         })
         .catch((error) => {

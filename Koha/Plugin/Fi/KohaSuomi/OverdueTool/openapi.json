@@ -921,6 +921,13 @@
           "type": "number",
           "description": "Patron's id",
           "required": true
+        },
+        {
+          "name": "guarantor_id",
+          "in": "query",
+          "type": "number",
+          "description": "Guarantor's id",
+          "required": false
         }
       ],
       "produces": [
@@ -930,7 +937,7 @@
         "200": {
           "description": "Invoice copy",
           "schema": {
-            "type": "object"
+            "type": "array"
           }
         },
         "400": {

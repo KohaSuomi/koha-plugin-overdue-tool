@@ -36,7 +36,7 @@
         </div>
 
         <div class="content">
-            <p><strong>Lainaajan: </strong> <xsl:value-of select="//BuyerContactPersonName"/></p>
+            <p><strong>Lainaaja: </strong> <xsl:value-of select="//BuyerContactPersonName"/></p>
             <table class="table">
                 <thead>
                     <tr>

@@ -78,7 +78,7 @@ sub process_xml {
 }
 
 sub finvoice_to_html {
-    my ($notice) = @_;
+    my ($notice, $patron) = @_;
 
     my $xslt = XML::LibXSLT->new();
     my $parser = XML::LibXML->new();
@@ -86,13 +86,13 @@ sub finvoice_to_html {
     my $plugin_path = C4::Context->config('pluginsdir') . '/Koha/Plugin/Fi/KohaSuomi/OverdueTool/finvoice/finvoice-to-html.xsl';
     my $style_doc = $parser->parse_file($plugin_path);
     my $stylesheet = $xslt->parse_stylesheet($style_doc);
-    my $finvoice = $notice->content;
+    my $finvoice = $notice->{content};
     $finvoice =~ s/encoding="ISO-8859-15"/encoding="UTF-8"/;
     my $xml_doc = $parser->parse_string($finvoice);
     my $message_timestamp = $xml_doc->findnodes('//MessageDetails/MessageTimeStamp')->[0];
     if ($message_timestamp) {
         $message_timestamp->removeChildNodes();
-        $message_timestamp->appendText(dt_from_string($notice->updated_on)->strftime('%d.%m.%Y'));
+        $message_timestamp->appendText(dt_from_string($notice->{updated_on})->strftime('%d.%m.%Y'));
     };
 
     my $message_invoicedate = $xml_doc->findnodes('//InvoiceDetails/PaymentTermsDetails/InvoiceDueDate')->[0];
@@ -112,6 +112,10 @@ sub finvoice_to_html {
             $date_row->appendText(_convert_finvoice_date($date));
         }
     }
+    my $borrower_name = $xml_doc->createElement('BuyerContactPersonName');
+    $borrower_name->appendText($patron->firstname . ' ' . $patron->surname . ' (' . $patron->cardnumber . ')');
+    my $buyer_party_details = $xml_doc->findnodes('//BuyerPartyDetails')->[0];
+    $buyer_party_details->appendChild($borrower_name) if $buyer_party_details;
 
     my $results = $stylesheet->transform($xml_doc);
     my $html = $stylesheet->output_string($results);

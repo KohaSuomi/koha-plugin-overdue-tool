@@ -1,4 +1,7 @@
 .a4-width {
+  max-width: 229mm;
+}
+.a4-width-finvoice {
   width: 229mm;
 }
 .preview .header,

@@ -72,7 +72,7 @@
 								</div>
 							</div>
 							<div class="d-flex justify-content-center" :class="{'d-none': showLoader }">
-								<div id="printDoc" class="preview a4-width" :class="{'a4-width-finvoice' : invoiceType == 'FINVOICE'}" v-html="notice"></div>
+								<div id="printDoc" class="preview a4-width" v-html="notice"></div>
 							</div>
 						</div>
 					</div>

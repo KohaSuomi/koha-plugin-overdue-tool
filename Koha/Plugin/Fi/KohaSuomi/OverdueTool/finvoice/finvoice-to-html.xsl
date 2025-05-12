@@ -5,7 +5,7 @@
     <xsl:output method="html" indent="yes"/>
 
     <xsl:template match="/">
-        <div class="header" style="width:229mm;">
+        <div class="header">
             <div class="sender">
                 <div class="library">
                     <ul class="info">

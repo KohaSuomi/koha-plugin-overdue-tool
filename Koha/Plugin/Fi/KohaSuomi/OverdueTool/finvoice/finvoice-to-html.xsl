@@ -42,7 +42,7 @@
                     <tr>
                         <th>Eräpäivä</th>
                         <th>Nimeke</th>
-                        <th>Nidenumero</th>
+                        <th>Lisätiedot</th>
                         <th>Hinta</th>
                     </tr>
                 </thead>
@@ -53,6 +53,10 @@
                             <td><xsl:value-of select="ArticleName"/></td>
                             <td>
                                 <xsl:value-of select="ArticleIdentifier"/><br/>
+                                <xsl:for-each select="RowFreeText">
+                                    <xsl:value-of select="."/>
+                                    <xsl:if test="position() != last()"><br/> </xsl:if>
+                                </xsl:for-each>
                             </td>
                             <td>
                                 <xsl:value-of select="UnitPriceNetAmount"/>€<br/>

@@ -267,8 +267,8 @@ sub invoice_copy {
         my $notices = $guarantor_id ? _patron_invoices($guarantor_id) : _patron_invoices($patron_id);
         my $html_pages = [];
         for my $notice (@$notices) {
-            if (_find_actual_borrower($notice->{message_id}) == $patron_id) {
-                    
+            if (_find_related_checkouts($notice->{message_id}, $patron_id)) {
+
                 my $html = $notice->{message_transport_type} eq 'finvoice' ? finvoice_to_html($notice, $patron) : $notice->{content};
 
                 $html =~ s/\n/<br>/g if $notice->{message_transport_type} eq 'print'; # For e-invoice we need to replace newlines with <br> for proper formatting
@@ -402,15 +402,15 @@ sub _patron_invoices {
     return $notices;
 }
 
-sub _find_actual_borrower {
-    my ($message_id) = @_;
+sub _find_related_checkouts {
+    my ($message_id, $patron_id) = @_;
 
-    my $item = Koha::Items->search({new_status => $message_id})->next;
-    if ($item) {
-        my $issue = Koha::Checkouts->search({itemnumber => $item->itemnumber})->next;
-        return $issue->borrowernumber;
+    my $items = Koha::Items->search({new_status => $message_id})->as_list;
+    for my $item (@$items) {
+        my $issue = Koha::Checkouts->search({itemnumber => $item->itemnumber, borrowernumber => $patron_id})->next;
+        return 1 if $issue;
     }
-    return undef;
+    return 0;
 }
 
 1;

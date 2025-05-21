@@ -117,6 +117,14 @@ sub finvoice_to_html {
     my $buyer_party_details = $xml_doc->findnodes('//BuyerPartyDetails')->[0];
     $buyer_party_details->appendChild($borrower_name) if $buyer_party_details;
 
+    my $buyer_name = $xml_doc->findnodes('//BuyerPartyDetails/BuyerOrganisationName')->[0];
+    if ($buyer_name) {
+        my $newname = $buyer_name->textContent;
+        $newname =~ s/^(\S+)\s+(\S+)/$1 . ' ' . uc($2)/e;
+        $buyer_name->removeChildNodes;
+        $buyer_name->appendText($newname);
+    }
+
     my $results = $stylesheet->transform($xml_doc);
     my $html = $stylesheet->output_string($results);
 

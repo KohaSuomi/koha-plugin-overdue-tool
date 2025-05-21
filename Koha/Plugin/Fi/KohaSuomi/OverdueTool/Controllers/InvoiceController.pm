@@ -137,7 +137,7 @@ sub set {
             accountnumber => $body->{accountnumber},
             biccode => $body->{biccode},
             businessid => $body->{businessid},
-            issueborname => $body->{firstname}.' '.$body->{surname},
+            issueborname => $body->{firstname}.' '.uc($body->{surname}),
             issueborbarcode => $body->{cardnumber},
             grouplibrary => $body->{grouplibrary},
             groupaddress => $body->{groupaddress},
@@ -150,7 +150,7 @@ sub set {
 
         if ($body->{guarantee}) {
             my $guarantee = Koha::Patrons->find($body->{guarantee});
-            $params{"substitute"}{"issueborname"} = $guarantee->firstname.' '.$guarantee->surname;
+            $params{"substitute"}{"issueborname"} = $guarantee->firstname.' '.uc($guarantee->surname);
             $params{"substitute"}{"issueborbarcode"} = $guarantee->cardnumber;
         }
 
@@ -161,7 +161,7 @@ sub set {
                 return $c->render(status => 400, openapi => {error => $validation_error});
             }
             $params{"substitute"}{"guarantorfirstname"} = $guarantor->firstname;
-            $params{"substitute"}{"guarantorsurname"} = $guarantor->surname;
+            $params{"substitute"}{"guarantorsurname"} = uc($guarantor->surname);
             $params{"substitute"}{"guarantoraddress"} = $guarantor->address;
             $params{"substitute"}{"guarantorcity"} = $guarantor->city;
             $params{"substitute"}{"guarantorzipcode"} = $guarantor->zipcode;

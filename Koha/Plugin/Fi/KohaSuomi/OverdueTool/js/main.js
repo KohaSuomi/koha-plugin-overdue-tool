@@ -242,6 +242,7 @@ new Vue({
         printable: 'printDoc',
         type: 'html',
         css: '/plugin/Koha/Plugin/Fi/KohaSuomi/OverdueTool/css/pdf.css',
+        style: '.a4-width-finvoice { width: auto; }',
       });
     },
     back() {

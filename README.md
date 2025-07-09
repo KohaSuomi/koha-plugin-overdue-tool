@@ -42,7 +42,6 @@ From the release page you can download the latest \*.kpz file
 `cronjobs/run_finvoice.pl /var/spool/koha/finvoice/ -p /etc/koha/finvoice-config.yaml -c LASKUOU -v --noescape --xsd /var/lib/koha/plugins/Koha/Plugin/Fi/KohaSuomi/OverdueTool/finvoice/Finvoice3.0.xsd --pretty`
   * jokaisella laskutusryhmällä tulee olla oma ajo!
   * ajo kyllä valittaa, jos asetuksissa tms. on jotain pielessä, yleensä laskupohja (ODUECLAIM) ei ole Finvoice3.0 skeeman mukainen (Finvoice3.0.xsd) tai sitten finvoice-config.yaml:issa on sisennykset väärin
-  * ajo valittaa melko usein (testeillä) puuttuvasta ssnkey-arvosta (Use of uninitialized value $ssnkey in substitution (s///)), ei ole vaarallista, laskut menee silti läpi (korjataan jossain vaiheessa)
 
 ## Ohjeet pääkäyttäjille
 

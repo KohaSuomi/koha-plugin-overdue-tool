@@ -45,6 +45,7 @@ use YAML::XS;
 use Net::SFTP::Foreign;
 use Koha::Plugins;
 use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Finvoice;
+use C4::KohaSuomi::SFTP;
 
 
 sub usage {
@@ -65,7 +66,7 @@ USAGE
     exit $_[0];
 }
 
-my ( $help, $config, $path, $validate, $xsd, $zip, $pretty, $noescape, $testssn );
+my ( $help, $config, $path, $validate, $xsd, $zip, $pretty, $noescape, $testssn, $newsftp );
 
 GetOptions(
     'h|help'     => \$help,
@@ -77,6 +78,7 @@ GetOptions(
     'pretty'     => \$pretty,
     'noescape'   => \$noescape,
     'testssn'    => \$testssn,
+    'newsftp'    => \$newsftp,
 ) || usage(1);
 
 usage(0) if ($help);
@@ -164,10 +166,18 @@ if (@message_ids) {
 
         my @zipfiles = <*.zip>;
 
-        $messages = sftp_transfer( \@zipfiles, \@message_ids );
+        if($newsftp){
+            $messages = C4::KohaSuomi::SFTP::sftp_transfer( \@zipfiles, $finvoiceconfig, $tmppath, $archivepath, \@message_ids );
+        } else {
+            $messages = sftp_transfer( \@zipfiles, \@message_ids );
+        }
 
     } else {
-        $messages = sftp_transfer( \@files );
+        if($newsftp){
+            $messages = C4::KohaSuomi::SFTP::sftp_transfer( \@files, $finvoiceconfig, $tmppath, $archivepath );
+        } else {
+            $messages = sftp_transfer(\@files);
+        }
     }
 
     foreach my $message (@$messages){

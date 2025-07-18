@@ -66,7 +66,7 @@ USAGE
     exit $_[0];
 }
 
-my ( $help, $config, $path, $validate, $xsd, $zip, $pretty, $noescape, $testssn, $newsftp );
+my ( $help, $config, $path, $validate, $xsd, $zip, $pretty, $noescape, $testssn );
 
 GetOptions(
     'h|help'     => \$help,
@@ -78,7 +78,6 @@ GetOptions(
     'pretty'     => \$pretty,
     'noescape'   => \$noescape,
     'testssn'    => \$testssn,
-    'newsftp'    => \$newsftp,
 ) || usage(1);
 
 usage(0) if ($help);
@@ -166,18 +165,10 @@ if (@message_ids) {
 
         my @zipfiles = <*.zip>;
 
-        if($newsftp){
-            $messages = C4::KohaSuomi::SFTP::sftp_transfer( \@zipfiles, $finvoiceconfig, $tmppath, $archivepath, \@message_ids );
-        } else {
-            $messages = sftp_transfer( \@zipfiles, \@message_ids );
-        }
+        $messages = C4::KohaSuomi::SFTP::sftp_transfer( \@zipfiles, $finvoiceconfig, $tmppath, $archivepath, \@message_ids );
 
     } else {
-        if($newsftp){
-            $messages = C4::KohaSuomi::SFTP::sftp_transfer( \@files, $finvoiceconfig, $tmppath, $archivepath );
-        } else {
-            $messages = sftp_transfer(\@files);
-        }
+        $messages = C4::KohaSuomi::SFTP::sftp_transfer( \@files, $finvoiceconfig, $tmppath, $archivepath );
     }
 
     foreach my $message (@$messages){
@@ -190,63 +181,4 @@ if (@message_ids) {
 
 } else {
     print "Not any notices processed\n";
-}
-
-sub sftp_transfer {
-    my ( $files, $message_ids ) = @_;
-
-    my @messages_array;
-    my $success = 1;
-    my $error = "";
-
-    # Connect and send with SFTP
-    my $sftp = Net::SFTP::Foreign->new('host' => $finvoiceconfig->{host},
-                                       'port' => $finvoiceconfig->{port} || '22',
-                                       'user' => $finvoiceconfig->{username},
-                                       'password' => $finvoiceconfig->{password});
-
-    if ( $sftp->error ) {
-        die "Logging in to SFTP server failed with: ".$sftp->error."\n";
-    }
-
-    foreach my $file ( @$files ) {
-        my $file_type = substr $file, -4;
-        my ($library, $message_id) = split(/(\d+)/, $file) unless $file_type eq ".zip";
-
-        unless ( $sftp->put($tmppath.$file, $finvoiceconfig->{filepath}.$file.'.part', copy_perms => 0, copy_time => 0)) {
-            $success = 0;
-            $error = $sftp->error;
-            print "Transferring file to SFTP server failed with: ".$sftp->error."\n";
-        }
-
-        unless ( $sftp->rename($finvoiceconfig->{filepath}.$file.'.part', $finvoiceconfig->{filepath}.$file)) {
-            $success = 0;
-            $error = $sftp->error;
-            print "Renaming a file on SFTP server failed with: ".$sftp->error."\n";
-        }
-
-        move ("$tmppath$file", "$archivepath") or die "The move operation failed: $!";
-
-        unless( $file_type eq ".zip" ){
-            my $message_hash = {
-                message_id => $message_id,
-                success => $success,
-                error => $error
-            };
-            push @messages_array, $message_hash;
-        }
-    }
-
-    if ( $message_ids ){
-        foreach my $message_id ( @$message_ids ){
-            my $message_hash = {
-                message_id => $message_id,
-                success => $success,
-                error => $error
-            };
-            push @messages_array, $message_hash;
-        }
-    }
-
-    return \@messages_array;
 }

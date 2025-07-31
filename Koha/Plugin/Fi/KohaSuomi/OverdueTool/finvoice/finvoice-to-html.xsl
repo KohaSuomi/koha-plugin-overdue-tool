@@ -11,7 +11,7 @@
                     <ul class="info">
                         <li><xsl:value-of select="//SellerOrganisationName"/></li>
                         <li><xsl:value-of select="//SellerStreetName"/></li>
-                        <li><xsl:value-of select="//SellerPostCodeIdentifier"/> <xsl:value-of select="//SellerTownName"/></li>
+                        <li><xsl:value-of select="//SellerPostCodeIdentifier"/><xsl:text> </xsl:text><xsl:value-of select="//SellerTownName"/></li>
                         <li><xsl:value-of select="//SellerPartyIdentifier"/></li>
                     </ul>
                 </div>
@@ -31,7 +31,7 @@
             <ul class="info">
                 <li><xsl:value-of select="//BuyerOrganisationName"/></li>
                 <li><xsl:value-of select="//BuyerStreetName"/></li>
-                <li><xsl:value-of select="//BuyerPostCodeIdentifier"/> <xsl:value-of select="//BuyerTownName"/></li>
+                <li><xsl:value-of select="//BuyerPostCodeIdentifier"/><xsl:text> </xsl:text><xsl:value-of select="//BuyerTownName"/></li>
             </ul>
         </div>
 
@@ -80,7 +80,7 @@
                 <ul class="info">
                     <li><xsl:value-of select="//SellerOrganisationName"/></li>
                     <li><xsl:value-of select="//SellerStreetName"/></li>
-                    <li><xsl:value-of select="//SellerPostCodeIdentifier"/> <xsl:value-of select="//SellerTownName"/></li>
+                    <li><xsl:value-of select="//SellerPostCodeIdentifier"/><xsl:text> </xsl:text><xsl:value-of select="//SellerTownName"/></li>
                     <li><xsl:value-of select="//SellerPartyIdentifier"/></li>
                 </ul>
             </div>

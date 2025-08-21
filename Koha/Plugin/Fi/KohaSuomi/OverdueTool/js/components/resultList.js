@@ -248,7 +248,15 @@ const resultList = Vue.component('result-list', {
     },
     invoiceCopies: function () {
       const guarantor_id = this.result.guarantorid && !this.$store.state.blockedGuarantors.some(data => data === this.result.categorycode) ? this.result.guarantorid : undefined;
-      return this.$store.dispatch('getInvoiceCopy', {patron_id: this.result.borrowernumber, guarantor_id: guarantor_id, multi: true});
+      this.removecheckouts.forEach((element) => {
+        let index = this.newcheckouts.findIndex(
+          (checkout) => checkout.itemnumber === element
+        );
+        this.newcheckouts.splice(index, 1);
+      });
+      if (this.newcheckouts.length) {
+        return this.$store.dispatch('getInvoiceCopy', {patron_id: this.result.borrowernumber, guarantor_id: guarantor_id, multi: true});
+      }
     },
     newPrice(val, index) {
       var intvalue = Math.floor(val);

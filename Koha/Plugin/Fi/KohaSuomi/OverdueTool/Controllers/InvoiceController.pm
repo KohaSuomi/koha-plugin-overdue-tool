@@ -80,17 +80,10 @@ sub set {
             $repeat->{replacementprice} =~ tr/,/./;
             $totalfines = $totalfines + $repeat->{replacementprice};
             $repeat->{replacementprice} =~ tr/./,/;
-            my $item = {
-                count => $count,
-                itemnumber => $repeat->{itemnumber},
-                replacementprice => $repeat->{replacementprice},
-                finvoice_date => $finvoice_date,
-                date_due => $d.'.'.$m.'.'.$y,
-                enumchron => $repeat->{enumchron},
-                itype => $repeat->{itype},
-                itemcallnumber => $repeat->{itemcallnumber},
-                barcode => $repeat->{barcode}
-            };
+            my $item = { %{$repeat} };
+            $item->{count} = $count;
+            $item->{finvoice_date} = $finvoice_date;
+            $item->{date_due} = $d.'.'.$m.'.'.$y;
 
             my $author = _escape_string($repeat->{author});
             my $title = _escape_string($repeat->{title});

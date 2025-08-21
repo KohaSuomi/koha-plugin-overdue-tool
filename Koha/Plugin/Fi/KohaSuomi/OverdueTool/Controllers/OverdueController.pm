@@ -94,8 +94,8 @@ sub get {
             }, 
             {
                 join => { 'item' => 'biblio'},
-                '+select' => ['item.barcode', 'item.enumchron', 'item.itemcallnumber', 'item.itype', 'item.replacementprice', 'item.biblionumber', 'item.dateaccessioned', 'biblio.title', 'biblio.author'],
-                '+as' => ['barcode', 'enumchron', 'itemcallnumber', 'itype', 'replacementprice', 'biblionumber', 'dateaccessioned', 'title', 'author'],
+                '+select' => ['item.barcode', 'item.enumchron', 'item.itemcallnumber', 'item.itype', 'item.replacementprice', 'item.biblionumber', 'item.dateaccessioned', 'biblio.title', 'biblio.author', 'item.homebranch', 'item.permanent_location'],
+                '+as' => ['barcode', 'enumchron', 'itemcallnumber', 'itype', 'replacementprice', 'biblionumber', 'dateaccessioned', 'title', 'author', 'homebranch', 'permanent_location'],
             }
         )->unblessed;
 

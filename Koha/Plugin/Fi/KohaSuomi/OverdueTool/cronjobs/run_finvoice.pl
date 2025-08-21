@@ -46,6 +46,7 @@ use Net::SFTP::Foreign;
 use Koha::Plugins;
 use Koha::Plugin::Fi::KohaSuomi::OverdueTool::Modules::Finvoice;
 use C4::KohaSuomi::SFTP;
+use Try::Tiny;
 
 
 sub usage {
@@ -148,37 +149,51 @@ if (@message_ids) {
     my @files = <*.xml>;
     my $messages;
 
-    if ($zip) {
-        my $zipwrite = Archive::Zip->new();
-        my $zipFile = $config."-kirjasto-finvoice-".$today. ".zip";
-        foreach my $file (@files) {
-            $zipwrite->addFile( $file );
+    try {
+        if ($zip) {
+            my $zipwrite = Archive::Zip->new();
+            my $zipFile = $config."-kirjasto-finvoice-".$today. ".zip";
+            foreach my $file (@files) {
+                $zipwrite->addFile( $file );
         }
 
-        unless ( $zipwrite->writeToFileNamed($tmppath . $zipFile) == AZ_OK ) {
-            die 'error creating zip-file';
-        }
+            unless ( $zipwrite->writeToFileNamed($tmppath . $zipFile) == AZ_OK ) {
+                die 'error creating zip-file';
+            }
 
-        foreach my $file (@files) {
-            unlink $file;
-        }
+            foreach my $file (@files) {
+                unlink $file;
+            }
 
-        my @zipfiles = <*.zip>;
+            my @zipfiles = <*.zip>;
 
-        $messages = C4::KohaSuomi::SFTP::sftp_transfer( \@zipfiles, $finvoiceconfig, $tmppath, $archivepath, \@message_ids );
+            $messages = C4::KohaSuomi::SFTP::sftp_transfer( \@zipfiles, $finvoiceconfig, $tmppath, $archivepath, \@message_ids );
 
-    } else {
-        $messages = C4::KohaSuomi::SFTP::sftp_transfer( \@files, $finvoiceconfig, $tmppath, $archivepath );
-    }
-
-    foreach my $message (@$messages){
-        if( $message->{success} ){
-            C4::Letters::_set_message_status({ message_id => $message->{message_id}, status => 'sent'} );
         } else {
-            C4::Letters::_set_message_status({ message_id => $message->{message_id}, status => 'failed', failure_code => "Error while transfering file: ".$message->{error} } );
+            $messages = C4::KohaSuomi::SFTP::sftp_transfer( \@files, $finvoiceconfig, $tmppath, $archivepath );
         }
-    }
 
+        foreach my $message (@$messages){
+            if( $message->{success} ){
+                C4::Letters::_set_message_status({ message_id => $message->{message_id}, status => 'sent'} );
+            } else {
+                C4::Letters::_set_message_status({ message_id => $message->{message_id}, status => 'failed', failure_code => "Error while transfering file: ".$message->{error} } );
+            }
+        }
+    } catch {
+        print "Error processing notices: $_";
+        # Clean up any zip files to prevent resending on next run
+        foreach my $zipfile (<*.zip>) {
+            unlink $zipfile;
+        }
+        # Clean up any xml files to prevent resending on next run
+        foreach my $xmlfile (<*.xml>) {
+            unlink $xmlfile;
+        }
+        foreach my $message_id (@message_ids) {
+            C4::Letters::_set_message_status({ message_id => $message_id, status => 'failed', failure_code => "Error while processing notices: $_" });
+        }
+    };
 } else {
     print "Not any notices processed\n";
 }

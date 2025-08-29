@@ -257,10 +257,11 @@ sub invoice_copy {
         my $patron_id = $c->validation->param('patron_id');
         my $guarantor_id = $c->validation->param('guarantor_id');
         my $patron = Koha::Patrons->find($patron_id);
+        my $guarantor = Koha::Patrons->find($guarantor_id) if $guarantor_id;
         my $notices = $guarantor_id ? _patron_invoices($guarantor_id) : _patron_invoices($patron_id);
         my $html_pages = [];
         for my $notice (@$notices) {
-            if (_find_related_checkouts($notice->{message_id}, $patron_id)) {
+            if (_find_related_checkouts($notice->{message_id}, $patron_id, $guarantor_id)) {
 
                 my $html = $notice->{message_transport_type} eq 'finvoice' ? finvoice_to_html($notice, $patron) : $notice->{content};
 

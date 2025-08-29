@@ -78,7 +78,7 @@ sub process_xml {
 }
 
 sub finvoice_to_html {
-    my ($notice, $patron) = @_;
+    my ($notice, $patron, $guarantor) = @_;
 
     my $xslt = XML::LibXSLT->new();
     my $parser = XML::LibXML->new();
@@ -120,7 +120,11 @@ sub finvoice_to_html {
     my $buyer_name = $xml_doc->findnodes('//BuyerPartyDetails/BuyerOrganisationName')->[0];
     if ($buyer_name) {
         my $newname = $buyer_name->textContent;
-        $newname =~ s/^(\S+)\s+(\S+)/$1 . ' ' . uc($2)/e;
+        my $surname = $guarantor ? $guarantor->surname : $patron->surname;
+        if ($surname && $newname =~ /\b\Q$surname\E\b/i) {
+            # Capitalize the surname in the name string
+            $newname =~ s/\b\Q$surname\E\b/uc($surname)/ie;
+        }
         $buyer_name->removeChildNodes;
         $buyer_name->appendText($newname);
     }

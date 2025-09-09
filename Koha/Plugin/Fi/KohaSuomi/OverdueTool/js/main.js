@@ -21,6 +21,7 @@ new Vue({
       finvoiceBtn: false,
       copyBtn: false,
       categoryfilter: '',
+      disableButton: false,
     };
   },
   mounted() {
@@ -107,6 +108,12 @@ new Vue({
     },
   },
   methods: {
+    disableInvoiceButton: function () {
+      this.disableButton = true;
+    },
+    releaseInvoiceButton: function () {
+      this.disableButton = false;
+    },
     getConfig() {
       axios
         .get('/api/v1/contrib/kohasuomi/overdues/config')
@@ -136,6 +143,7 @@ new Vue({
       store.dispatch('fetchOverdues');
       this.activate();
       this.validateSettings();
+      this.releaseInvoiceButton();
     },
     async refreshInvoiceNumber() {
       return axios
@@ -156,6 +164,7 @@ new Vue({
     },
     async allFinvoices() {
       if (this.$refs.resultComponentRef) {
+        this.disableInvoiceButton();
         await this.refreshInvoiceNumber();
         this.finvoiceBtn = true;
         store.commit('setCreated', false);

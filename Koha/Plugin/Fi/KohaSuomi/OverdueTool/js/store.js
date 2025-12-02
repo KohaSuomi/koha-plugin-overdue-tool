@@ -46,7 +46,8 @@ const store = new Vuex.Store({
     invoiceNumber: 0,
     cancelToken: null,
     blockedGuarantors: [],
-    guarantorDebarment: false
+    guarantorDebarment: false,
+    itemtypes: []
   },
   mutations: {
     addError(state, value) {
@@ -212,6 +213,9 @@ const store = new Vuex.Store({
     },
     addGuarantorDebarment(state, value) {
       state.guarantorDebarment = value;
+    },
+    addItemTypes(state, value) {
+      state.itemtypes = value;
     }
   },
   actions: {

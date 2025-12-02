@@ -25,6 +25,7 @@ new Vue({
   },
   mounted() {
     this.getConfig();
+    this.fetchItemTypes();
   },
   computed: {
     results() {
@@ -142,6 +143,16 @@ new Vue({
         .get('/api/v1/contrib/kohasuomi/overdues/config')
         .then((response) => {
           store.commit('addInvoiceNumber', response.data.invoicenumber);
+        })
+        .catch((error) => {
+          store.commit('addErrors', error.response.data.error);
+        });
+    },
+    async fetchItemTypes() {
+      return axios
+        .get('/api/v1/item_types')
+        .then((response) => {
+          store.commit('addItemTypes', response.data);
         })
         .catch((error) => {
           store.commit('addErrors', error.response.data.error);

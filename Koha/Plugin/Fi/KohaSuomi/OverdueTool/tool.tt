@@ -225,7 +225,7 @@
 
 						<li class="list-inline-item d-table-cell">
 							<span :class="{'text-danger font-weight-bold': checkout.itype == 'KAUKOLAINA'}">
-							{{ checkout.itype }}
+							{{ checkout.itype }} - {{ getItemTypeDescription(checkout.itype) }}
 							</span>
 						</li>	
 

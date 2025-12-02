@@ -134,6 +134,9 @@ const resultList = Vue.component('result-list', {
     invoicenumber() {
       return parseInt(this.$store.state.invoiceNumber);
     },
+    itemTypes() {
+      return this.$store.state.itemtypes || [];
+    },
   },
   methods: {
     disableInvoiceButton: function () {
@@ -154,6 +157,11 @@ const resultList = Vue.component('result-list', {
           this.patronErrors.push(finnishFields[fields.indexOf(field)]);
         }
       });
+    },
+    getItemTypeDescription(code) {
+      if (!this.itemTypes || !this.itemTypes.length) return code;
+      const type = this.itemTypes.find(t => t.item_type_id === code);
+      return type ? type.description : code;
     },
     create: function () {
       if (this.invoiceType === 'FINVOICE' || this.invoiceType === 'EINVOICE') {

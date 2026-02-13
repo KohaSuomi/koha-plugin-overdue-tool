@@ -716,10 +716,6 @@
                 "description": "Add debarment for patron",
                 "type": "boolean"
               },
-              "guarantordebarment": {
-                "description": "Add debarment for patron",
-                "type": "boolean"
-              },
               "addreferencenumber": {
                 "description": "Add reference number to invoice",
                 "type": "boolean"

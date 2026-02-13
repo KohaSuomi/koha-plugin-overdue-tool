@@ -173,13 +173,6 @@
                                                             <label class="custom-control-label" :for="group.groupname + '_debarment'" ></label>
                                                             </div>
                                                         </li>
-                                                        <li class="list-group-item has-icon">
-                                                            Aseta rajoitus huoltajalle
-                                                            <div class="custom-control custom-control-nolabel custom-switch ml-auto">
-                                                            <input type="checkbox" class="custom-control-input" :id="group.groupname + '_guarantordebarment'" v-model="group.guarantordebarment">
-                                                            <label class="custom-control-label" :for="group.groupname + '_guarantordebarment'" ></label>
-                                                            </div>
-                                                        </li>
                                                         <li class="list-group-item">
                                                             <label for="invoicefine">Laskutuslisä</label>
                                                             <input type="text" class="form-control" name="invoicefine"  v-model="group.invoicefine"/>

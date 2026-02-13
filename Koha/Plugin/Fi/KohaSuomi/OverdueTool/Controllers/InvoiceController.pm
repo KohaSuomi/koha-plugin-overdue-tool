@@ -194,26 +194,10 @@ sub set {
                 $item_object->store;
             }
 
-            if ($body->{debarment} && !$body->{guarantee} && !$body->{guarantor}) {
+            if ($body->{debarment}) {
 
                 Koha::Patron::Debarments::AddUniqueDebarment({
                     borrowernumber => $patron_id,
-                    type           => 'OVERDUES',
-                    comment        => "Lainauskielto laskutetusta aineistosta",
-                });
-            } 
-            
-            if ($body->{debarment} && $body->{guarantee}) {
-                Koha::Patron::Debarments::AddUniqueDebarment({
-                    borrowernumber => $body->{guarantee},
-                    type           => 'OVERDUES',
-                    comment        => "Lainauskielto laskutetusta aineistosta",
-                });
-            }
-
-            if ($body->{guarantordebarment} && ($body->{guarantee} || $body->{guarantor})) {
-                Koha::Patron::Debarments::AddUniqueDebarment({
-                    borrowernumber => $body->{guarantor} ? $body->{guarantor} : $patron_id,
                     type           => 'OVERDUES',
                     comment        => "Lainauskielto laskutetusta aineistosta",
                 });

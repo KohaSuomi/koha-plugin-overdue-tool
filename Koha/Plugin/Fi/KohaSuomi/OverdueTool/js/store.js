@@ -46,7 +46,6 @@ const store = new Vuex.Store({
     invoiceNumber: 0,
     cancelToken: null,
     blockedGuarantors: [],
-    guarantorDebarment: false,
     itemtypes: []
   },
   mutations: {
@@ -211,9 +210,6 @@ const store = new Vuex.Store({
     addBlockedGuarantors(state, value) {
       state.blockedGuarantors = value;
     },
-    addGuarantorDebarment(state, value) {
-      state.guarantorDebarment = value;
-    },
     addItemTypes(state, value) {
       state.itemtypes = value;
     }
@@ -255,9 +251,6 @@ const store = new Vuex.Store({
             if (group.guarantorblock) {
               let blockedArr = group.guarantorblock.split(',');
               commit('addBlockedGuarantors', blockedArr);
-            }
-            if (group.guarantordebarment) {
-              commit('addGuarantorDebarment', group.guarantordebarment);
             }
           }
         });

@@ -213,8 +213,7 @@ const resultList = Vue.component('result-list', {
         groupaddress: this.$store.state.groupAddress,
         groupcity: this.$store.state.groupCity,
         groupzipcode: this.$store.state.groupZipcode,
-        groupphone: this.$store.state.groupPhone,
-        guarantordebarment: this.$store.state.guarantorDebarment
+        groupphone: this.$store.state.groupPhone
       };
 
       if (this.invoiceType == 'FINVOICE' && !preview) {

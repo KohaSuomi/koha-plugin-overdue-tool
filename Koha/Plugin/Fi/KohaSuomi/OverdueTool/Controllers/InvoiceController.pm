@@ -197,7 +197,7 @@ sub set {
             if ($body->{debarment}) {
 
                 Koha::Patron::Debarments::AddUniqueDebarment({
-                    borrowernumber => $patron_id,
+                    borrowernumber => $body->{guarantee},
                     type           => 'OVERDUES',
                     comment        => "Lainauskielto laskutetusta aineistosta",
                 });

@@ -196,11 +196,19 @@ sub set {
 
             if ($body->{debarment}) {
 
-                Koha::Patron::Debarments::AddUniqueDebarment({
-                    borrowernumber => $body->{guarantee},
-                    type           => 'OVERDUES',
-                    comment        => "Lainauskielto laskutetusta aineistosta",
-                });
+                if ($body->{guarantee}) {
+                    Koha::Patron::Debarments::AddUniqueDebarment({
+                        borrowernumber => $body->{guarantee},
+                        type           => 'OVERDUES',
+                        comment        => "Lainauskielto laskutetusta aineistosta",
+                    });
+                } else {
+                    Koha::Patron::Debarments::AddUniqueDebarment({
+                        borrowernumber => $patron_id,
+                        type           => 'OVERDUES',
+                        comment        => "Lainauskielto laskutetusta aineistosta",
+                    });
+                }
             }
 
             if ($body->{patronmessage}) {

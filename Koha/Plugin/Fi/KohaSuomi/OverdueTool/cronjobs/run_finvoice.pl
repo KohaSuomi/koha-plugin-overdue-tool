@@ -62,12 +62,14 @@ Usage: $0 OUTPUT_DIRECTORY
   --zip             Create zip from xml files
   --pretty          Create human readable xml files
   --noescape        Do not use method _escape_string with field ArticleName.
+  --testssn         Create test ssn for patrons
+  --test            Generate test files to test directory
 
 USAGE
     exit $_[0];
 }
 
-my ( $help, $config, $path, $validate, $xsd, $zip, $pretty, $noescape, $testssn );
+my ( $help, $config, $path, $validate, $xsd, $zip, $pretty, $noescape, $testssn, $test );
 
 GetOptions(
     'h|help'     => \$help,
@@ -79,6 +81,7 @@ GetOptions(
     'pretty'     => \$pretty,
     'noescape'   => \$noescape,
     'testssn'    => \$testssn,
+    'test'       => \$test,
 ) || usage(1);
 
 usage(0) if ($help);
@@ -123,6 +126,7 @@ exit unless $notices;
 
 my $tmppath = $output_directory ."/tmp/";
 my $archivepath = $output_directory.'/archived/';
+my $testpath = $test ? $output_directory ."/test/" : "";
 
 my @message_ids;
 foreach my $notice (@{$notices->unblessed}) {
@@ -136,14 +140,15 @@ foreach my $notice (@{$notices->unblessed}) {
         { message_id => $notice->{message_id}, status => 'failed', failure_code => "Finvoice template error, check the logs." } );
     } else {
         my $xmlFile = $notice->{from_address}.'_'.$notice->{message_id}."_".$today. ".xml";
+        my $write_path = $testpath ? $testpath : $tmppath;
         #Write xml to file
-        open(my $fh, '>', $tmppath.$xmlFile);
+        open(my $fh, '>', $write_path.$xmlFile);
         print $fh $doc->toString($pretty);
         close $fh;
         push @message_ids, $notice->{message_id};
     }
 }
-if (@message_ids) {
+if (@message_ids && !$test) {
 
     chdir $tmppath;
     my @files = <*.xml>;
@@ -155,7 +160,7 @@ if (@message_ids) {
             my $zipFile = $config."-kirjasto-finvoice-".$today. ".zip";
             foreach my $file (@files) {
                 $zipwrite->addFile( $file );
-        }
+            }
 
             unless ( $zipwrite->writeToFileNamed($tmppath . $zipFile) == AZ_OK ) {
                 die 'error creating zip-file';

@@ -199,6 +199,10 @@ if (@message_ids && !$test) {
             C4::Letters::_set_message_status({ message_id => $message_id, status => 'failed', failure_code => "Error while processing notices: $_" });
         }
     };
+} elsif (@message_ids && $test){
+    foreach my $message_id (@message_ids) {
+        C4::Letters::_set_message_status({ message_id => $message_id, status => 'failed', failure_code => "Test notice, do not sent these" });
+    }
 } else {
     print "Not any notices processed\n";
 }

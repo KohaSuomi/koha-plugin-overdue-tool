@@ -113,18 +113,15 @@ sub finvoice_to_html {
         }
     }
     my $borrower_name = $xml_doc->createElement('BuyerContactPersonName');
-    $borrower_name->appendText($patron->firstname . ' ' . $patron->surname . ' (' . $patron->cardnumber . ')');
+    $borrower_name->appendText($patron->firstname . ' ' . uc($patron->surname) . ' (' . $patron->cardnumber . ')');
     my $buyer_party_details = $xml_doc->findnodes('//BuyerPartyDetails')->[0];
     $buyer_party_details->appendChild($borrower_name) if $buyer_party_details;
 
     my $buyer_name = $xml_doc->findnodes('//BuyerPartyDetails/BuyerOrganisationName')->[0];
     if ($buyer_name) {
-        my $newname = $buyer_name->textContent;
         my $surname = $guarantor ? $guarantor->surname : $patron->surname;
-        if ($surname && $newname =~ /\b\Q$surname\E\b/i) {
-            # Capitalize the surname in the name string
-            $newname =~ s/\b\Q$surname\E\b/uc($surname)/ie;
-        }
+        my $firstname = $guarantor ? $guarantor->firstname : $patron->firstname;
+        my $newname = $firstname . ' ' . uc($surname);
         $buyer_name->removeChildNodes;
         $buyer_name->appendText($newname);
     }

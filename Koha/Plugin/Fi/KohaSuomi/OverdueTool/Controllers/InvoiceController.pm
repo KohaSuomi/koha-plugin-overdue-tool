@@ -247,7 +247,7 @@ sub invoice_copy {
         for my $notice (@$notices) {
             if (_find_related_checkouts($notice->{message_id}, $patron_id, $guarantor_id)) {
 
-                my $html = $notice->{message_transport_type} eq 'finvoice' ? finvoice_to_html($notice, $patron) : $notice->{content};
+                my $html = $notice->{message_transport_type} eq 'finvoice' ? finvoice_to_html($notice, $patron, $guarantor) : $notice->{content};
 
                 $html =~ s/\n/<br>/g if $notice->{message_transport_type} eq 'print'; # For e-invoice we need to replace newlines with <br> for proper formatting
                 push @$html_pages, {

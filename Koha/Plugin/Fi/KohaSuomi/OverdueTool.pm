@@ -16,15 +16,31 @@ our $VERSION = "2.1.0";
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {
-    name            => 'Laskutustyökalu',
     author          => 'Johanna Räisä',
     date_authored   => '2020-12-28',
     date_updated    => "2025-03-05",
     minimum_version => '21.11.00.000',
     maximum_version => undef,
     version         => $VERSION,
-    description     => 'Laskutustyökalu laskujen lähetykseen. (Paikalliskannat)',
 };
+
+sub get_localized_metadata {
+    my ($self) = @_;
+    my $lang = C4::Languages::getlanguage() || 'en';
+    my ($name, $description);
+
+    if ( $lang eq 'sv-SE' ) {
+        $name = "Faktureringverktyg";
+        $description = "Faktureringsverktyg för att skicka fakturor. (Lokala databaser)";
+    } elsif ( $lang eq 'fi-FI' ) {
+        $name = "Laskutustyökalu";
+        $description = "Laskutustyökalu laskujen lähetykseen. (Paikalliskannat)";
+    } else {
+        $name = "Invoicing tool";
+        $description = "Invoicing tool for sending invoices. (Local databases)";
+    }
+    return ($name, $description);
+}
 
 ## This is the minimum code required for a plugin's 'new' method
 ## More can be added, but none should be removed
@@ -39,6 +55,10 @@ sub new {
     ## This runs some additional magic and checking
     ## and returns our actual $self
     my $self = $class->SUPER::new($args);
+
+    my ($name, $description) = $self->get_localized_metadata();
+    $self->{'metadata'}->{'name'} = $name;
+    $self->{'metadata'}->{'description'} = $description;
 
     return $self;
 }

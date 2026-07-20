@@ -1,7 +1,12 @@
+[% TRY %]
+    [% PROCESS "$PLUGIN_DIR/i18n/${LANG}.inc" %]
+[% CATCH %]
+    [% PROCESS "$PLUGIN_DIR/i18n/default.inc" %]
+[% END %]
 <!DOCTYPE html>
 <html>
 	<head>
-	<title>Koha-Suomi - Laskutustyökalu</title>
+	<title>[% T.config_1 %]</title>
 	<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta name="description" content="">
@@ -23,11 +28,11 @@
 	<body>
 
 		<!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="main-breadcrumb">
+        <nav aria-label="[% T.config_2 %]" class="main-breadcrumb">
             <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/cgi-bin/koha/mainpage.pl">Etusivu</a></li>
-            <li class="breadcrumb-item"><a href="/cgi-bin/koha/plugins/plugins-home.pl">Liitännäiset</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Laskutustyökalu</li>
+            <li class="breadcrumb-item"><a href="/cgi-bin/koha/mainpage.pl">[% T.config_3 %]</a></li>
+            <li class="breadcrumb-item"><a href="/cgi-bin/koha/plugins/plugins-home.pl">[% T.tool_1 %]</a></li>
+            <li class="breadcrumb-item active" aria-current="page">[% T.config_5 %]</li>
             </ol>
         </nav>
         <!-- /Breadcrumb -->
@@ -36,30 +41,30 @@
 				<main role="main" class="ml-sm-auto pt-3 px-4">
 				<div id="viewApp">
 					<div class="alert alert-danger" role="alert" v-if="errors.length">
-						<b>Tapahtui virhe:</b>
+						<b>[% T.config_7 %]</b>
 						<ul class="text-danger">
 							<li v-for="error in errors">{{ error }}</li>
 						</ul>
 					</div>
 					<div class="alert alert-warning" role="alert" v-if="warnings.length">
-						<b>Huomioitavaa:</b>
+						<b>[% T.tool_2 %]</b>
 						<ul>
 							<li v-for="warning in warnings">{{ warning }}</li>
 						</ul>
 					</div>
 					<div class="alert alert-success fixed-top" role="alert" v-if="created">
-						<b>Luonti onnistui!</b>
-						<button type="button" class="close" @click="dismissCreated" aria-label="Close">
+						<b>[% T.tool_3 %]</b>
+						<button type="button" class="close" @click="dismissCreated" aria-label="[% T.tool_4 %]">
 							<span aria-hidden="true">&times;</span>
 						</button>
 					</div>
 					<div v-if="showPDF">
 						<ul class="nav nav-pills mb-3 mt-3 justify-content-center">
 							<li class="nav-item pr-2">
-								<button class="btn btn-default" v-on:click="back">Takaisin</button>
+								<button class="btn btn-default" v-on:click="back">[% T.tool_5 %]</button>
 							</li>
 							<li class="nav-item pr-2">
-								<button class="btn btn-success" v-on:click="printPDF">Tulosta</button>
+								<button class="btn btn-success" v-on:click="printPDF">[% T.tool_6 %]</button>
 							</li>
 						</ul>
 						<hr/>
@@ -90,11 +95,11 @@
 									</div>
 								</li>
 								<li class="nav-item pl-2">
-									<label for="invoiced" class="btn btn-default">Näytä laskutetut <input type="checkbox" id="invoiced" @change="changeInvoiced($event)" class="badgebox" ><span class="badge">&check;</span></label>
+									<label for="invoiced" class="btn btn-default">[% T.tool_7 %]<input type="checkbox" id="invoiced" @change="changeInvoiced($event)" class="badgebox" ><span class="badge">&check;</span></label>
 								</li>
 								<li class="nav-item pl-2">
 									<div class="row">
-										<label for="categorycode" class="col-sm-5 col-form-label">Asiakasryhmä</label>
+										<label for="categorycode" class="col-sm-5 col-form-label">[% T.tool_8 %]</label>
 										<div class="col-sm-6">
 											<select class="form-control bg-default" id="categorycode" @change="onCategoryChange($event)">
 												<option value=""></option>
@@ -105,37 +110,35 @@
 								</li>
 								<li class="nav-item pl-2">
 									<div class="form-group row">
-										<label for="formControlRange" class="col-sm-6 col-form-label pr-1">Minimi summa: <span id="rangeval">{{sumFilter}}</span>€</label>
+										<label for="formControlRange" class="col-sm-6 col-form-label pr-1">[% T.tool_9 %]<span id="rangeval">{{sumFilter}}</span>€</label>
 										<input type="range" @change="filterResults($event)" min="0" max="100" step="5" :value="sumFilter" class="form-control-range col-sm-5" id="formControlRange" onInput="$('#rangeval').html($(this).val())">
 									</div>
 								</li>
 								<li v-if="results.length" :class="{'d-none': showLoader }" class="nav-item pl-2">
 									<div class="form-group row">
-										<button v-if="!invoiced && invoiceType == 'FINVOICE' && !errors.length && !created"class="btn btn-info" v-on:click="allFinvoices" :disabled='disableButton'><i v-if="finvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo Finvoice:t</span></button>
-										<button v-if="!invoiced && invoiceType == 'EINVOICE' && !errors.length && !created"class="btn btn-info" v-on:click="allEinvoices" :disabled='einvoiceBtn'><i v-if="einvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo e-laskut</span></button>
-										<button v-if="!invoiced && invoiceType == 'ODUECLAIM' && !errors.length && !created"class="btn btn-info" :disabled='pdfBtn' v-on:click="allPDFs(false)"><i v-if="pdfBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Luo PDF:t</span></button>
-										<button v-if="invoiced || created" class="btn btn-info ml-1" :disabled='copyBtn' v-on:click="allCopies()"><i v-if="copyBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>Jäljennökset</span></button>
+										<button v-if="!invoiced && invoiceType == 'FINVOICE' && !errors.length && !created"class="btn btn-info" v-on:click="allFinvoices" :disabled='disableButton'><i v-if="finvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>[% T.tool_10 %]</span></button>
+										<button v-if="!invoiced && invoiceType == 'EINVOICE' && !errors.length && !created"class="btn btn-info" v-on:click="allEinvoices" :disabled='einvoiceBtn'><i v-if="einvoiceBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>[% T.tool_11 %]</span></button>
+										<button v-if="!invoiced && invoiceType == 'ODUECLAIM' && !errors.length && !created"class="btn btn-info" :disabled='pdfBtn' v-on:click="allPDFs(false)"><i v-if="pdfBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>[% T.tool_12 %]</span></button>
+										<button v-if="invoiced || created" class="btn btn-info ml-1" :disabled='copyBtn' v-on:click="allCopies()"><i v-if="copyBtn" class="fas fa-circle-notch fa-spin"></i><span v-else>[% T.tool_13 %]</span></button>
 									</div>
 								</li>
 							</ul>
 						</div>
 						<div>
-						<div :class="{'d-none': showLoader }" v-if="!results.length" class="alert alert-warning" role="alert">
-							Aikavälillä ei ole laskutettavia lainoja!
-						</div>
+						<div :class="{'d-none': showLoader }" v-if="!results.length" class="alert alert-warning" role="alert">[% T.tool_14 %]</div>
 						<div v-else>
 							<div>
 							<ul style="list-style: none;">
-								<li><b> Tuloksia: {{totalResults}} </b></li>
+								<li><b> [% T.tool_15 %] {{totalResults}} </b></li>
 								<li v-if="invoiced">Laskutettuja niteitä yhteensä: {{totalItems}} </li>
 								<li v-if="invoiced">Laskutettujen niteiden yhteissumma: {{totalSum}} euroa</li>
 							</ul>
 							</div>
 							<div class="row d-table w-100 p-3 border-bottom" style="table-layout:fixed;">
 								<ul class="list-inline d-table-row font-weight-bold">
-									<li class="list-inline-item d-table-cell">Lainaaja</li>
-									<li class="list-inline-item d-table-cell">Takaaja</li>
-									<li class="list-inline-item d-table-cell">Toiminnot</li>
+									<li class="list-inline-item d-table-cell">[% T.tool_19 %]</li>
+									<li class="list-inline-item d-table-cell">[% T.tool_20 %]</li>
+									<li class="list-inline-item d-table-cell">[% T.tool_21 %]</li>
 								</ul>
 							</div>
 							<div is="result-list"
@@ -162,13 +165,11 @@
 				<div class="modal-dialog" role="document">
 					<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Lataa sivu uudelleen</h5>
+						<h5 class="modal-title" id="exampleModalLabel">[% T.tool_22 %]</h5>
 					</div>
-					<div class="modal-body">
-						Laskutustyökalu on päivittynyt, lataa sivu uudelleen.
-					</div>	
+					<div class="modal-body">[% T.tool_23 %]</div>	
 					<div class="modal-footer">
-						<button type="button" class="btn btn-primary" onclick="location.reload(true);" >Lataa</button>
+						<button type="button" class="btn btn-primary" onclick="location.reload(true);" >[% T.tool_24 %]</button>
 					</div>
 					</div>
 				</div>
@@ -178,7 +179,7 @@
 			<div>
 				<div class="row d-table w-100 p-3" style="table-layout:fixed;" :class="{'odd-cell': index % 2 !== 0 }">
 					<span v-if="patronErrors.length" class="text-danger">
-						Asiakastiedoissa puutteita: {{ patronErrors.join(', ') }}
+						[% T.tool_25 %] {{ patronErrors.join(', ') }}
 					</span>
 					<ul class="list-inline w-100 d-table-row">
 						<li class="list-inline-item d-table-cell">
@@ -193,23 +194,23 @@
 							<button class="btn btn-info" v-on:click="activate"><i class='fas fa-angle-down' :class="{'fa-angle-up': isActive}" style='font-size:24px'></i></button>
 							<span v-if="!invoiced">
 								<button class="btn btn-success" v-on:click="create();" :disabled="disableButton">
-									Luo {{ invoiceType == 'FINVOICE' ? 'Finvoice' : invoiceType == 'EINVOICE' ? 'e-lasku' : 'pdf-lasku' }}
+									[% T.tool_26 %] {{ invoiceType == 'FINVOICE' ? 'Finvoice' : invoiceType == 'EINVOICE' ? 'e-lasku' : 'pdf-lasku' }}
 								</button>
 							</span>
-							<button v-if="(!invoiced && !disableButton) || patronErrors.length" class="btn btn-success" v-on:click="previewPDF(true, true)">Esikatselu</button>
-							<button v-else class="btn btn-success" v-on:click="invoiceCopy()">Jäljennös</button>
+							<button v-if="(!invoiced && !disableButton) || patronErrors.length" class="btn btn-success" v-on:click="previewPDF(true, true)">[% T.tool_27 %]</button>
+							<button v-else class="btn btn-success" v-on:click="invoiceCopy()">[% T.tool_28 %]</button>
 						</li>
 					</ul>
 				</div>
 				<div class="row d-none w-100 p-3" :class="{'d-table': isActive, 'odd-cell': index % 2 !== 0 }">
 					<ul class="list-inline d-table-row font-weight-bold">
 						<li class="list-inline-item d-table-cell"></li>
-						<li class="list-inline-item d-table-cell">Laskuta</li>
-						<li class="list-inline-item d-table-cell">Eräpäivä</li>
-						<li class="list-inline-item d-table-cell">Nidenumero</li>
-						<li class="list-inline-item d-table-cell">Nidetyyppi</li>
-						<li class="list-inline-item d-table-cell">Korvaushinta</li>
-						<li class="list-inline-item d-table-cell">Nimeke</li>
+						<li class="list-inline-item d-table-cell">[% T.tool_29 %]</li>
+						<li class="list-inline-item d-table-cell">[% T.tool_30 %]</li>
+						<li class="list-inline-item d-table-cell">[% T.tool_31 %]</li>
+						<li class="list-inline-item d-table-cell">[% T.tool_32 %]</li>
+						<li class="list-inline-item d-table-cell">[% T.tool_33 %]</li>
+						<li class="list-inline-item d-table-cell">[% T.tool_34 %]</li>
 					</ul>
 					<ul class="list-inline w-100 d-table-row" v-for="(checkout, index) in result.checkouts" :key="checkout.itemnumber">
 						<li class="list-inline-item d-table-cell">{{index + 1}}</li>

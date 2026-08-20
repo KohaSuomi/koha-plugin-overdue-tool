@@ -8,6 +8,7 @@ use base qw(Koha::Plugins::Base);
 
 ## We will also need to include any Koha libraries we want to access
 use C4::Context;
+use Koha::DateUtils qw( dt_from_string );
 use utf8;
 use JSON;
 
@@ -145,6 +146,69 @@ sub api_namespace {
     my ( $self ) = @_;
     
     return 'kohasuomi';
+}
+
+sub after_circ_action {
+    my ( $self, $params ) = @_;
+
+    # Only run on checkin actions, ignore checkouts and other actions
+    return unless $params->{action} eq 'checkin';
+
+    my $checkout = $params->{payload}->{checkout};
+    my $borrowernumber = $checkout->borrowernumber;
+    my $itemnumber = $checkout->itemnumber;
+
+    # The notforloan value that indicates an item has been invoiced
+    my $invoicedstatus = $self->retrieve_data('invoicenotforloan') || 6;
+
+    my $dbh = C4::Context->dbh;
+
+    # 1) Check if the returned item is invoiced (notforloan matches configured value).
+    #    If not, this plugin has nothing to do.
+    my $sth_item = $dbh->prepare("SELECT notforloan FROM items WHERE itemnumber = ?");
+    $sth_item->execute($itemnumber);
+    my ($notforloan) = $sth_item->fetchrow_array();
+    return unless defined $notforloan && $notforloan == $invoicedstatus;
+
+    # 2) Check if the patron has a debarment created by this plugin
+    #    (type OVERDUES with the Finnish comment for invoiced material).
+    #    If no matching debarment exists, nothing to remove.
+    my $sth_debarment = $dbh->prepare(
+        "SELECT borrower_debarment_id FROM borrower_debarments WHERE borrowernumber = ? AND type = 'OVERDUES' AND comment = 'Lainauskielto laskutetusta aineistosta'"
+    );
+    $sth_debarment->execute($borrowernumber);
+    my ($debarment_id) = $sth_debarment->fetchrow_array();
+    return unless $debarment_id;
+
+    # 3) Check if the patron still has any overdue loans.
+    #    If yes, keep the debarment — it serves a purpose.
+    my $sth_overdue = $dbh->prepare(
+        "SELECT 1 FROM issues JOIN items ON issues.itemnumber = items.itemnumber WHERE issues.borrowernumber = ? AND issues.date_due < NOW() LIMIT 1"
+    );
+    $sth_overdue->execute($borrowernumber);
+    return if $sth_overdue->fetchrow_array();
+
+    # 4) Check if the patron still has other invoiced items checked out.
+    #    If yes, keep the debarment — those items may also need invoicing.
+    my $sth_invoiced = $dbh->prepare(
+        "SELECT 1 FROM issues JOIN items ON issues.itemnumber = items.itemnumber WHERE issues.borrowernumber = ? AND items.notforloan = ? LIMIT 1"
+    );
+    $sth_invoiced->execute($borrowernumber, $invoicedstatus);
+    return if $sth_invoiced->fetchrow_array();
+
+    # 5) All conditions met: remove all matching debarments for this patron.
+    my $sth_delete = $dbh->prepare(
+        "DELETE FROM borrower_debarments WHERE borrowernumber = ? AND type = 'OVERDUES' AND comment = 'Lainauskielto laskutetusta aineistosta'"
+    );
+    $sth_delete->execute($borrowernumber);
+
+    # 6) Clear the debarred fields on the borrower record.
+    my $sth_update = $dbh->prepare(
+        "UPDATE borrowers SET debarred = NULL, debarredcomment = NULL WHERE borrowernumber = ? AND debarred IS NOT NULL"
+    );
+    $sth_update->execute($borrowernumber);
+
+    return 1;
 }
 
 sub table_inserts {

@@ -58,6 +58,17 @@ sub process_xml {
     # $name->removeChildNodes;
     # $name->appendText($newname); 
 
+    my $seller_name_node = $doc->findnodes("Finvoice/SellerPartyDetails/SellerOrganisationName")->[0];
+    if ($seller_name_node) {
+        my $seller_name = $seller_name_node->textContent;
+        $seller_name =~ s/\s*\(.*$//;
+        if (length($seller_name) > 35) {
+            $seller_name = substr($seller_name, 0, 35);
+        }
+        $seller_name_node->removeChildNodes;
+        $seller_name_node->appendText($seller_name);
+    }
+
     for my $invoicerow ($doc->findnodes("Finvoice/InvoiceRow")) {
         my ($row) = $invoicerow->findnodes('ArticleName');
         my $newvalue = !$noescape ? _escape_string($row->textContent) : $row->textContent;

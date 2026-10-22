@@ -330,7 +330,7 @@
                 ],
                 "description": "GENRE (MARC21 952$G)"
               },
-              "sub_location": {
+              "sublocation": {
                 "type": [
                   "string",
                   "null"

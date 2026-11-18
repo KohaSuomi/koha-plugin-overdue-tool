@@ -31,7 +31,7 @@ sub get_localized_metadata {
     my ($name, $description);
 
     if ( $lang eq 'sv-SE' ) {
-        $name = "Faktureringverktyg";
+        $name = "Faktureringsverktyg";
         $description = "Faktureringsverktyg för att skicka fakturor. (Lokala databaser)";
     } elsif ( $lang eq 'fi-FI' ) {
         $name = "Laskutustyökalu";
